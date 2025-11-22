@@ -27,7 +27,7 @@ export const ProjectAnalysisSchema = z.object({
     devServer: z
       .object({
         url: z.string().nullable(),
-        port: z.number().nullable(),
+        port: z.union([z.number(), z.string()]).nullable(),
       })
       .optional()
       .nullable(),

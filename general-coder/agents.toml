@@ -1,8 +1,8 @@
 [package]
-name = "@terrazul/general-coder"
-version = "1.0.0"
+name = "@leourbina/general-coder"
+version = "1.0.3"
 description = "A comprehensive AI coding assistant package that provides deep codebase understanding, TDD workflow enforcement, and intelligent debugging support"
-homepage = "https://github.com/terrazul/packages"
+homepage = "https://github.com/terrazul-ai/tz-packages"
 license = "MIT"
 keywords = ["coding", "tdd", "debugging", "architecture", "code-review"]
 authors = ["Terrazul Team"]
@@ -15,7 +15,6 @@ template = "templates/CLAUDE.md.hbs"
 promptsDir = "templates/prompts"
 subagentsDir = "templates/claude/agents"
 commandsDir = "templates/claude/commands"
-
 
 [metadata]
 tz_spec_version = 1
