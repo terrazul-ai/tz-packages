@@ -1,0 +1,31 @@
+# Terrazul CLI directories
+.terrazul/
+agent_modules/
+.tz-backup/
+
+# Cache and state files
+agents-cache.toml
+agents-lock.toml
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Build artifacts
+dist/
+build/

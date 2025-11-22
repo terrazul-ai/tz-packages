@@ -1,0 +1,348 @@
+{{~ var project_name = askUser('What is the name of this project?') ~}}
+{{~ var github_url = askUser('Where is the project code hosted? (GitHub/GitLab URL)', { placeholder: 'https://github.com/owner/repo' }) ~}}
+{{~ var coverage = askUser('What should be the minimum test coverage % to aim for?', { default: '80' }) ~}}
+
+{{~ var project_analysis = askAgent('templates/prompts/analyze-project.txt', { json: true, schema: { file: 'schemas/analyze-project.mjs' } }) ~}}
+
+# {{ vars.project_name }} - Development Context
+
+This file provides comprehensive context about the {{ vars.project_name }} project for Claude Code.
+
+## Core Principles
+
+- **Incremental progress over big bangs** - Small changes that compile and pass tests
+- **Learning from existing code** - Study patterns before implementing
+- **Pragmatic over dogmatic** - Adapt to project reality
+- **Clear intent over clever code** - Be boring and obvious
+- **TDD when it matters** - Tests for features and bug fixes, flexible for trivial changes
+
+## General Instructions
+
+- Do not let yourself get lost. If you've tried fixing an issue more than *3* times without success, stop. Either ask for help or break down the task into smaller steps.
+- Do not be overly agreeable. Think critically about requests and suggest alternatives if there's a better way.
+- The future is _NOW_. *ALWAYS* create fully fleshed implementations, not placeholder code.
+- Always double-check your work by building and testing after completion.
+
+## Coding Standards
+
+### Code Quality
+
+- **Comments**: Add sparingly, focus on _why_ not _what_. Only comment complex logic or non-obvious decisions.
+- **Naming**: Use descriptive variable and function names that make code self-documenting.
+- **Functions**: Keep short (<60 lines ideally, <100 lines max). Break down complex logic into smaller functions.
+- **Side effects**: Avoid when possible. Isolate side effects (HTTP, DB calls) from business logic.
+- **Collections**: Prefer collection-based operations. For singletons, wrap in collections.
+- **Modules**: Organize code into logical modules by domain/feature.
+- **Data models**: Core models in shared module, domain-specific models in their domains.
+
+### Error Handling
+
+- Fail fast with descriptive messages
+- Include context for debugging
+- Never silently swallow exceptions
+- Handle errors at the appropriate abstraction level
+
+## Test-Driven Development (TDD)
+
+### TDD Workflow (Pragmatic Approach)
+
+**IMPORTANT**: Use TDD for all feature additions and bug fixes. For trivial changes (typos, formatting, simple refactors), use judgment.
+
+1. **Understand** - Study existing patterns in the codebase
+2. **Test First** - Write thorough tests for the functionality (RED)
+3. **Implement** - Write minimal code to pass the tests (GREEN)
+4. **Retest** - Run tests again to verify they pass
+5. **Refactor** - Clean up code while keeping tests green
+
+Continue this cycle until all tests pass and code is clean. You may use the
+
+### Testing Best Practices
+
+- **Test harnesses**: Share fixtures and setup between tests
+- **Mocking**: Mock 3rd party API calls only. Prefer real implementations for your own code
+- **Testcontainers**: Use containerized dependencies (DBs, caches) over mocks when possible
+- **Never skip tests**: If a test fails, fix it. If it's flaky, fix or discuss with team before deleting
+- **Coverage target**: Aim for {{vars.coverage}}% minimum coverage
+- **Test types**:
+  - Unit tests: >{{vars.coverage}}% coverage
+  - Integration tests: Full request flow validation
+  - E2E tests: Critical user journeys
+
+## Technology Stack
+
+{{#if vars.project_analysis.techStack}}
+### Languages
+{{#each vars.project_analysis.techStack.languages}}
+- {{this}}
+{{/each}}
+
+{{#if vars.project_analysis.techStack.frameworks.length}}
+### Frameworks & Libraries
+{{#each vars.project_analysis.techStack.frameworks}}
+- {{this}}
+{{/each}}
+{{/if}}
+
+### Tools
+- **Package Manager**: {{vars.project_analysis.techStack.packageManager}}
+{{#if vars.project_analysis.techStack.buildTools.length}}
+- **Build Tools**: {{#each vars.project_analysis.techStack.buildTools}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+{{#if vars.project_analysis.techStack.testFrameworks.length}}
+- **Testing**: {{#each vars.project_analysis.techStack.testFrameworks}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+{{#if vars.project_analysis.techStack.databases.length}}
+- **Databases**: {{#each vars.project_analysis.techStack.databases}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+{{#if vars.project_analysis.techStack.infrastructure.length}}
+- **Infrastructure**: {{#each vars.project_analysis.techStack.infrastructure}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{/if}}
+{{/if}}
+
+## Local Development
+
+{{#if vars.project_analysis.buildSystem.runCommands}}
+### Running the Project
+
+{{#each vars.project_analysis.buildSystem.runCommands}}
+```bash
+{{this}}
+```
+{{/each}}
+
+{{#if vars.project_analysis.buildSystem.devServer}}
+**Development Server**: {{vars.project_analysis.buildSystem.devServer.url}}
+{{/if}}
+{{/if}}
+
+{{#if vars.project_analysis.buildSystem.buildCommands}}
+### Building the Project
+
+{{#each vars.project_analysis.buildSystem.buildCommands}}
+```bash
+{{this}}
+```
+{{/each}}
+{{/if}}
+
+{{#if vars.project_analysis.buildSystem.testCommands}}
+### Running Tests
+
+{{#each vars.project_analysis.buildSystem.testCommands}}
+```bash
+{{this}}
+```
+{{/each}}
+
+**IMPORTANT**: Always run tests after making changes. Use the pre-commit hook to ensure tests pass before committing.
+{{/if}}
+
+{{#if vars.project_analysis.buildSystem.lintCommands}}
+### Linting and Formatting
+
+{{#each vars.project_analysis.buildSystem.lintCommands}}
+```bash
+{{this}}
+```
+{{/each}}
+{{/if}}
+
+{{#if vars.project_analysis.buildSystem.otherCommands}}
+### Other Useful Commands
+
+{{#each vars.project_analysis.buildSystem.otherCommands}}
+- **{{@key}}**: `{{this}}`
+{{/each}}
+{{/if}}
+
+{{#if vars.project_analysis.buildSystem.notes}}
+### Important Notes
+
+{{vars.project_analysis.buildSystem.notes}}
+{{/if}}
+
+## Debugging and Troubleshooting
+
+{{#if vars.project_analysis.debuggingTools}}
+{{#if vars.project_analysis.debuggingTools.debuggerConfig.available}}
+### Debugger Setup
+
+{{vars.project_analysis.debuggingTools.debuggerConfig.instructions}}
+{{/if}}
+
+{{#if vars.project_analysis.debuggingTools.logging}}
+### Logging
+
+- **Library**: {{vars.project_analysis.debuggingTools.logging.library}}
+- **Levels**: {{#each vars.project_analysis.debuggingTools.logging.levels}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{#if vars.project_analysis.debuggingTools.logging.location}}
+- **Location**: {{vars.project_analysis.debuggingTools.logging.location}}
+{{/if}}
+{{/if}}
+
+{{#if vars.project_analysis.debuggingTools.errorTracking.configured}}
+### Error Tracking
+
+This project uses **{{vars.project_analysis.debuggingTools.errorTracking.service}}** for error tracking and monitoring.
+{{/if}}
+
+{{#if vars.project_analysis.debuggingTools.profiling.available}}
+### Performance Profiling
+
+Available profiling tools:
+{{#each vars.project_analysis.debuggingTools.profiling.tools}}
+- {{this}}
+{{/each}}
+{{/if}}
+
+{{#if vars.project_analysis.debuggingTools.tips.length}}
+### Debugging Tips
+
+{{#each vars.project_analysis.debuggingTools.tips}}
+- {{this}}
+{{/each}}
+{{/if}}
+
+{{#if vars.project_analysis.debuggingTools.commonIssues.length}}
+### Common Issues
+
+{{#each vars.project_analysis.debuggingTools.commonIssues}}
+- {{this}}
+{{/each}}
+{{/if}}
+{{/if}}
+
+## Project Structure
+
+{{{vars.project_analysis.projectStructure}}}
+
+## Task Management
+
+### Using Todo Lists
+
+*ALWAYS* create a tasklist for multi-step work. Update tasks regularly as you complete them.
+
+Use the TodoWrite tool to:
+- Break down complex tasks into smaller steps
+- Track progress across sessions
+- Ensure nothing is forgotten
+
+### When Stuck (After 3 Attempts)
+
+**CRITICAL**: Maximum 3 attempts per issue, then STOP.
+
+1. **Document what failed**: What you tried, specific errors, why it failed
+2. **Research alternatives**: Find 2-3 similar implementations, note different approaches
+3. **Question fundamentals**: Is this the right abstraction? Can it be split? Is there a simpler approach?
+4. **Try different angle**: Different library? Different pattern? Less abstraction?
+
+## MCP Server Integration
+
+### context7
+
+Use the context7 MCP server to fetch up-to-date library documentation:
+
+```
+When you need documentation for a library, use:
+mcp__context7__resolve-library-id
+mcp__context7__get-library-docs
+```
+
+**Always prefer context7 over web search for library documentation.**
+
+### exa
+
+Use the exa MCP server for web research and finding code examples:
+
+```
+When you need to research approaches, patterns, or examples, use exa to search the web.
+```
+
+### GitHub (Optional)
+
+If configured, use the GitHub MCP server for:
+- Fetching PR information
+- Reading issue details
+- Analyzing repository structure
+
+## Project Specifics
+
+### Repository
+{{vars.github_url}}
+
+### Conventions and Patterns
+
+Study the existing codebase to identify:
+- Naming conventions (files, functions, variables)
+- Code organization patterns (feature-based, layer-based, etc.)
+- Error handling patterns
+- Testing patterns
+- Documentation patterns
+
+**Always follow existing patterns** unless there's a compelling reason to change them.
+
+### Memory Files
+
+Load technology-specific best practices from the `memories/` directory if it exists.
+
+{{#if (exists 'memories/')}}
+Relevant memory files:
+{{{ askAgent("""List all files under the 'memories/' directory by '@'-mentioning each one. If the directory doesn't exist, return 'No memory files found.'""") }}}
+{{/if}}
+
+## Git Workflow
+
+### Commits
+
+- Commit working code incrementally
+- Write clear commit messages explaining "why"
+- Ensure tests pass before committing (pre-commit hook enforces this)
+- Never use `--no-verify` to bypass hooks
+
+### Pull Requests
+
+When creating PRs:
+- Include clear description of changes
+- Reference related issues
+- Ensure CI passes
+- Request review from appropriate team members
+
+## Decision Framework
+
+When multiple valid approaches exist, choose based on:
+
+1. **Testability** - Can I easily test this?
+2. **Readability** - Will someone understand this in 6 months?
+3. **Consistency** - Does this match project patterns?
+4. **Simplicity** - Is this the simplest solution that works?
+5. **Reversibility** - How hard to change later?
+
+## Definition of Done
+
+Before marking work complete:
+
+- [ ] Tests written and passing ({{vars.coverage}}% coverage minimum)
+- [ ] Code follows project conventions
+- [ ] No linter/formatter warnings
+- [ ] Commit messages are clear
+- [ ] Implementation matches plan
+- [ ] Documentation updated if needed
+- [ ] No TODOs without issue numbers
+
+## Important Reminders
+
+**NEVER**:
+- Use `--no-verify` to bypass commit hooks
+- Disable or skip tests instead of fixing them
+- Commit code that doesn't compile
+- Make assumptions - verify with existing code
+- Use clever tricks - prefer boring, obvious solutions
+
+**ALWAYS**:
+- Commit working code incrementally
+- Update task documentation as you go
+- Learn from existing implementations
+- Stop after 3 failed attempts and reassess
+- Use TDD for features and bug fixes
+- Run tests before committing
+- Ask clarifying questions when uncertain

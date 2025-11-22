@@ -1,0 +1,342 @@
+# @terrazul/general-coder - Package Help
+
+Welcome to the **@terrazul/general-coder** package! This package provides a comprehensive AI coding assistant experience for Claude Code with deep codebase understanding, pragmatic TDD workflow enforcement, and intelligent debugging support.
+
+---
+
+## 📋 Quick Overview
+
+This package includes:
+- **Dynamic context generation** that analyzes your codebase automatically
+- **4 specialized agents** for different development tasks
+- **4 custom commands** for common workflows
+- **Automated hooks** for testing and linting
+- **MCP server integration** (context7, exa, github)
+- **Pragmatic TDD workflow** enforcement
+
+---
+
+## 🤖 Available Agents
+
+### 1. **test-driven-developer** (Green)
+**Purpose**: Enforces TDD workflow for all feature development and bug fixes
+
+**When to use**:
+- Adding new features
+- Fixing bugs
+- Writing tests for existing code
+
+**Key capabilities**:
+- Writes tests before implementation (RED → GREEN → REFACTOR)
+- Ensures {{coverage}}% test coverage
+- Fixes failing tests systematically
+- Prefers testcontainers over mocks
+
+**Switch to this agent**: When you need to add functionality with comprehensive test coverage
+
+---
+
+### 2. **code-reviewer** (Purple)
+**Purpose**: Performs thorough code reviews for quality, security, and best practices
+
+**When to use**:
+- Reviewing your own code before committing
+- Reviewing PRs
+- Getting feedback on code quality
+- Checking for security vulnerabilities
+
+**Key capabilities**:
+- Reviews for code quality, readability, structure
+- Identifies security issues (SQL injection, XSS, etc.)
+- Checks test coverage and quality
+- Provides prioritized, actionable feedback
+- Read-only (no code modifications)
+
+**Switch to this agent**: When you need a fresh pair of eyes on code changes
+
+---
+
+### 3. **debugger** (Red)
+**Purpose**: Diagnoses errors, analyzes test failures, and troubleshoots issues
+
+**When to use**:
+- Tests are failing
+- Getting runtime errors
+- Need to troubleshoot production issues
+- Performance problems
+
+**Key capabilities**:
+- Analyzes stack traces and error messages
+- Systematic debugging process (gather, reproduce, analyze, fix)
+- Deep-dives into test failures
+- Uses IDE diagnostics for additional context
+- Suggests fixes with explanations
+
+**Switch to this agent**: When you're stuck on an error or test failure
+
+---
+
+### 4. **architect** (Cyan)
+**Purpose**: Assists with design decisions and architectural planning
+
+**When to use**:
+- Planning new features
+- Making architectural decisions
+- Writing technical specifications
+- Evaluating different approaches
+
+**Key capabilities**:
+- Reviews design decisions and trade-offs
+- Writes detailed technical specifications
+- Suggests architectural patterns
+- Evaluates alternatives objectively
+- Read-only (focuses on planning, not implementation)
+
+**Switch to this agent**: Before implementing complex features
+
+---
+
+## 📝 Available Commands
+
+### `/analyze-codebase`
+**Description**: Performs a comprehensive analysis of your codebase
+
+**What it does**:
+- Analyzes project structure and organization
+- Identifies technology stack and dependencies
+- Maps out key components and patterns
+- Highlights potential issues or technical debt
+- Provides recommendations
+
+**When to use**:
+- First time in a new codebase
+- After major refactoring
+- When documenting the project
+
+**Example**:
+```
+/analyze-codebase
+```
+
+---
+
+### `/run-tests`
+**Description**: Runs the project's test suite and analyzes failures
+
+**What it does**:
+- Identifies and runs the test command
+- Reports pass/fail summary
+- Analyzes failing tests with root cause analysis
+- Suggests fixes for failures
+- Checks test coverage if available
+
+**When to use**:
+- After making code changes
+- Before committing
+- When debugging test failures
+
+**Example**:
+```
+/run-tests
+```
+
+---
+
+### `/debug [error|file]`
+**Description**: Debug an error or issue systematically
+
+**What it does**:
+- Analyzes error messages and stack traces
+- Checks IDE diagnostics
+- Reproduces the issue if possible
+- Identifies root cause
+- Suggests concrete fixes with explanations
+- Recommends tests to prevent regression
+
+**When to use**:
+- When you get an error message
+- When tests are failing unexpectedly
+- When troubleshooting production issues
+
+**Examples**:
+```
+/debug "TypeError: Cannot read property 'foo' of undefined"
+/debug src/components/Button.tsx
+/debug
+```
+
+---
+
+### `/review [file|PR]`
+**Description**: Review code changes for quality and best practices
+
+**What it does**:
+- Reviews specific files or PRs
+- Checks code quality, functionality, tests, security
+- Identifies issues by priority (Critical → Low)
+- Provides specific, actionable feedback
+- Suggests improvements with code examples
+
+**When to use**:
+- Before submitting a PR
+- Reviewing teammate's code
+- Self-review before commit
+- Security audit
+
+**Examples**:
+```
+/review src/utils/helper.ts
+/review https://github.com/owner/repo/pull/123
+/review
+```
+
+---
+
+## 🔧 Automated Features
+
+### Hooks
+
+This package configures automated hooks in your Claude Code settings:
+
+1. **Post-Edit Hook**: Automatically runs linter after file edits
+2. **Pre-Commit Hook**: Runs tests when you mention "commit" or "push"
+
+These hooks help maintain code quality automatically!
+
+---
+
+## 🌐 MCP Servers
+
+### context7 (Required)
+**Purpose**: Fetch up-to-date library documentation
+
+**When to use**:
+- Need documentation for a library
+- Want to understand best practices
+- Looking for API references
+
+**How to use**:
+```
+"Can you look up the documentation for React hooks using context7?"
+```
+
+### exa (Required)
+**Purpose**: Web research and finding code examples
+
+**When to use**:
+- Need code examples
+- Research implementation patterns
+- Find solutions to problems
+
+**How to use**:
+```
+"Use exa to search for examples of implementing authentication with JWT"
+```
+
+### github (Optional)
+**Purpose**: GitHub integration for PRs and issues
+
+**When to use**:
+- Fetching PR details
+- Reading issues
+- Analyzing repository info
+
+---
+
+## 🎯 Typical Workflows
+
+### Adding a New Feature
+1. Switch to **architect** agent → Plan the feature
+2. Switch to **test-driven-developer** agent → Implement with TDD
+3. Run `/run-tests` → Verify all tests pass
+4. Run `/review` → Self-review your changes
+5. Commit (hooks will run tests automatically)
+
+### Debugging an Issue
+1. Run `/debug [error message]` → Get initial analysis
+2. Switch to **debugger** agent if more investigation needed
+3. Implement fix
+4. Run `/run-tests` → Verify fix works
+
+### Code Review
+1. Run `/review [file or PR URL]` → Get automated review
+2. Switch to **code-reviewer** agent for deeper analysis
+3. Address feedback
+4. Re-review until satisfied
+
+### Understanding a Codebase
+1. Run `/analyze-codebase` → Get comprehensive overview
+2. Read the generated context in `CLAUDE.md`
+3. Use **architect** agent to understand design decisions
+
+---
+
+## 💡 Best Practices
+
+### TDD Workflow
+- **Always** write tests for features and bug fixes
+- Use testcontainers for integration tests
+- Mock only third-party services
+- Aim for {{coverage}}% test coverage
+
+### When Stuck
+- Try max 3 times, then STOP and ask for help
+- Document what you tried
+- Break down the task into smaller steps
+
+### Code Quality
+- Keep functions short (<60 lines)
+- Use descriptive names
+- Add comments only for "why", not "what"
+- Follow existing patterns in the codebase
+
+---
+
+## 📚 Additional Resources
+
+- **Project Context**: See `@CLAUDE.md` for project-specific information
+- **README**: Check the package README for installation and setup
+- **Agents**: Switch agents based on your current task
+- **Commands**: Use commands for quick, focused tasks
+
+---
+
+## 🆘 Troubleshooting
+
+### MCP Servers Not Working
+```bash
+# Check configuration
+cat ~/.claude/mcp_servers.json
+
+# Restart Claude Code
+```
+
+### Agents Not Available
+```bash
+# Re-apply the package
+tz apply --force
+
+# Check symlinks
+ls -la .claude/agents
+```
+
+### Stale Cache
+```bash
+# Clear cache and regenerate
+rm agents-cache.toml
+tz apply --no-cache
+```
+
+---
+
+## 🎓 Pro Tips
+
+1. **Use the right agent for the task**: Don't use debugger for planning, or architect for implementation
+2. **Leverage commands for quick tasks**: Commands are faster for focused operations
+3. **Trust the hooks**: They ensure tests run and code is linted automatically
+4. **Use context7 first**: Before web searching, check if context7 has the docs
+5. **TDD is pragmatic**: Write tests for features/bugs, but use judgment for trivial changes
+
+---
+
+Need more help? Check the README or ask me directly about specific features!

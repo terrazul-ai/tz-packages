@@ -1,0 +1,49 @@
+Review code changes for quality, best practices, and potential issues.
+
+Usage: `/review [file path or PR URL]`
+
+Steps:
+1. **Understand What to Review**:
+   - If file path: Review the specific file
+   - If PR URL: Use GitHub MCP to fetch PR details and changes
+   - If no argument: Review recent git changes (git diff)
+
+2. **Gather Context**:
+   - Read the code being reviewed
+   - Understand the purpose and requirements
+   - Check related files and dependencies
+   - Review any associated tests
+
+3. **Perform Review** (using code-reviewer agent approach):
+   - **Code Quality**: Readability, naming, structure, complexity
+   - **Functionality**: Correctness, edge cases, error handling
+   - **Tests**: Coverage, quality, meaningfulness
+   - **Security**: Vulnerabilities, input validation, auth/authz
+   - **Performance**: Efficiency, potential bottlenecks
+   - **Best Practices**: Follows project conventions and patterns
+
+4. **Check for Common Issues**:
+   - SQL injection, XSS, command injection
+   - Hardcoded secrets or sensitive data
+   - Memory leaks or performance issues
+   - Missing error handling
+   - Insufficient test coverage
+   - Code duplication
+
+5. **Provide Feedback**:
+   - Prioritize issues (Critical > High > Medium > Low)
+   - Be specific with file:line references
+   - Suggest concrete improvements
+   - Provide code examples
+   - Acknowledge good code too
+
+Provide a structured review report:
+- **Summary**: High-level overview of changes
+- **Critical Issues**: Security vulnerabilities, data loss risks, bugs
+- **High Priority**: Performance issues, missing tests, incorrect functionality
+- **Medium Priority**: Code quality, maintainability, style
+- **Low Priority**: Suggestions, nitpicks, nice-to-haves
+- **Positive Notes**: Good patterns and well-written code
+- **Overall Assessment**: Ready to merge, needs changes, or requires discussion
+
+Use the code-reviewer agent's expertise and leverage IDE diagnostics, context7 for library best practices, and GitHub MCP for PR context.

@@ -1,0 +1,75 @@
+{
+  "autoSave": "afterDelay",
+  "autoSaveDelay": 1000,
+  "formatOnSave": true,
+  "terminal": {
+    "integrated": {
+      "defaultProfile": "bash"
+    }
+  },
+  "editor": {
+    "rulers": [80, 120],
+    "wordWrap": "on",
+    "tabSize": 2,
+    "detectIndentation": true,
+    "formatOnPaste": true,
+    "formatOnType": false,
+    "codeActionsOnSave": {
+      "source.fixAll": true,
+      "source.organizeImports": true
+    }
+  },
+  "files": {
+    "trimTrailingWhitespace": true,
+    "insertFinalNewline": true,
+    "exclude": {
+      "**/node_modules": true,
+      "**/.git": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/.terrazul": true,
+      "**/agent_modules": true
+    },
+    "watcherExclude": {
+      "**/node_modules/**": true,
+      "**/.git/**": true,
+      "**/dist/**": true,
+      "**/build/**": true
+    }
+  },
+  "search": {
+    "exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/.terrazul": true,
+      "**/agent_modules": true
+    }
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "{{#if vars.build_system.lintCommands}}{{vars.build_system.lintCommands.[0]}}{{else}}echo 'No lint command configured'{{/if}}",
+            "description": "Run linter after file edits"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if echo \"$PROMPT\" | grep -qi 'commit\\|push'; then {{#if vars.build_system.testCommands}}{{vars.build_system.testCommands.[0]}}{{else}}echo 'No test command configured'{{/if}}; fi",
+            "description": "Run tests before git commits"
+          }
+        ]
+      }
+    ]
+  }
+}

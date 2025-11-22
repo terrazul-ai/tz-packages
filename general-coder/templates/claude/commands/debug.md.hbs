@@ -1,0 +1,42 @@
+Debug an error or issue in the codebase.
+
+Usage: `/debug [error message or file path]`
+
+Steps:
+1. **Understand the Problem**:
+   - If an error message is provided, analyze the stack trace
+   - If a file path is provided, check IDE diagnostics for that file
+   - Gather context about when and how the error occurs
+
+2. **Reproduce** (if possible):
+   - Try to reproduce the error
+   - Identify minimal reproduction steps
+   - Note any patterns or conditions
+
+3. **Analyze**:
+   - Read the failing code
+   - Check recent changes (git log)
+   - Review related code and dependencies
+   - Look for common error patterns
+   - Use IDE diagnostics to check for type errors, lint warnings
+
+4. **Diagnose Root Cause**:
+   - Identify what's actually wrong (not just symptoms)
+   - Consider edge cases, race conditions, timing issues
+   - Check assumptions and validation
+
+5. **Suggest Fix**:
+   - Propose concrete solutions
+   - Explain why the fix works
+   - Consider alternative approaches
+   - Add tests to prevent regression
+
+Provide a structured debug report:
+- **Problem**: Clear description of the issue
+- **Root Cause**: What's actually wrong
+- **Analysis**: How you identified the problem
+- **Proposed Fix**: Concrete solution with code examples
+- **Prevention**: Tests or checks to prevent recurrence
+- **Alternatives**: Other possible solutions considered
+
+Use the debugger agent's systematic approach and leverage mcp__ide__getDiagnostics for additional insights.
