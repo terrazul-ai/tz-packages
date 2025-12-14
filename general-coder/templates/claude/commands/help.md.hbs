@@ -98,28 +98,6 @@ This package includes:
 
 ## 📝 Available Commands
 
-### `/analyze-codebase`
-**Description**: Performs a comprehensive analysis of your codebase
-
-**What it does**:
-- Analyzes project structure and organization
-- Identifies technology stack and dependencies
-- Maps out key components and patterns
-- Highlights potential issues or technical debt
-- Provides recommendations
-
-**When to use**:
-- First time in a new codebase
-- After major refactoring
-- When documenting the project
-
-**Example**:
-```
-/analyze-codebase
-```
-
----
-
 ### `/run-tests`
 **Description**: Runs the project's test suite and analyzes failures
 
@@ -188,6 +166,33 @@ This package includes:
 /review src/utils/helper.ts
 /review https://github.com/owner/repo/pull/123
 /review
+```
+
+---
+
+### `/address [PR]`
+**Description**: Address PR review comments systematically
+
+**What it does**:
+- Fetches PR details using GitHub MCP or `gh` CLI
+- Gathers all review comments (general feedback and inline comments)
+- Categorizes comments by priority (blocking, suggestions, questions)
+- Implements fixes and improvements for each comment
+- Runs tests to verify changes
+- Provides summary of all addressed comments
+
+**When to use**:
+- After receiving PR review feedback
+- When you need to systematically address reviewer comments
+- To ensure all PR feedback is handled (including "future work")
+
+**Important**: All improvements and "future" recommendations must be addressed immediately, not deferred.
+
+**Examples**:
+```
+/address https://github.com/owner/repo/pull/123
+/address 123
+/address
 ```
 
 ---
@@ -264,10 +269,12 @@ These hooks help maintain code quality automatically!
 3. Address feedback
 4. Re-review until satisfied
 
-### Understanding a Codebase
-1. Run `/analyze-codebase` → Get comprehensive overview
-2. Read the generated context in `CLAUDE.md`
-3. Use **architect** agent to understand design decisions
+### Addressing PR Feedback
+1. Run `/address [PR URL or number]` → Systematically address all review comments
+2. Review the implemented changes
+3. Run `/run-tests` → Verify all tests still pass
+4. Commit changes with descriptive message
+5. Push and notify reviewers
 
 ---
 

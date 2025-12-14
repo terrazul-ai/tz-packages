@@ -2,7 +2,7 @@
 {{~ var github_url = askUser('Where is the project code hosted? (GitHub/GitLab URL)', { placeholder: 'https://github.com/owner/repo' }) ~}}
 {{~ var coverage = askUser('What should be the minimum test coverage % to aim for?', { default: '80' }) ~}}
 
-{{~ var project_analysis = askAgent('templates/prompts/analyze-project.txt', { json: true, schema: { file: 'schemas/analyze-project.mjs' } }) ~}}
+{{~ var project_analysis = askAgent('templates/prompts/analyze-project.txt', { json: true }) ~}}
 
 # {{ vars.project_name }} - Development Context
 
@@ -70,146 +70,125 @@ Continue this cycle until all tests pass and code is clean. You may use the
 
 ## Technology Stack
 
-{{#if vars.project_analysis.techStack}}
+{{#if vars.project_analysis.languages}}
 ### Languages
-{{#each vars.project_analysis.techStack.languages}}
-- {{this}}
-{{/each}}
+{{vars.project_analysis.languages}}
 
-{{#if vars.project_analysis.techStack.frameworks.length}}
+{{#if vars.project_analysis.frameworks}}
 ### Frameworks & Libraries
-{{#each vars.project_analysis.techStack.frameworks}}
-- {{this}}
-{{/each}}
+{{vars.project_analysis.frameworks}}
 {{/if}}
 
 ### Tools
-- **Package Manager**: {{vars.project_analysis.techStack.packageManager}}
-{{#if vars.project_analysis.techStack.buildTools.length}}
-- **Build Tools**: {{#each vars.project_analysis.techStack.buildTools}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+- **Package Manager**: {{vars.project_analysis.packageManager}}
+{{#if vars.project_analysis.buildTools}}
+- **Build Tools**: {{vars.project_analysis.buildTools}}
 {{/if}}
-{{#if vars.project_analysis.techStack.testFrameworks.length}}
-- **Testing**: {{#each vars.project_analysis.techStack.testFrameworks}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{#if vars.project_analysis.testFrameworks}}
+- **Testing**: {{vars.project_analysis.testFrameworks}}
 {{/if}}
-{{#if vars.project_analysis.techStack.databases.length}}
-- **Databases**: {{#each vars.project_analysis.techStack.databases}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{#if vars.project_analysis.databases}}
+- **Databases**: {{vars.project_analysis.databases}}
 {{/if}}
-{{#if vars.project_analysis.techStack.infrastructure.length}}
-- **Infrastructure**: {{#each vars.project_analysis.techStack.infrastructure}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+{{#if vars.project_analysis.infrastructure}}
+- **Infrastructure**: {{vars.project_analysis.infrastructure}}
 {{/if}}
 {{/if}}
 
 ## Local Development
 
-{{#if vars.project_analysis.buildSystem.runCommands}}
+{{#if vars.project_analysis.runCommands}}
 ### Running the Project
 
-{{#each vars.project_analysis.buildSystem.runCommands}}
 ```bash
-{{this}}
+{{vars.project_analysis.runCommands}}
 ```
-{{/each}}
 
-{{#if vars.project_analysis.buildSystem.devServer}}
-**Development Server**: {{vars.project_analysis.buildSystem.devServer.url}}
+{{#if vars.project_analysis.devServerUrl}}
+**Development Server**: {{vars.project_analysis.devServerUrl}}
 {{/if}}
 {{/if}}
 
-{{#if vars.project_analysis.buildSystem.buildCommands}}
+{{#if vars.project_analysis.buildCommands}}
 ### Building the Project
 
-{{#each vars.project_analysis.buildSystem.buildCommands}}
 ```bash
-{{this}}
+{{vars.project_analysis.buildCommands}}
 ```
-{{/each}}
 {{/if}}
 
-{{#if vars.project_analysis.buildSystem.testCommands}}
+{{#if vars.project_analysis.testCommands}}
 ### Running Tests
 
-{{#each vars.project_analysis.buildSystem.testCommands}}
 ```bash
-{{this}}
+{{vars.project_analysis.testCommands}}
 ```
-{{/each}}
 
 **IMPORTANT**: Always run tests after making changes. Use the pre-commit hook to ensure tests pass before committing.
 {{/if}}
 
-{{#if vars.project_analysis.buildSystem.lintCommands}}
+{{#if vars.project_analysis.lintCommands}}
 ### Linting and Formatting
 
-{{#each vars.project_analysis.buildSystem.lintCommands}}
 ```bash
-{{this}}
+{{vars.project_analysis.lintCommands}}
 ```
-{{/each}}
 {{/if}}
 
-{{#if vars.project_analysis.buildSystem.otherCommands}}
+{{#if vars.project_analysis.otherCommands}}
 ### Other Useful Commands
 
-{{#each vars.project_analysis.buildSystem.otherCommands}}
-- **{{@key}}**: `{{this}}`
-{{/each}}
+{{vars.project_analysis.otherCommands}}
 {{/if}}
 
-{{#if vars.project_analysis.buildSystem.notes}}
+{{#if vars.project_analysis.buildNotes}}
 ### Important Notes
 
-{{vars.project_analysis.buildSystem.notes}}
+{{vars.project_analysis.buildNotes}}
 {{/if}}
 
 ## Debugging and Troubleshooting
 
-{{#if vars.project_analysis.debuggingTools}}
-{{#if vars.project_analysis.debuggingTools.debuggerConfig.available}}
+{{#if vars.project_analysis.debuggerAvailable}}
 ### Debugger Setup
 
-{{vars.project_analysis.debuggingTools.debuggerConfig.instructions}}
+{{vars.project_analysis.debuggerInstructions}}
 {{/if}}
 
-{{#if vars.project_analysis.debuggingTools.logging}}
+{{#if vars.project_analysis.loggingLibrary}}
 ### Logging
 
-- **Library**: {{vars.project_analysis.debuggingTools.logging.library}}
-- **Levels**: {{#each vars.project_analysis.debuggingTools.logging.levels}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
-{{#if vars.project_analysis.debuggingTools.logging.location}}
-- **Location**: {{vars.project_analysis.debuggingTools.logging.location}}
+- **Library**: {{vars.project_analysis.loggingLibrary}}
+{{#if vars.project_analysis.loggingLevels}}
+- **Levels**: {{vars.project_analysis.loggingLevels}}
+{{/if}}
+{{#if vars.project_analysis.loggingLocation}}
+- **Location**: {{vars.project_analysis.loggingLocation}}
 {{/if}}
 {{/if}}
 
-{{#if vars.project_analysis.debuggingTools.errorTracking.configured}}
+{{#if vars.project_analysis.errorTrackingConfigured}}
 ### Error Tracking
 
-This project uses **{{vars.project_analysis.debuggingTools.errorTracking.service}}** for error tracking and monitoring.
+This project uses **{{vars.project_analysis.errorTrackingService}}** for error tracking and monitoring.
 {{/if}}
 
-{{#if vars.project_analysis.debuggingTools.profiling.available}}
+{{#if vars.project_analysis.profilingAvailable}}
 ### Performance Profiling
 
-Available profiling tools:
-{{#each vars.project_analysis.debuggingTools.profiling.tools}}
-- {{this}}
-{{/each}}
+Available profiling tools: {{vars.project_analysis.profilingTools}}
 {{/if}}
 
-{{#if vars.project_analysis.debuggingTools.tips.length}}
+{{#if vars.project_analysis.debuggingTips}}
 ### Debugging Tips
 
-{{#each vars.project_analysis.debuggingTools.tips}}
-- {{this}}
-{{/each}}
+{{vars.project_analysis.debuggingTips}}
 {{/if}}
 
-{{#if vars.project_analysis.debuggingTools.commonIssues.length}}
+{{#if vars.project_analysis.commonIssues}}
 ### Common Issues
 
-{{#each vars.project_analysis.debuggingTools.commonIssues}}
-- {{this}}
-{{/each}}
-{{/if}}
+{{vars.project_analysis.commonIssues}}
 {{/if}}
 
 ## Project Structure

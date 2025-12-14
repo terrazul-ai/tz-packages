@@ -58,70 +58,50 @@ Analyze:
 
 ---
 
-Return your complete analysis in the following JSON format:
+Return your complete analysis as a **flat JSON object** where every value is a string. Use comma-separated values for lists. Do not use nested objects or arrays.
+
+Example format:
 
 {
-  "techStack": {
-    "languages": ["TypeScript", "Python"],
-    "frameworks": ["Next.js", "FastAPI"],
-    "packageManager": "pnpm",
-    "buildTools": ["vite", "esbuild"],
-    "testFrameworks": ["Vitest", "pytest"],
-    "databases": ["PostgreSQL", "Redis"],
-    "infrastructure": ["Docker"],
-    "confidence": "high|medium|low"
-  },
-  "buildSystem": {
-    "runCommands": ["npm run dev", "PORT=3000"],
-    "buildCommands": ["npm run build", "npm run build:prod"],
-    "testCommands": ["npm test", "npm run test:watch"],
-    "lintCommands": ["npm run lint", "npm run format"],
-    "otherCommands": {
-      "migrate": "npm run migrate",
-      "seed": "npm run db:seed"
-    },
-    "devServer": {
-      "url": "http://localhost:3000",
-      "port": 3000
-    },
-    "notes": "Additional important notes about the build process"
-  },
-  "debuggingTools": {
-    "debuggerConfig": {
-      "available": true,
-      "type": "node|chrome|python",
-      "instructions": "How to start debugging"
-    },
-    "logging": {
-      "library": "winston|pino|console",
-      "levels": ["error", "warn", "info", "debug"],
-      "location": "Where logs are written"
-    },
-    "errorTracking": {
-      "service": "Sentry|Rollbar|none",
-      "configured": true
-    },
-    "profiling": {
-      "available": true,
-      "tools": ["node --inspect", "py-spy"]
-    },
-    "commonIssues": [
-      "Known issues and their solutions"
-    ],
-    "tips": [
-      "Useful debugging tips specific to this project"
-    ]
-  },
-  "projectStructure": "# Project Structure\n\n## Main Directories\n\n- `src/` - Main source code\n  - `components/` - React components\n  - `utils/` - Utility functions\n  - `api/` - API endpoints\n- `tests/` or `__tests__/` - Test files\n- `docs/` - Documentation\n\n## Key Files\n\n- `src/index.ts` - Main entry point\n- `vite.config.ts` - Build configuration\n\n## Organization Pattern\n\n[Feature-based organization with domain modules]\n\n## Conventions\n\n- File naming: kebab-case\n- Component files: .tsx with co-located tests\n- Test files: .test.ts pattern"
+  "languages": "TypeScript, Python",
+  "frameworks": "Next.js, FastAPI",
+  "packageManager": "pnpm",
+  "buildTools": "vite, esbuild",
+  "testFrameworks": "Vitest, pytest",
+  "databases": "PostgreSQL, Redis",
+  "infrastructure": "Docker",
+  "confidence": "high",
+
+  "runCommands": "npm run dev",
+  "buildCommands": "npm run build",
+  "testCommands": "npm test",
+  "lintCommands": "npm run lint, npm run format",
+  "otherCommands": "migrate: npm run migrate, seed: npm run db:seed",
+  "devServerUrl": "http://localhost:3000",
+  "buildNotes": "Additional important notes about the build process",
+
+  "debuggerAvailable": "true",
+  "debuggerType": "node",
+  "debuggerInstructions": "Run 'npm run debug' or use VS Code debugger",
+  "loggingLibrary": "winston",
+  "loggingLevels": "error, warn, info, debug",
+  "loggingLocation": "stdout, logs/app.log",
+  "errorTrackingService": "Sentry",
+  "errorTrackingConfigured": "true",
+  "profilingAvailable": "true",
+  "profilingTools": "node --inspect, Chrome DevTools",
+  "commonIssues": "Port 3000 in use: kill process or use different port. Database connection: ensure PostgreSQL is running",
+  "debuggingTips": "Use DEBUG=* env var for verbose logging. Check .env.example for required variables",
+
+  "projectStructure": "# Project Structure\n\n- src/ - Main source code\n- tests/ - Test files\n- docs/ - Documentation\n\n## Key Files\n\n- src/index.ts - Main entry point\n- vite.config.ts - Build configuration"
 }
 
 **IMPORTANT GUIDELINES:**
 
-1. Only include items you find clear evidence for
-2. If you cannot determine something, omit the optional field or note it in "notes"
-3. For techStack.confidence, use:
-   - "high" if you found definitive evidence (config files, dependencies)
-   - "medium" if you inferred from code patterns
-   - "low" if you're making educated guesses
-4. The projectStructure field should be formatted as markdown
-5. Be thorough but concise - developers need actionable information
+1. **All values must be strings** - no arrays, no nested objects
+2. Use comma-separated values for lists (e.g., "TypeScript, Python")
+3. Only include fields you find clear evidence for - omit fields if unknown
+4. For confidence, use: "high" (config files found), "medium" (inferred from code), "low" (educated guess)
+5. The projectStructure field should be formatted as markdown with newlines
+6. Be thorough but concise - developers need actionable information
+7. *IMPORTANT*  ONLY RESPOND WITH THE JSON RESPONSE AND NOTHING ELSE
