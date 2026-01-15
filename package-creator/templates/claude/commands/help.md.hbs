@@ -1,0 +1,207 @@
+# @leourbina/package-creator - Package Help
+
+Welcome to the **@leourbina/package-creator** package! This package helps you create and manage Terrazul packages with ease.
+
+---
+
+## 📋 Quick Overview
+
+This package includes:
+- **Skills for package creation** - Interactive tools to scaffold packages, agents, and skills
+- **Best practice templates** - Pre-built templates for common patterns
+- **Documentation generation** - Automated context file creation
+- **MCP server integration** - Ready-to-use configurations
+
+---
+
+## 🛠️ Available Skills
+
+### 1. **create-agent**
+**Purpose**: Scaffold new Claude Code agent definitions
+
+**When to use**:
+- Adding specialized agents to your package
+- Creating custom coding assistants
+- Building domain-specific helpers
+
+**Templates available**:
+- `basic-agent.md` - Simple agent template
+- `code-agent.md` - Agent for code generation tasks
+- `research-agent.md` - Agent for code analysis
+- `review-agent.md` - Agent for code review
+
+**How to use**:
+Activate the skill by asking Claude to create an agent based on one of the templates.
+
+---
+
+### 2. **create-skill**
+**Purpose**: Scaffold new Claude Code skill definitions
+
+**When to use**:
+- Adding reusable skills to your package
+- Creating specialized workflows
+- Building tool integrations
+
+**Templates available**:
+- `basic-skill.md` - Simple skill template
+- `guidelines-skill.md` - Skills that provide guidelines
+- `process-skill.md` - Multi-step workflow skills
+- `tool-integration-skill.md` - Skills that integrate external tools
+
+**How to use**:
+Activate the skill by asking Claude to create a skill based on one of the templates.
+
+---
+
+## 📁 Package Structure
+
+When creating a new Terrazul package, follow this structure:
+
+```
+my-package/
+├── agents.toml              # REQUIRED: Package manifest
+├── README.md                # RECOMMENDED: Package documentation
+├── .gitignore               # Optional: Standard ignores
+├── prompts/                 # Optional: External prompt files for askAgent
+└── templates/               # Templates directory
+    ├── CLAUDE.md.hbs        # Context file for Claude
+    ├── AGENTS.md.hbs        # Context file for Codex
+    └── claude/              # Claude-specific operational files
+        ├── settings.json.hbs
+        ├── mcp_servers.json.hbs
+        ├── agents/          # Agent definitions
+        ├── commands/        # Slash commands
+        └── skills/          # Reusable skills
+```
+
+---
+
+## 🎯 Common Workflows
+
+### Creating a New Package from Scratch
+
+1. **Initialize package structure**:
+   ```bash
+   mkdir my-package && cd my-package
+   tz init
+   ```
+
+2. **Add package metadata** to `agents.toml`:
+   ```toml
+   [package]
+   name = "@yourname/my-package"
+   version = "1.0.0"
+   description = "Your package description"
+   license = "MIT"
+
+   [compatibility]
+   claude = ">=0.2.0"
+
+   [exports.claude]
+   template = "templates/CLAUDE.md.hbs"
+   commandsDir = "templates/claude/commands"
+   subagentsDir = "templates/claude/agents"
+   skillsDir = "templates/claude/skills"
+   ```
+
+3. **Create templates directory**:
+   ```bash
+   mkdir -p templates/claude/{agents,commands,skills}
+   ```
+
+4. **Use create-agent skill** to add agents
+5. **Use create-skill skill** to add skills
+6. **Test locally** with `tz run @yourname/my-package`
+
+---
+
+### Adding Agents to Existing Package
+
+1. Ask Claude: "Use the create-agent skill to create a new code reviewer agent"
+2. Claude will use the `create-agent` skill with the appropriate template
+3. The new agent will be created in `templates/claude/agents/`
+4. Re-run `tz apply` to activate the new agent
+
+---
+
+### Adding Skills to Existing Package
+
+1. Ask Claude: "Use the create-skill skill to create a deployment workflow"
+2. Claude will use the `create-skill` skill with the appropriate template
+3. The new skill will be created in `templates/claude/skills/`
+4. Re-run `tz apply` to activate the new skill
+
+---
+
+## 💡 Best Practices
+
+### Template Design
+- Use Handlebars syntax for dynamic content
+- Leverage `askUser` for interactive prompts
+- Use `askAgent` sparingly - it's expensive
+- Prefer flat JSON schemas for structured data
+
+### Agent Design
+- Keep agents focused on a single responsibility
+- Use clear color assignments for easy identification
+- Document when to use each agent
+- Make agents read-only when appropriate
+
+### Skill Design
+- Include clear examples in skill documentation
+- Provide templates for common patterns
+- Document prerequisites and dependencies
+- Test skills in isolation before packaging
+
+---
+
+## 📚 Additional Resources
+
+- **Terrazul Documentation**: [https://github.com/terrazul-ai/tz-cli](https://github.com/terrazul-ai/tz-cli)
+- **Package Context**: See `@CLAUDE.md` in your project for project-specific information
+- **Templates**: Check `templates/` directory for available templates
+- **Examples**: Look at existing packages like `@leourbina/general-coder`
+
+---
+
+## 🆘 Troubleshooting
+
+### Skills Not Available
+```bash
+# Re-apply the package
+tz apply --force
+
+# Check symlinks
+ls -la .claude/skills
+```
+
+### Templates Not Rendering
+```bash
+# Clear cache and regenerate
+rm agents-cache.toml
+tz apply --no-cache --force
+```
+
+### Package Validation Errors
+```bash
+# Validate package structure
+tz validate
+
+# Check for missing files
+cat agents.toml
+```
+
+---
+
+## 🎓 Pro Tips
+
+1. **Start with templates**: Use the provided templates instead of writing from scratch
+2. **Test incrementally**: Run `tz apply` after each change to catch issues early
+3. **Use version control**: Commit your package to git for easy rollback
+4. **Keep it simple**: Don't overcomplicate - start minimal and add as needed
+5. **Document everything**: Good documentation makes packages easier to use
+
+---
+
+Need more help? Check the README or ask me directly about specific features!
