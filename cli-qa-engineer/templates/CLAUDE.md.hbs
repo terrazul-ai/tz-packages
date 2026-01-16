@@ -1,0 +1,139 @@
+{{~ var cliCommand = askUser('What is the CLI command to test? (e.g., mycli, ./bin/app, npx my-tool)') ~}}
+{{~ var workingDir = askUser('Working directory for running tests?', { default: '.', placeholder: 'Path relative to project root' }) ~}}
+{{~ var successPatterns = askUser('Output patterns indicating success (comma-separated)?', { default: 'success,completed,done', placeholder: 'e.g., success,completed,✓' }) ~}}
+{{~ var errorPatterns = askUser('Output patterns indicating errors (comma-separated)?', { default: 'error,failed,Error:', placeholder: 'e.g., error,failed,Exception' }) ~}}
+{{~ var reportDir = askUser('Directory for QA reports?', { default: 'qa-reports', placeholder: 'e.g., qa-reports, test-results' }) ~}}
+{{~ var sessionPrefix = askUser('Tmux session name prefix?', { default: 'cli-qa', placeholder: 'e.g., cli-qa, test' }) ~}}
+{{~ var commandTimeout = askUser('Default command timeout in seconds?', { default: '30', placeholder: 'e.g., 30, 60' }) ~}}
+
+{{~ var projectAnalysis = askAgent('./prompts/analyze-project-for-cli-qa.txt', { json: true }) ~}}
+
+# CLI QA Engineer
+
+AI-powered QA testing for command-line interfaces using tmux terminal automation.
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| CLI Command | `{{ vars.cliCommand }}` |
+| Working Directory | `{{ vars.workingDir }}` |
+| Success Patterns | `{{ vars.successPatterns }}` |
+| Error Patterns | `{{ vars.errorPatterns }}` |
+| Report Directory | `{{ vars.reportDir }}` |
+| Session Prefix | `{{ vars.sessionPrefix }}` |
+| Command Timeout | `{{ vars.commandTimeout }}s` |
+
+## Project Analysis
+
+{{#if vars.projectAnalysis.cliEntryPoint}}
+- **CLI Entry Point:** `{{ vars.projectAnalysis.cliEntryPoint }}`
+{{/if}}
+{{#if vars.projectAnalysis.subcommands}}
+- **Subcommands:** {{ vars.projectAnalysis.subcommands }}
+{{/if}}
+{{#if vars.projectAnalysis.hasInteractivePrompts}}
+- **Has Interactive Prompts:** {{ vars.projectAnalysis.hasInteractivePrompts }}
+{{/if}}
+{{#if vars.projectAnalysis.testableCommands}}
+- **Testable Commands:** {{ vars.projectAnalysis.testableCommands }}
+{{/if}}
+{{#if vars.projectAnalysis.destructiveCommands}}
+- **Destructive Commands (use caution):** {{ vars.projectAnalysis.destructiveCommands }}
+{{/if}}
+
+## Available Tools
+
+This package uses the `tmux-mcp` server which provides terminal automation:
+
+### Session Management
+- `create-session` - Create a new tmux session for test isolation
+- `list-sessions` - List active test sessions
+- `kill-session` - Clean up completed test sessions
+- `find-session` - Locate a specific test session
+
+### Window Management
+- `create-window` - Create windows for parallel tests
+- `list-windows` - List windows in a session
+- `kill-window` - Clean up test windows
+
+### Pane Management
+- `split-pane` - Split panes for side-by-side testing
+- `list-panes` - List panes in a window
+- `capture-pane` - **Key tool**: Capture command output for assertions
+- `kill-pane` - Clean up test panes
+
+### Command Execution
+- `execute-command` - **Key tool**: Run CLI commands in tmux
+- `get-command-result` - Get results of executed commands
+
+## Testing Workflow
+
+### 1. Setup Test Session
+```
+create-session: {{ vars.sessionPrefix }}-<test-name>
+```
+
+### 2. Execute Commands
+```
+execute-command: {{ vars.cliCommand }} <args>
+```
+
+### 3. Capture Output
+```
+capture-pane → analyze for success/error patterns
+```
+
+### 4. Cleanup
+```
+kill-session: {{ vars.sessionPrefix }}-<test-name>
+```
+
+## Test Categories
+
+### Functional Tests
+- **Help/Version**: `{{ vars.cliCommand }} --help`, `{{ vars.cliCommand }} --version`
+- **Argument Parsing**: Valid args, invalid args, missing required, extra args
+- **Input Validation**: Empty input, special characters, unicode, long strings
+- **Error Handling**: File not found, permission denied, network errors
+- **Output Formats**: JSON, table, plain text, quiet/verbose modes
+
+### Integration Tests
+- **Init Workflows**: Setup followed by operations
+- **CRUD Workflows**: Create, read, update, delete sequences
+- **Pipeline Workflows**: Command chaining with pipes
+- **Interactive Flows**: Prompts, menus, wizards
+- **Config Loading**: Environment variables, config files
+
+## Interactive Prompt Handling
+
+When testing interactive CLI prompts:
+
+1. **Detect prompt** by capturing pane and looking for prompt patterns
+2. **Send response** via execute-command:
+   - Text input: Send text followed by Enter key
+   - Yes/No: Send 'y' or 'n' followed by Enter
+   - Selection: Arrow keys to navigate, Enter to select
+   - Multi-select: Space to toggle, Enter to confirm
+
+## Assertions
+
+### Success Assertion
+Output should contain one of: `{{ vars.successPatterns }}`
+
+### Error Assertion
+Output should NOT contain: `{{ vars.errorPatterns }}`
+
+### Custom Assertions
+- Exact output match
+- Regex pattern match
+- JSON schema validation
+- Exit code verification (when available)
+
+## Skills
+
+Use these skills to run CLI QA tests:
+
+- `/test-cli <command>` - Test a specific CLI command with functional tests
+- `/test-interactive <scenario>` - Test interactive prompt flows and wizards
+- `/cli-qa-report` - Generate comprehensive QA test report

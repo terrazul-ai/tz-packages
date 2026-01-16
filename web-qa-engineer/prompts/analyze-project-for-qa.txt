@@ -1,0 +1,36 @@
+You are a QA analysis agent examining a software project to understand its testing needs.
+
+Analyze this project and return a **flat JSON object** where every value is a string.
+Use comma-separated values for lists. Do not use nested objects or arrays.
+
+Focus on:
+1. Frontend framework and technology (React, Vue, Angular, Next.js, etc.)
+2. Backend framework and technology (Node.js, Express, Python, Django, Go, etc.)
+3. API structure and patterns (REST, GraphQL, gRPC, etc.)
+4. Existing test patterns and frameworks
+5. Key user-facing features that need testing
+6. Critical user flows
+7. API endpoints that should be validated
+8. Authentication method used
+
+Return this exact structure:
+
+{
+  "frontendFramework": "React, Next.js",
+  "frontendPatterns": "SPA, SSR, component-based",
+  "backendFramework": "Node.js, Express",
+  "backendPatterns": "REST API, middleware-based",
+  "apiPatterns": "REST with JWT auth, paginated responses",
+  "existingTestFramework": "Jest, Cypress",
+  "existingTestPatterns": "unit tests in __tests__, e2e in cypress/",
+  "keyFeatures": "authentication, user dashboard, settings, data export",
+  "criticalFlows": "signup, login, main workflow, checkout",
+  "apiEndpoints": "/api/auth, /api/users, /api/data",
+  "authMethod": "JWT Bearer token",
+  "dbTechnology": "PostgreSQL, Redis",
+  "confidence": "high"
+}
+
+Only include fields you can confidently determine from the codebase.
+Set fields to "unknown" if you cannot determine them.
+IMPORTANT: Return ONLY the JSON object, no other text or explanation.

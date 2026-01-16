@@ -1,0 +1,245 @@
+Generate a comprehensive QA report from testing findings.
+
+**Usage**: `/qa-report [type]`
+
+**Types**:
+- `summary` - Executive summary only (quick overview)
+- `full` - Complete detailed report (default)
+- `bugs` - Bug reports only (for issue tracking)
+- `all` - Generate all report types
+
+**Examples**:
+- `/qa-report` - Generate full report
+- `/qa-report summary` - Executive summary for stakeholders
+- `/qa-report bugs` - Individual bug reports for tracking
+- `/qa-report all` - Generate all report formats
+{{#if (eq vars.useRunDirs 'yes')}}
+- `/qa-report --run=20250114-143025-login` - Report for specific run
+{{/if}}
+
+{{#if (eq vars.useRunDirs 'yes')}}
+**Options**:
+- `--run=<run-id>` - Generate report for a specific run directory
+- Default: Uses the `latest` symlink to find most recent run
+{{/if}}
+
+---
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Report Output** | {{ vars.reportOutputDir }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Target URL** | {{ vars.targetUrl }} |
+| **API Base URL** | {{ vars.apiBaseUrl }} |
+
+---
+
+## Workflow
+
+### Step 1: Gather Findings
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Collect results from the run directory:
+
+1. **Locate run directory**:
+   - If `--run=<run-id>` specified: Use `{{ vars.reportOutputDir }}/<run-id>/`
+   - Otherwise: Use `{{ vars.reportOutputDir }}/latest/` symlink
+
+2. **Gather from run directory**:
+   - `[run-dir]/test-results.md` - Functional test results
+   - `[run-dir]/api-tests.md` - API test results (if present)
+   - `[run-dir]/screenshots/` - Visual evidence
+   - `[run-dir]/bugs/` - Existing bug reports
+   - `[run-dir]/README.md` - Run manifest for metadata
+{{else}}
+Collect results from all test executions:
+- Functional test results in `{{ vars.reportOutputDir }}`
+- API test results
+- Screenshots and evidence from `{{ vars.screenshotDir }}`
+- Any notes or observations
+{{/if}}
+
+### Step 2: Analyze Results
+
+Calculate metrics:
+- Total tests executed
+- Pass/fail counts and percentages
+- Issue counts by severity (4, 3, 2, 1)
+- Test coverage by feature/endpoint
+- Identify patterns across issues
+
+### Step 3: Generate Report
+
+Use the **report-generator** agent to create professional documentation.
+
+#### Executive Summary
+```markdown
+## Executive Summary
+
+### Overall Status: [PASS / PASS WITH ISSUES / FAIL]
+
+| Metric | Value |
+|--------|-------|
+| Total Tests | X |
+| Passed | X (X%) |
+| Failed | X (X%) |
+| Critical Issues | X |
+
+### Key Findings
+1. [Finding 1]
+2. [Finding 2]
+
+### Recommendation
+[Ship / Fix first / Investigate]
+```
+
+#### Detailed Report
+- Complete test coverage
+- All issues with full details
+- Priority matrix
+- Remediation recommendations
+
+#### Bug Reports
+- Individual issue reports
+- Reproduction steps
+- Suggested fixes
+
+### Step 4: Save Reports
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Output to the run directory:
+- **Full Report**: `[run-dir]/qa-report.md`
+- **Summary**: `[run-dir]/qa-summary.md`
+- **Bug Reports**: `[run-dir]/bugs/BUG-[id].md`
+- **Updated Manifest**: `[run-dir]/README.md` (with report completion status)
+{{else}}
+Output locations:
+- **Full Report**: `{{ vars.reportOutputDir }}/qa-report-[date].md`
+- **Summary**: `{{ vars.reportOutputDir }}/qa-summary-[date].md`
+- **Bug Reports**: `{{ vars.reportOutputDir }}/bugs/BUG-[id].md`
+{{/if}}
+
+---
+
+## Report Types
+
+### Summary Report (`/qa-report summary`)
+
+Quick overview for stakeholders:
+- Overall pass/fail status
+- Key metrics table
+- Critical findings only
+- Top 3 recommendations
+- Go/no-go recommendation
+
+Best for: standup updates, quick status checks, stakeholder briefings
+
+### Full Report (`/qa-report full`)
+
+Complete documentation:
+- Executive summary
+- Test coverage breakdown
+- All issues with details
+- Evidence references
+- Priority matrix
+- Full recommendations
+- Environment details
+- Appendices
+
+Best for: release sign-off, audit trails, detailed analysis
+
+### Bug Reports (`/qa-report bugs`)
+
+Individual issue documentation:
+- Detailed reproduction steps
+- Expected vs actual behavior
+- Evidence (screenshots, responses)
+- Suggested fixes
+- Impact assessment
+
+Best for: issue tracking integration, developer handoff
+
+### All Reports (`/qa-report all`)
+
+Generates all three formats for comprehensive documentation.
+
+---
+
+## Severity Reference
+
+| Severity | Label | Meaning |
+|----------|-------|---------|
+| 4 | Critical | Blocks release - must fix immediately |
+| 3 | Major | Should fix before release |
+| 2 | Minor | Schedule fix - not blocking |
+| 1 | Cosmetic | Nice to have - lowest priority |
+
+---
+
+## Priority Matrix
+
+Reports include a priority matrix:
+
+|  | Low Effort | High Effort |
+|---|------------|-------------|
+| **High Impact** | Quick Wins - Do First | Plan Carefully |
+| **Low Impact** | Nice to Have | Deprioritize |
+
+---
+
+## Output Files
+
+After running `/qa-report`:
+
+{{#if (eq vars.useRunDirs 'yes')}}
+```
+{{ vars.reportOutputDir }}/
+├── 20250114-143025-login-feature/
+│   ├── README.md              # Run manifest (updated)
+│   ├── test-results.md        # Test results
+│   ├── qa-report.md           # Full report
+│   ├── qa-summary.md          # Executive summary
+│   ├── screenshots/
+│   │   └── TC-001-step-1.png
+│   └── bugs/
+│       ├── BUG-001.md
+│       └── ...
+└── latest -> 20250114-143025-login-feature/
+```
+{{else}}
+```
+{{ vars.reportOutputDir }}/
+├── qa-report-2025-01-14.md      # Full report
+├── qa-summary-2025-01-14.md     # Executive summary
+└── bugs/
+    ├── BUG-001.md               # Individual bug
+    ├── BUG-002.md
+    └── ...
+```
+{{/if}}
+
+---
+
+## Quick Actions
+
+### Daily Standup
+```
+/qa-report summary
+```
+
+### Release Sign-off
+```
+/qa-report full
+```
+
+### Developer Handoff
+```
+/qa-report bugs
+```
+
+### Complete Documentation
+```
+/qa-report all
+```

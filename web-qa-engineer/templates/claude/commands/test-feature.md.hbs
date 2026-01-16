@@ -1,0 +1,200 @@
+Test a specific feature based on provided specification.
+
+**Usage**: `/test-feature <spec-or-description>`
+
+**Examples**:
+- `/test-feature "User should be able to log in with email and password"`
+- `/test-feature user-story-123.md`
+- `/test-feature "Test the checkout flow with credit card payment"`
+- `/test-feature --file=specs/auth-feature.md`
+
+---
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Target URL** | {{ vars.targetUrl }} |
+| **Browser Engine** | {{ vars.browserEngine }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Output** | {{ vars.reportOutputDir }} |
+| **Spec Format** | {{ vars.specFormat }} |
+
+---
+
+## Workflow
+
+{{#if (eq vars.useRunDirs 'yes')}}
+### Step 0: Initialize Run Directory
+
+Before executing tests, create a unique run directory for this test execution:
+
+1. **Generate timestamp**: Use format `YYYYMMDD-HHMMSS` (e.g., `20250114-143025`)
+2. **Extract feature slug**:
+   - Parse the spec/description to identify the primary feature name
+   - Convert to lowercase, replace spaces and special characters with hyphens
+   - Truncate to 50 characters maximum
+   - Example: `"User should be able to log in"` → `login`
+   - Fallback: Use `qa-run` if feature cannot be determined
+3. **Create run directory**: `{{ vars.reportOutputDir }}/[timestamp]-[feature-slug]/`
+4. **Create subdirectories**:
+   - `screenshots/` - For visual evidence
+   - `bugs/` - For individual bug reports
+5. **Initialize manifest**: Create `README.md` with run metadata:
+   ```markdown
+   # QA Run: [feature-slug]
+   **Run ID**: [timestamp]-[feature-slug]
+   **Started**: [datetime]
+   **Type**: test-feature
+   **Status**: IN_PROGRESS
+
+   ## Scope
+   - Feature: "[original spec/description]"
+   - Target URL: {{ vars.targetUrl }}
+   - Browser: {{ vars.browserEngine }}
+   ```
+6. **Update latest symlink**: Point `{{ vars.reportOutputDir }}/latest` to this run directory
+
+**Store the run directory path** for use in subsequent steps. All file operations should use this path as the base directory.
+{{/if}}
+
+### Step 1: Parse Specification
+
+Analyze the provided spec to extract:
+- **Feature scope** - What functionality is being tested
+- **User stories** - Who does what for what purpose
+- **Acceptance criteria** - Specific pass/fail conditions
+- **Edge cases** - Boundary conditions and error scenarios
+- **Test data** - Required data for testing
+
+The spec can be in any format: {{ vars.specFormat }}
+
+### Step 2: Design Test Cases
+
+Create test cases covering:
+- **Happy path** - Normal successful flow
+- **Input validation** - Field validation, required fields
+- **Error handling** - Error scenarios, edge cases
+- **Edge cases** - Boundary conditions
+- **Security basics** - Basic security checks if applicable
+
+Use the **functional-tester** agent methodology for test case design.
+
+### Step 3: Setup Browser
+
+{{#if (or (eq vars.browserEngine 'playwright') (eq vars.browserEngine 'both'))}}
+**Using Playwright:**
+1. Browser automatically launches when navigating
+2. Navigate to {{ vars.targetUrl }}
+3. Wait for page to be ready
+{{/if}}
+
+{{#if (or (eq vars.browserEngine 'puppeteer') (eq vars.browserEngine 'both'))}}
+**Using Puppeteer:**
+1. `puppeteer_launch` - Start browser instance
+2. `puppeteer_new_page` - Create new tab
+3. `puppeteer_navigate` - Go to {{ vars.targetUrl }}
+4. `puppeteer_wait_for_selector` - Ensure page loaded
+{{/if}}
+
+### Step 4: Execute Tests
+
+For each test case:
+1. Screenshot initial state
+2. Perform test actions
+3. Verify expected results
+4. Screenshot final state
+5. Record pass/fail
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Save screenshots to: `[run-dir]/screenshots/[test-id]-[step].png`
+{{else}}
+Save screenshots to: `{{ vars.screenshotDir }}/`
+{{/if}}
+
+### Step 5: Document Results
+
+Create test results with:
+- Test case ID and title
+- Pass/fail status
+- Evidence (screenshots)
+- Issues found with severity
+
+### Step 6: Generate Summary
+
+Output summary including:
+- Total tests run
+- Pass/fail counts
+- Issues found
+- Recommendations
+
+---
+
+## Quick Test Categories
+
+### Smoke Test
+```
+/test-feature "Quick smoke test of core functionality"
+```
+Validates:
+- Page loads without errors
+- Key elements visible
+- No console errors
+- Basic navigation works
+
+### Login Flow
+```
+/test-feature "Test login with valid and invalid credentials"
+```
+Validates:
+- Login form visible and functional
+- Valid login succeeds
+- Invalid login shows appropriate error
+- Session established correctly
+
+### Form Submission
+```
+/test-feature "Test contact form submission"
+```
+Validates:
+- Required fields enforced
+- Format validation works
+- Successful submission
+- Error messages clear
+
+### Navigation
+```
+/test-feature "Test main navigation menu"
+```
+Validates:
+- All links work
+- Correct pages load
+- No broken links
+- Mobile menu works (if applicable)
+
+---
+
+## Output
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Results saved to the run directory:
+- `[run-dir]/test-results.md` - Test results document
+- `[run-dir]/screenshots/` - Visual evidence
+- `[run-dir]/bugs/` - Bug reports (if issues found)
+- `[run-dir]/README.md` - Run manifest with metadata
+
+The run directory is also accessible via: `{{ vars.reportOutputDir }}/latest/`
+{{else}}
+Results saved to:
+- `{{ vars.reportOutputDir }}/test-results-[feature]-[date].md`
+- Screenshots in `{{ vars.screenshotDir }}/`
+{{/if}}
+
+---
+
+## Next Steps
+
+After running `/test-feature`:
+- Use `/qa-report` to generate comprehensive report
+- Use `/test-api` for related API testing
+- Use `regression-test` skill for broader coverage

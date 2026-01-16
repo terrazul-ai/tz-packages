@@ -1,0 +1,391 @@
+{{~ var targetUrl = askUser('What is the target URL for UX evaluation?', {
+  placeholder: 'https://example.com or http://localhost:3000'
+}) ~}}
+{{~ var appType = askUser('What type of application is this?', {
+  default: 'web-app',
+  placeholder: 'web-app, e-commerce, saas, dashboard, marketing-site, documentation'
+}) ~}}
+{{~ var evaluationScope = askUser('What evaluation types do you need?', {
+  default: 'all',
+  placeholder: 'all, heuristics, accessibility, flows, or comma-separated combination'
+}) ~}}
+{{~ var wcagLevel = askUser('What WCAG conformance level should be evaluated?', {
+  default: 'AA',
+  placeholder: 'A, AA, or AAA'
+}) ~}}
+{{~ var screenshotDir = askUser('Where should screenshots be saved?', {
+  default: './ux-reports/screenshots',
+  placeholder: './ux-reports/screenshots'
+}) ~}}
+{{~ var reportFormat = askUser('Preferred report format?', {
+  default: 'markdown',
+  placeholder: 'markdown, json, or both'
+}) ~}}
+
+# UX Research Assistant
+
+**Package**: `@leourbina/ux-researcher`
+**Version**: 0.1.0
+**Purpose**: AI-powered UX evaluation with browser automation via Puppeteer MCP
+
+This package provides comprehensive UX evaluation capabilities for web applications, combining:
+- **Nielsen's 10 Usability Heuristics** analysis
+- **WCAG Accessibility** evaluation (Level {{ vars.wcagLevel }})
+- **User Flow Testing** for common journeys
+- **Consistent Report Generation** across all evaluation types
+
+---
+
+## Project Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Target URL** | {{ vars.targetUrl }} |
+| **Application Type** | {{ vars.appType }} |
+| **Evaluation Scope** | {{ vars.evaluationScope }} |
+| **WCAG Level** | {{ vars.wcagLevel }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Format** | {{ vars.reportFormat }} |
+
+---
+
+## Prerequisites
+
+This package requires the Puppeteer MCP server for browser automation. It is configured automatically via `mcp_servers.json` and will be installed via npx when first used.
+
+---
+
+## Available Puppeteer Tools
+
+The following browser automation tools are available via MCP:
+
+### Navigation & Browser Control
+| Tool | Purpose |
+|------|---------|
+| `puppeteer_launch` | Launch browser instance |
+| `puppeteer_new_page` | Create new browser tab |
+| `puppeteer_navigate` | Navigate to URL |
+| `puppeteer_close_page` | Close browser tab |
+| `puppeteer_close_browser` | Close browser instance |
+
+### Interaction
+| Tool | Purpose |
+|------|---------|
+| `puppeteer_click` | Click on element |
+| `puppeteer_type` | Type text into input |
+| `puppeteer_wait_for_selector` | Wait for element to appear |
+
+### Data Extraction
+| Tool | Purpose |
+|------|---------|
+| `puppeteer_get_text` | Extract text content |
+| `puppeteer_evaluate` | Execute JavaScript in page context |
+| `puppeteer_screenshot` | Capture page screenshot |
+
+---
+
+## Available Skills
+
+Use the `Skill` tool to invoke these specialized capabilities.
+
+### 1. **batch-ux-audit**
+Comprehensive UX audit covering all evaluation types across multiple pages.
+
+**Use cases**:
+- Full site evaluation before launch
+- Periodic UX health checks
+- Competitive analysis
+- Design system validation
+
+**Example**:
+```
+Use the batch-ux-audit skill to evaluate {{ vars.targetUrl }}
+```
+
+### 2. **wcag-compliance**
+Deep WCAG accessibility evaluation at Level {{ vars.wcagLevel }}.
+
+**Use cases**:
+- Accessibility compliance audits
+- ADA/Section 508 requirements
+- Inclusive design validation
+- Screen reader compatibility testing
+
+**Example**:
+```
+Use the wcag-compliance skill to audit {{ vars.targetUrl }} at Level {{ vars.wcagLevel }}
+```
+
+### 3. **flow-analysis**
+User journey testing for common flows.
+
+**Use cases**:
+- Signup/registration flows
+- Checkout processes
+- Onboarding sequences
+- Core feature workflows
+
+**Example**:
+```
+Use the flow-analysis skill to test the signup flow on {{ vars.targetUrl }}
+```
+
+### 4. **report-generator**
+Generate consistent, well-formatted reports from evaluation findings.
+
+**Use cases**:
+- Standardize report format across evaluations
+- Generate executive summaries
+- Create prioritized remediation roadmaps
+- Export findings in multiple formats
+
+**Example**:
+```
+Use the report-generator skill to create a comprehensive report from the audit findings
+```
+
+---
+
+## Slash Commands
+
+Quick-action commands for common evaluation tasks:
+
+### `/analyze-ux [url]`
+Comprehensive heuristics evaluation using Nielsen's 10 principles.
+- Systematic evaluation against each heuristic
+- Severity ratings for violations (0-4 scale)
+- Screenshots with findings
+- Actionable recommendations
+
+**Examples**:
+- `/analyze-ux` - Analyze {{ vars.targetUrl }}
+- `/analyze-ux https://example.com` - Analyze specific URL
+- `/analyze-ux --heuristic=visibility` - Focus on specific heuristic
+
+### `/accessibility-audit [url]`
+WCAG {{ vars.wcagLevel }} accessibility audit with detailed findings.
+- Color contrast analysis
+- Keyboard navigation testing
+- ARIA implementation review
+- Screen reader compatibility
+
+**Examples**:
+- `/accessibility-audit` - Audit {{ vars.targetUrl }}
+- `/accessibility-audit --level=AAA` - Override conformance level
+- `/accessibility-audit --focus=forms` - Focus on form accessibility
+
+### `/test-flow <flow-type> [url]`
+Test specific user flows through the application.
+
+**Flow types**: `signup`, `login`, `checkout`, `onboarding`, `search`, `settings`, `custom`
+
+**Examples**:
+- `/test-flow signup` - Test signup flow
+- `/test-flow checkout` - Test checkout process
+- `/test-flow custom --steps="login,add-to-cart,checkout"` - Custom flow
+
+---
+
+## Specialized Agents
+
+Three specialized agents are available for complex analysis:
+
+### **heuristics-evaluator**
+Expert in Nielsen's 10 Usability Heuristics.
+- Systematic evaluation workflow
+- Severity ratings with rationale
+- Evidence-based findings
+- Prioritized recommendations
+
+### **accessibility-auditor**
+WCAG compliance specialist.
+- Criterion-by-criterion testing
+- Keyboard and screen reader evaluation
+- Color contrast analysis
+- ARIA implementation review
+
+### **flow-tester**
+User journey testing expert.
+- Step-by-step flow execution
+- Friction point identification
+- Error state testing
+- Performance measurement
+
+---
+
+## Nielsen's 10 Usability Heuristics Reference
+
+| # | Heuristic | Key Question |
+|---|-----------|--------------|
+| 1 | **Visibility of System Status** | Does the system keep users informed? |
+| 2 | **Match Between System & Real World** | Does it speak the users' language? |
+| 3 | **User Control & Freedom** | Can users undo and exit easily? |
+| 4 | **Consistency & Standards** | Does it follow conventions? |
+| 5 | **Error Prevention** | Does design prevent errors? |
+| 6 | **Recognition Rather Than Recall** | Are options visible? |
+| 7 | **Flexibility & Efficiency** | Are there shortcuts for experts? |
+| 8 | **Aesthetic & Minimalist Design** | Is information focused? |
+| 9 | **Error Recovery** | Are error messages helpful? |
+| 10 | **Help & Documentation** | Is help available when needed? |
+
+---
+
+## WCAG 2.1 Level {{ vars.wcagLevel }} Quick Reference
+
+### Perceivable
+- Text alternatives for non-text content
+- Captions and alternatives for multimedia
+- Content adaptable to different presentations
+- Distinguishable content (color contrast: 4.5:1 for AA, 7:1 for AAA)
+
+### Operable
+- Keyboard accessible (all functionality)
+- Enough time to read and use content
+- No content that causes seizures
+- Navigable (clear structure, focus order, visible focus)
+
+### Understandable
+- Readable text content
+- Predictable page behavior
+- Input assistance (error identification, labels, suggestions)
+
+### Robust
+- Compatible with current and future technologies
+- Proper ARIA implementation
+- Valid HTML structure
+
+---
+
+## Report Severity Scale
+
+All evaluations use a consistent 0-4 severity scale:
+
+| Severity | Label | Definition | Action |
+|----------|-------|------------|--------|
+| 0 | Not an issue | No usability problem | None |
+| 1 | Cosmetic | Minor issue | Fix if time permits |
+| 2 | Minor | Low priority | Schedule for future |
+| 3 | Major | High priority | Fix in current cycle |
+| 4 | Critical | Catastrophic | Fix before release |
+
+---
+
+## Common Workflows
+
+### Quick UX Health Check
+```
+1. Launch browser: puppeteer_launch
+2. Navigate: puppeteer_navigate to {{ vars.targetUrl }}
+3. Run analysis: /analyze-ux
+4. Screenshot findings: puppeteer_screenshot
+5. Generate report: Use report-generator skill
+```
+
+### Full Accessibility Compliance Audit
+```
+1. Navigate to target: puppeteer_navigate
+2. Run audit: Use wcag-compliance skill at Level {{ vars.wcagLevel }}
+3. Review findings and evidence
+4. Generate compliance report
+```
+
+### User Flow Testing
+```
+1. Define flow: /test-flow signup
+2. Agent executes flow automatically
+3. Review friction points
+4. Test error states
+5. Generate flow report
+```
+
+### Interactive Analysis Session
+```
+1. Start with: Use batch-ux-audit skill with interactive mode
+2. Navigate pages as needed
+3. Capture specific elements: puppeteer_screenshot
+4. Get real-time analysis and guidance
+```
+
+---
+
+## Report Output Structure
+
+Reports are saved to `{{ vars.screenshotDir }}/../` in {{ vars.reportFormat }} format:
+
+### Standard Report Sections
+1. **Executive Summary** - Overall score, issue counts, key findings
+2. **Methodology** - Tools used, criteria applied, scope
+3. **Detailed Findings** - Categorized by type, with severity and evidence
+4. **Priority Matrix** - Impact vs effort analysis
+5. **Recommendations** - Quick wins and strategic improvements
+6. **Appendix** - Screenshots, raw data, references
+
+---
+
+## Best Practices
+
+### Evaluation
+1. **Start with goals** - Define what success looks like
+2. **Test clean state** - Clear cookies/cache between sessions
+3. **Capture evidence** - Screenshot every finding
+4. **Prioritize findings** - Use severity scale consistently
+5. **Provide solutions** - Don't just identify problems
+
+### Accessibility
+1. **Test with keyboard** - Tab through entire flow
+2. **Check contrast** - Use 4.5:1 minimum for AA
+3. **Verify ARIA** - Ensure proper roles and states
+4. **Test responsive** - Mobile and desktop breakpoints
+5. **Consider assistive tech** - Screen readers, magnification
+
+### Flow Testing
+1. **Map flows first** - Understand expected behavior
+2. **Test error states** - Invalid inputs, network failures
+3. **Measure timing** - Note slow interactions
+4. **Check empty states** - First-time user experience
+5. **Verify feedback** - Loading states, confirmations
+
+---
+
+## Troubleshooting
+
+### Puppeteer Issues
+
+**Browser not launching**:
+```bash
+# Test Puppeteer MCP manually
+npx puppeteer-mcp-claude serve --help
+```
+
+**Element not found**:
+- Use `puppeteer_wait_for_selector` before interacting
+- Verify selector is correct
+- Check element is visible (not hidden by CSS)
+
+**Page not loading**:
+- Verify URL is accessible
+- Check for authentication requirements
+- Try with different viewport size
+
+### MCP Server Issues
+
+**Server not responding**:
+- Restart Claude Code session
+- Verify mcp_servers.json configuration
+- Check npx can access the package
+
+---
+
+## Support
+
+For issues with this package:
+- Review skill documentation in `reference.md` files
+- Check example usage in `examples.md` files
+
+For UX methodology questions:
+- Nielsen Norman Group: https://www.nngroup.com/
+- WCAG Guidelines: https://www.w3.org/WAI/WCAG21/quickref/
+
+---
+
+**Ready to evaluate!** Use the skills, commands, and agents to conduct comprehensive UX research with AI-powered analysis and consistent reporting.

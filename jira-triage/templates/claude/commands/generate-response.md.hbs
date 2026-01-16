@@ -1,0 +1,491 @@
+Generate professional, empathetic customer response for a JIRA ticket.
+
+**Usage**: `/generate-response <ticket-key>`
+
+**Example**: `/generate-response SUPPORT-123`
+
+---
+
+## Purpose
+
+This command drafts professional customer communications for JIRA tickets, useful for:
+- Acknowledging new tickets
+- Providing solutions or workarounds
+- Explaining issues or behaviors
+- Escalation notifications
+- Status updates
+- Closure messages
+
+The response will be tailored to the ticket context, issue type, and customer situation.
+
+---
+
+## Workflow
+
+### Step 1: Validate Input
+
+Ensure ticket key is provided:
+- Format: `PROJECT-123`
+- If missing, prompt: "Which ticket would you like to generate a response for?"
+
+---
+
+### Step 2: Fetch Comprehensive Context
+
+Use JIRA CLI to gather all relevant information:
+
+```bash
+# Get ticket details
+jira issue view TICKET-KEY --format=json
+
+# Get full comment history
+jira issue view TICKET-KEY --comments
+
+# Extract:
+# - Reporter name (for personalization)
+# - Issue summary and description
+# - Previous communications
+# - Current status and priority
+# - Labels and components
+# - Any linked issues
+# - Attachments
+```
+
+---
+
+### Step 3: Analyze Ticket Situation
+
+Before generating response, determine:
+
+**Response Type Needed**:
+- **Acknowledgment** - Just received, need time to investigate
+- **Solution** - Have fix or workaround available
+- **Explanation** - Need to clarify how something works
+- **Escalation** - Routing to engineering or another team
+- **Status Update** - Progress update on ongoing issue
+- **Closure** - Issue resolved, closing ticket
+
+**Appropriate Tone**:
+- **Apologetic** - Service failure, serious bug, long wait time
+- **Empathetic** - Customer blocked/frustrated, business impact
+- **Professional/Technical** - Developer audience, detailed explanation
+- **Friendly/Educational** - How-to question, new user
+- **Urgent** - Production outage, security issue, data loss
+
+**Key Context Factors**:
+- How long has ticket been open?
+- Has customer sent follow-ups?
+- Is this high-priority or urgent?
+- Is there a workaround available?
+- Do we have a fix in progress?
+- Is this a known issue?
+
+---
+
+### Step 4: Invoke Response Generator Agent
+
+Use the **response-generator** agent to draft the response.
+
+The agent will:
+1. **Analyze ticket context** - Understand issue and customer situation
+2. **Determine response type** - Select appropriate response template
+3. **Assess tone** - Match tone to urgency and situation
+4. **Draft personalized response** - Create empathetic, actionable communication
+5. **Include next steps** - Provide clear timeline and actions
+6. **Add helpful resources** - Link to docs, guides, or related info
+7. **Set expectations** - Be honest about timelines and outcomes
+
+---
+
+### Step 5: Present Generated Response
+
+Display the response draft with analysis:
+
+```markdown
+## Response Draft for: [TICKET-KEY]
+
+### Response Analysis
+
+**Response Type**: [Acknowledgment/Solution/Explanation/Escalation/Status Update/Closure]
+**Recommended Tone**: [Apologetic/Empathetic/Professional/Friendly/Urgent]
+**Urgency**: [High/Medium/Low]
+
+**Context Summary**:
+[1-2 sentences summarizing the ticket and what this response addresses]
+
+---
+
+### Generated Response
+
+**Subject** (optional): [Suggested subject line if email notification]
+
+---
+
+```
+[FULL RESPONSE TEXT - Ready to copy and paste]
+```
+
+---
+
+### Response Rationale
+
+**Why this approach**:
+[2-3 sentences explaining why this response type, tone, and structure were chosen]
+
+**Key elements included**:
+- ✓ [Element 1: e.g., "Personalized greeting using reporter's name"]
+- ✓ [Element 2: e.g., "Acknowledgment of business impact"]
+- ✓ [Element 3: e.g., "Clear workaround with steps"]
+- ✓ [Element 4: e.g., "Specific timeline for follow-up"]
+- ✓ [Element 5: e.g., "Link to relevant documentation"]
+
+---
+
+### Before Posting This Response
+
+**Verify**:
+- [ ] Ticket details are accurate
+- [ ] Timeline commitment is realistic
+- [ ] Workaround steps are correct (if provided)
+- [ ] Links work and are accessible
+- [ ] Tone is appropriate for situation
+- [ ] All customer questions addressed
+
+**Additional Actions** (if applicable):
+- [ ] Update ticket status: [From] → [To]
+- [ ] Update priority: [If needed]
+- [ ] Assign to team/person: [If routing]
+- [ ] Add labels: [If categorizing]
+- [ ] Create escalation ticket: [If escalating]
+- [ ] Set reminder for follow-up: [When]
+
+---
+
+### Alternative Approaches
+
+[If there are other valid response strategies, mention them here]
+
+**Alternative 1**: [Different approach]
+**When to use**: [Circumstances]
+
+**Alternative 2**: [Different approach]
+**When to use**: [Circumstances]
+
+---
+
+### Post Response
+
+**Would you like me to post this response to JIRA?** [Yes/No/Edit First]
+```
+
+---
+
+### Step 6: Post Response (if confirmed)
+
+If user approves, post the response:
+
+```bash
+# Add comment with response
+jira issue comment add TICKET-KEY --comment="[Generated response text]"
+
+# If status update needed
+jira issue move TICKET-KEY --status="[New Status]"
+
+# If assigning during response
+jira issue update TICKET-KEY --assignee=[assignee]
+```
+
+Confirm posting:
+```markdown
+✅ **Response posted to TICKET-KEY**
+
+Actions taken:
+- Posted response comment
+[If status changed:] - Updated status: [Old] → [New]
+[If assigned:] - Assigned to: [Person/Team]
+
+Next steps:
+- [What happens next]
+- [When to follow up]
+```
+
+---
+
+## Response Examples by Scenario
+
+### Example: Acknowledgment Response
+
+**Ticket**: User reports slow loading times
+**Response Type**: Acknowledgment
+**Tone**: Empathetic
+
+```
+Hi [Name],
+
+Thank you for reporting this. I can see you're experiencing slow loading times when accessing the dashboard, which I know must be frustrating.
+
+I'm investigating this now to understand what's causing the delay. I'll have an update for you by [today at 5pm ET] with either a solution or a clear next step.
+
+In the meantime, if you notice any specific patterns (certain times of day, specific pages, etc.), please share them here - that information will help me investigate faster.
+
+Thanks,
+[Your name]
+```
+
+---
+
+### Example: Solution Response
+
+**Ticket**: User can't find export button
+**Response Type**: Solution
+**Tone**: Friendly/Educational
+
+```
+Hi [Name],
+
+Great question! The export functionality is available, just in a slightly different location.
+
+Here's how to export your data:
+
+1. Navigate to the Reports page
+2. Click the "Actions" dropdown in the top right
+3. Select "Export to CSV" or "Export to PDF"
+4. Choose your date range and click "Download"
+
+The export will download immediately to your Downloads folder.
+
+For more details about export options, check out our guide: [link to documentation]
+
+Let me know if you encounter any issues with these steps or need to export in a different format!
+
+Thanks,
+[Your name]
+```
+
+---
+
+### Example: Bug Escalation Response
+
+**Ticket**: API returns 500 error
+**Response Type**: Escalation
+**Tone**: Apologetic + Professional
+
+```
+Hi [Name],
+
+Thank you for the detailed error report and API logs - that's very helpful.
+
+You've identified a bug in our API endpoint. Based on the error pattern, this appears to be related to [specific issue]. I apologize for the disruption this is causing to your integration.
+
+**What I've done**:
+- Reviewed your logs and confirmed the issue
+- Created an escalation ticket for our engineering team (ENG-456)
+- Flagged this as high priority due to the impact on your production system
+
+**What happens next**:
+1. Engineering team will investigate (typically responds within 4 hours for priority issues)
+2. I'll update you by [tomorrow morning at 10am] with their findings
+3. Once we have a fix timeline, I'll share that immediately
+
+**Workaround for now**:
+You can use the v1 endpoint (/api/v1/resource) which doesn't have this issue. It has the same functionality but slightly different response format. Here's the migration guide: [link]
+
+I'm monitoring this closely and will keep you informed of progress. Please let me know if the workaround doesn't work for your use case or if you have any questions.
+
+Thanks,
+[Your name]
+```
+
+---
+
+### Example: Status Update Response
+
+**Ticket**: Ongoing investigation of data sync issue
+**Response Type**: Status Update
+**Tone**: Professional + Empathetic
+
+```
+Hi [Name],
+
+I wanted to give you an update on your data sync issue.
+
+**Current status**: Our engineering team is actively investigating.
+
+**Progress so far**:
+- Confirmed the sync failure is occurring for accounts created after March 1st
+- Identified the root cause: a configuration change in our sync service
+- Developed a fix and testing it in staging environment now
+
+**Next steps**:
+- Testing completes: Today by 6pm
+- Deploy fix to production: Tomorrow morning
+- Verify sync works for your account: Tomorrow afternoon
+- Provide you confirmation: Tomorrow by 5pm
+
+I know this is taking longer than we'd like, and I appreciate your patience. The issue is complex but we're making solid progress.
+
+I'll update you again tomorrow after the fix is deployed, even if we encounter any delays.
+
+Please let me know if you have any questions or concerns.
+
+Thanks,
+[Your name]
+```
+
+---
+
+### Example: Closure Response
+
+**Ticket**: Bug fix deployed and verified
+**Response Type**: Closure
+**Tone**: Positive + Professional
+
+```
+Hi [Name],
+
+Good news! The data export bug has been fixed and deployed to production.
+
+**What was fixed**:
+We identified and corrected an issue in the export service that was causing CSV files to truncate after 10,000 rows. The fix now properly handles exports of any size.
+
+**What you should see now**:
+- Complete CSV exports with all rows included
+- Faster export generation for large datasets
+- No more timeout errors
+
+**Please verify**:
+Could you try exporting your full dataset again and confirm it works as expected? If you're still seeing any issues, please let me know right away and I'll investigate further.
+
+I'm marking this ticket as resolved, but don't hesitate to reopen it or create a new ticket if you need anything else.
+
+Thanks for your patience while we worked through this, and for providing the detailed information that helped us identify the root cause!
+
+Thanks,
+[Your name]
+```
+
+---
+
+## Integration with Other Commands
+
+**Before generating response**:
+
+**Analyze ticket first**:
+```
+/analyze-ticket TICKET-KEY
+```
+Understand priority and urgency before crafting response.
+
+**Categorize ticket**:
+```
+/categorize TICKET-KEY
+```
+Know issue type to select appropriate response template.
+
+---
+
+**After generating response**:
+
+**For complex tickets**:
+```
+Use the response-draft skill for batch response generation
+```
+
+**For priority assessment**:
+```
+Use the priority-analysis skill if response requires timeline commitment
+```
+
+---
+
+## Best Practices
+
+### Response Quality ✅
+
+1. **Personalize** - Always use reporter's name
+2. **Be specific** - Give concrete timelines and steps
+3. **Show empathy** - Acknowledge frustration or impact
+4. **Be honest** - Don't overpromise
+5. **Provide alternatives** - Offer workarounds when available
+6. **Link resources** - Include helpful documentation
+7. **Set expectations** - Be clear about what happens next
+8. **Proofread** - Check for clarity and tone
+
+### Common Mistakes ❌
+
+1. **Vague timelines** - "We'll look into it soon" → "I'll update you by tomorrow at 2pm"
+2. **No next steps** - Always tell customer what happens next
+3. **Too technical** - Explain jargon for non-technical users
+4. **Ignoring context** - Reference their previous messages
+5. **Being defensive** - Own the issue even if not your fault
+6. **Robotic language** - Show human empathy
+7. **Leaving questions unaddressed** - Answer all their questions
+8. **Forgetting to thank** - Appreciate their patience and reports
+
+---
+
+## Response Type Selection Guide
+
+| Situation | Response Type | Tone | Key Elements |
+|-----------|---------------|------|--------------|
+| Just received ticket | Acknowledgment | Empathetic | Timeline for investigation |
+| Have solution available | Solution | Helpful | Clear steps, links |
+| How-to question | Explanation | Friendly | Step-by-step, examples |
+| Bug needs engineering | Escalation | Apologetic | Workaround, timeline |
+| Long-running investigation | Status Update | Professional | Progress, next steps |
+| Issue resolved | Closure | Positive | Verification request |
+| Production outage | Urgent Acknowledgment | Urgent + Empathetic | Immediate action, frequent updates |
+| Security issue | Urgent Escalation | Professional | Containment, investigation plan |
+
+---
+
+## Customization Options
+
+When generating response, you can specify:
+
+**Custom tone**:
+```
+/generate-response SUPPORT-123
+[When prompted: "Make this more technical, customer is a developer"]
+```
+
+**Custom response type**:
+```
+/generate-response SUPPORT-123
+[When prompted: "Focus on the workaround, don't mention the bug fix timeline"]
+```
+
+**Include specific information**:
+```
+/generate-response SUPPORT-123
+[When prompted: "Mention that this affects version 2.3 specifically"]
+```
+
+---
+
+## Troubleshooting
+
+**Response seems generic**:
+- Provide more context about the ticket
+- Specify custom requirements
+- Edit the draft before posting
+- Use the response-generator agent directly for more control
+
+**Tone doesn't match situation**:
+- Override the suggested tone
+- Provide context: "Customer has been waiting 3 days"
+- Adjust manually before posting
+
+**Missing key information**:
+- Gather facts before generating response
+- Use /analyze-ticket first
+- Add missing details to the draft
+
+**Too technical / not technical enough**:
+- Specify audience: "Customer is non-technical"
+- Request simplification or more depth
+- Edit jargon before posting
+
+---
+
+Generate professional, empathetic responses that maintain high support standards and customer satisfaction.

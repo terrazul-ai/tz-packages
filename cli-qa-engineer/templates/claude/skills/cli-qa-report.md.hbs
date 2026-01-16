@@ -1,0 +1,229 @@
+---
+name: cli-qa-report
+description: Generate a comprehensive QA test report for CLI testing
+arguments: optional scope (e.g., "functional", "interactive", "all")
+---
+
+# Generate CLI QA Report
+
+Generate a comprehensive QA test report for the CLI: `{{ vars.cliCommand }}`
+
+## Configuration
+
+- **CLI Command**: `{{ vars.cliCommand }}`
+- **Working Directory**: `{{ vars.workingDir }}`
+- **Report Directory**: `{{ vars.reportDir }}`
+- **Success Patterns**: `{{ vars.successPatterns }}`
+- **Error Patterns**: `{{ vars.errorPatterns }}`
+
+## Report Generation Process
+
+### 1. Collect Test Results
+
+Review any existing test results from previous `/test-cli` and `/test-interactive` runs in this session.
+
+### 2. Run Comprehensive Test Suite
+
+If no prior results exist or scope is "all", run a comprehensive test suite:
+
+#### Functional Tests to Run
+
+| Test | Command | Expected |
+|------|---------|----------|
+| Help | `{{ vars.cliCommand }} --help` | Shows usage |
+| Version | `{{ vars.cliCommand }} --version` | Shows version |
+| No args | `{{ vars.cliCommand }}` | Shows help or error |
+| Invalid flag | `{{ vars.cliCommand }} --invalid-flag` | Shows error |
+
+{{#if vars.projectAnalysis.subcommands}}
+#### Subcommand Tests
+Test each discovered subcommand: {{ vars.projectAnalysis.subcommands }}
+{{/if}}
+
+{{#if vars.projectAnalysis.hasInteractivePrompts}}
+#### Interactive Tests
+Run interactive flow tests for detected prompts.
+{{/if}}
+
+### 3. Generate Report
+
+Create a markdown report at: `{{ vars.reportDir }}/cli-qa-report-<date>.md`
+
+## Report Template
+
+```markdown
+# CLI QA Test Report
+
+**CLI**: {{ vars.cliCommand }}
+**Date**: <generated date>
+**Tester**: Claude AI (CLI QA Engineer)
+
+## Executive Summary
+
+- **Total Tests**: <count>
+- **Passed**: <count> (<percentage>%)
+- **Failed**: <count> (<percentage>%)
+- **Skipped**: <count>
+
+### Overall Status: PASS / FAIL / PARTIAL
+
+## Test Environment
+
+| Property | Value |
+|----------|-------|
+| CLI Command | `{{ vars.cliCommand }}` |
+| Working Directory | `{{ vars.workingDir }}` |
+| Session Prefix | `{{ vars.sessionPrefix }}` |
+| Timeout | `{{ vars.commandTimeout }}s` |
+
+## Test Results
+
+### Functional Tests
+
+#### Help & Documentation
+
+| Test | Status | Notes |
+|------|--------|-------|
+| `--help` | PASS/FAIL | <notes> |
+| `--version` | PASS/FAIL | <notes> |
+| `help` subcommand | PASS/FAIL/N/A | <notes> |
+
+#### Argument Handling
+
+| Test | Status | Notes |
+|------|--------|-------|
+| No arguments | PASS/FAIL | <notes> |
+| Valid arguments | PASS/FAIL | <notes> |
+| Invalid arguments | PASS/FAIL | <notes> |
+| Missing required | PASS/FAIL | <notes> |
+
+#### Error Handling
+
+| Scenario | Status | Error Message Quality |
+|----------|--------|----------------------|
+| File not found | PASS/FAIL | Clear / Unclear |
+| Permission denied | PASS/FAIL | Clear / Unclear |
+| Invalid input | PASS/FAIL | Clear / Unclear |
+
+{{#if vars.projectAnalysis.hasInteractivePrompts}}
+### Interactive Tests
+
+| Flow | Steps | Status | Notes |
+|------|-------|--------|-------|
+| <flow name> | <count> | PASS/FAIL | <notes> |
+{{/if}}
+
+## Detailed Results
+
+### Test: <test-name>
+
+**Command**: `<command>`
+**Status**: PASS/FAIL
+**Duration**: <time>
+
+**Output**:
+```
+<output>
+```
+
+**Assertions**:
+- [x] Assertion 1 passed
+- [ ] Assertion 2 failed: <reason>
+
+---
+<repeat for each test>
+
+## Issues Found
+
+### Critical
+<list critical issues>
+
+### Major
+<list major issues>
+
+### Minor
+<list minor issues>
+
+## Recommendations
+
+1. <recommendation 1>
+2. <recommendation 2>
+3. <recommendation 3>
+
+## Coverage Analysis
+
+### Tested Commands
+<list of commands tested>
+
+### Untested Commands
+<list of commands not tested, if known>
+
+### Test Coverage Estimate
+- **Command coverage**: <percentage>%
+- **Argument coverage**: <percentage>%
+- **Error path coverage**: <percentage>%
+
+## Appendix
+
+### Raw Test Output
+<link or collapsed section with full outputs>
+
+### Test Session IDs
+<list of tmux sessions used>
+```
+
+### 4. Save Report
+
+1. Create the report directory if it doesn't exist:
+   ```
+   mkdir -p {{ vars.reportDir }}
+   ```
+
+2. Write the report file:
+   ```
+   {{ vars.reportDir }}/cli-qa-report-YYYY-MM-DD.md
+   ```
+
+3. Optionally create a JSON summary:
+   ```
+   {{ vars.reportDir }}/cli-qa-summary-YYYY-MM-DD.json
+   ```
+
+## JSON Summary Format
+
+```json
+{
+  "cli": "{{ vars.cliCommand }}",
+  "date": "<ISO date>",
+  "summary": {
+    "total": <number>,
+    "passed": <number>,
+    "failed": <number>,
+    "skipped": <number>,
+    "passRate": <percentage>
+  },
+  "status": "PASS" | "FAIL" | "PARTIAL",
+  "tests": [
+    {
+      "name": "<test name>",
+      "command": "<command>",
+      "status": "PASS" | "FAIL" | "SKIP",
+      "duration": "<duration>",
+      "notes": "<notes>"
+    }
+  ],
+  "issues": {
+    "critical": [],
+    "major": [],
+    "minor": []
+  }
+}
+```
+
+## Important
+
+1. Run actual tests if results don't exist from prior skill invocations
+2. Create the report directory if it doesn't exist
+3. Include timestamps in filenames
+4. Provide actionable recommendations
+5. Be thorough but concise in summaries

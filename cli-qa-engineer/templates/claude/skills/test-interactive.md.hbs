@@ -1,0 +1,205 @@
+---
+name: test-interactive
+description: Test interactive CLI prompts, wizards, and multi-step flows using tmux automation
+arguments: scenario
+---
+
+# Test Interactive CLI Flow
+
+You are a QA engineer testing interactive CLI prompts for scenario: `$ARGUMENTS`
+
+## Configuration
+
+- **CLI Command**: `{{ vars.cliCommand }}`
+- **Working Directory**: `{{ vars.workingDir }}`
+- **Success Patterns**: `{{ vars.successPatterns }}`
+- **Error Patterns**: `{{ vars.errorPatterns }}`
+- **Session Prefix**: `{{ vars.sessionPrefix }}`
+- **Timeout**: `{{ vars.commandTimeout }}s`
+
+## Interactive Testing Strategy
+
+Interactive CLIs require a different approach - you must detect prompts and respond appropriately.
+
+### Common Prompt Patterns
+
+Detect these patterns in captured output to identify prompts:
+
+| Pattern | Type | Response Method |
+|---------|------|-----------------|
+| `? ` (inquirer style) | Question prompt | Text + Enter |
+| `[Y/n]` or `[y/N]` | Yes/No confirmation | 'y' or 'n' + Enter |
+| `>` with options listed | Selection menu | Arrow keys + Enter |
+| `[ ]` / `[x]` | Multi-select | Space to toggle + Enter |
+| `:` at end of line | Input prompt | Text + Enter |
+| `Password:` | Hidden input | Text + Enter |
+| `(default: X)` | Optional with default | Enter for default, or text |
+
+### Sending Keystrokes via tmux
+
+Use `mcp__tmux__execute-command` with send-keys:
+
+```
+# Send text and press Enter
+send-keys "my input" Enter
+
+# Send just Enter (accept default)
+send-keys Enter
+
+# Send arrow down
+send-keys Down
+
+# Send arrow up
+send-keys Up
+
+# Send space (for toggles)
+send-keys Space
+
+# Send Escape
+send-keys Escape
+
+# Send Ctrl+C (cancel)
+send-keys C-c
+```
+
+## Test Execution Steps
+
+### 1. Create Test Session
+
+Use `mcp__tmux__create-session`:
+- Session name: `{{ vars.sessionPrefix }}-interactive-<timestamp>`
+
+### 2. Navigate to Working Directory
+
+```
+cd {{ vars.workingDir }}
+```
+
+### 3. Start the Interactive Command
+
+Execute the command that triggers the interactive flow:
+```
+{{ vars.cliCommand }} $ARGUMENTS
+```
+
+### 4. Interactive Loop
+
+Repeat until flow completes:
+
+1. **Wait briefly** for prompt to appear (1-2 seconds)
+
+2. **Capture pane output** with `mcp__tmux__capture-pane`
+
+3. **Detect prompt type** by analyzing captured output:
+   - Look for `?`, `[Y/n]`, `>`, selection indicators
+   - Check if waiting for input vs processing
+
+4. **Send appropriate response**:
+   - For text prompts: send test value + Enter
+   - For yes/no: send 'y' or 'n' + Enter
+   - For selections: send arrow keys then Enter
+   - For multi-select: send Space to toggle, then Enter
+
+5. **Verify response accepted** by capturing output again
+
+6. **Continue until flow completes** or error occurs
+
+### 5. Verify Final State
+
+After interactive flow completes:
+- Check for success patterns in final output
+- Verify any created files/config exist
+- Check for error messages
+
+### 6. Cleanup
+
+Destroy test session with `mcp__tmux__kill-session`.
+
+## Test Scenarios
+
+### Init/Setup Wizard
+Test initial setup flows:
+1. Start init command
+2. Respond to each configuration prompt
+3. Verify configuration is created correctly
+
+### Confirmation Dialogs
+Test destructive action confirmations:
+1. Trigger action requiring confirmation
+2. Test with 'n' (decline) - verify action cancelled
+3. Test with 'y' (accept) - verify action performed
+
+### Selection Menus
+Test menu navigation:
+1. Trigger menu display
+2. Navigate with arrow keys
+3. Select option with Enter
+4. Verify correct option selected
+
+### Multi-step Workflows
+Test sequential operations:
+1. Start workflow command
+2. Complete each step with appropriate input
+3. Verify intermediate states
+4. Verify final outcome
+
+### Error Recovery
+Test handling of invalid input:
+1. Provide invalid input at prompt
+2. Verify error message displayed
+3. Verify prompt re-appears for retry
+4. Provide valid input
+5. Verify flow continues
+
+## Report Format
+
+```markdown
+## Interactive Test: $ARGUMENTS
+
+### Flow Overview
+- **Command**: `{{ vars.cliCommand }} $ARGUMENTS`
+- **Session**: <session-name>
+- **Total Steps**: <number>
+
+### Step-by-Step Results
+
+#### Step 1: <prompt description>
+- **Prompt Detected**: `<prompt text>`
+- **Response Sent**: `<response>`
+- **Result**: Accepted / Error
+- **Output**:
+```
+<captured output after response>
+```
+
+#### Step 2: <prompt description>
+...
+
+### Final State
+- **Status**: PASS / FAIL
+- **Final Output**:
+```
+<final captured output>
+```
+
+### Assertions
+- [ ] All prompts detected correctly
+- [ ] All responses accepted
+- [ ] Flow completed successfully
+- [ ] No unexpected errors
+- [ ] Final state matches expectations
+
+### Issues Found
+<list any problems encountered>
+
+### Recommendations
+<suggestions for improvement>
+```
+
+## Important Guidelines
+
+1. **Be patient**: Interactive prompts may take time to appear
+2. **Capture frequently**: Capture output before and after each input
+3. **Handle timeouts**: If a prompt doesn't appear within {{ vars.commandTimeout }}s, report timeout
+4. **Test cancellation**: Verify Ctrl+C properly cancels the flow
+5. **Document all steps**: Record every prompt and response for the report

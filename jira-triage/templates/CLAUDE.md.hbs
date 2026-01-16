@@ -1,0 +1,369 @@
+{{~ var jiraUrl = askUser('What is your JIRA instance URL?', {
+  placeholder: 'https://yourcompany.atlassian.net'
+}) ~}}
+{{~ var jiraProject = askUser('What is your primary JIRA project key?', {
+  placeholder: 'SUPPORT'
+}) ~}}
+{{~ var triageBoard = askUser('What is the ID of your triage board? (optional)', {
+  default: '',
+  placeholder: 'Leave empty to use default project board'
+}) ~}}
+{{~ var priorityMapping = askUser('How should urgency be mapped to priority?', {
+  default: 'Critical=Highest, High=High, Medium=Medium, Low=Low',
+  placeholder: 'Critical=Highest, High=High, Medium=Medium, Low=Low'
+}) ~}}
+{{~ var triageLabel = askUser('What label should mark triaged tickets?', {
+  default: 'triaged',
+  placeholder: 'triaged'
+}) ~}}
+{{~ var slaHours = askUser('What is your standard SLA response time in hours?', {
+  default: '24',
+  placeholder: '24'
+}) ~}}
+
+# JIRA Triage Assistant
+
+**Package**: `@leourbina/jira-triage`
+**Version**: 0.1.0
+**Purpose**: AI-powered JIRA ticket triage using Atlassian CLI
+
+This package provides specialized agents, commands, and skills to help you efficiently triage JIRA support tickets using AI analysis.
+
+---
+
+## Project Configuration
+
+**JIRA URL**: {{ vars.jiraUrl }}
+**Project Key**: {{ vars.jiraProject }}
+{{#if vars.triageBoard}}**Triage Board ID**: {{ vars.triageBoard }}{{/if}}
+**Priority Mapping**: {{ vars.priorityMapping }}
+**Triage Label**: `{{ vars.triageLabel }}`
+**SLA Response Time**: {{ vars.slaHours }} hours
+
+---
+
+## Prerequisites
+
+This package requires the Atlassian JIRA CLI to be installed and configured:
+
+```bash
+# Install JIRA CLI (if not already installed)
+# Option 1: Using Homebrew (macOS/Linux)
+brew install ankitpokhrel/jira-cli/jira-cli
+
+# Option 2: Using Go
+go install github.com/ankitpokhrel/jira-cli/cmd/jira@latest
+
+# Configure JIRA CLI with your credentials
+jira init
+```
+
+Follow the interactive setup to configure your JIRA instance URL and authentication.
+
+---
+
+## Available Skills
+
+You have access to three specialized skills for JIRA ticket triage. Use the `Skill` tool to invoke them.
+
+### 1. **bulk-triage**
+Analyze multiple tickets in batch and provide comprehensive triage recommendations.
+
+**Use cases**:
+- Morning triage session for all overnight tickets
+- Process backlog of untriaged tickets
+- Identify patterns across similar issues
+- Generate triage reports for team review
+
+**Example usage**:
+```
+Use the bulk-triage skill to analyze all open untriaged tickets in {{ vars.jiraProject }}
+```
+
+### 2. **priority-analysis**
+Deep analysis of ticket urgency and impact to suggest accurate priority levels.
+
+**Use cases**:
+- Complex tickets requiring careful priority assessment
+- Escalation decisions for high-impact issues
+- SLA compliance checks
+- Business impact evaluation
+
+**Example usage**:
+```
+Use the priority-analysis skill to assess SUPPORT-123
+```
+
+### 3. **response-draft**
+Generate professional, empathetic response drafts based on ticket content and context.
+
+**Use cases**:
+- High-priority tickets needing immediate response
+- Standard responses for common issue types
+- Escalation communications
+- Customer status updates
+
+**Example usage**:
+```
+Use the response-draft skill to create a response for SUPPORT-456
+```
+
+---
+
+## Slash Commands
+
+Quick-action commands for common triage tasks:
+
+### `/triage [ticket-key or JQL]`
+Main triage command for single or bulk ticket analysis.
+- Analyzes ticket(s) using AI
+- Suggests priority, category, and assignee
+- Optionally applies changes to JIRA
+
+### `/analyze-ticket <ticket-key>`
+Detailed analysis of a single ticket.
+- Extracts key information
+- Identifies urgency signals
+- Provides structured recommendations
+
+### `/categorize <ticket-key>`
+Quick categorization helper.
+- Classifies issue type (bug, feature, question, etc.)
+- Suggests appropriate labels and components
+
+### `/generate-response <ticket-key>`
+Draft a professional response for a ticket.
+- Analyzes ticket content and customer context
+- Generates empathetic, actionable response
+- Includes relevant documentation links
+
+---
+
+## Specialized Agents
+
+Three specialized agents are available for complex analysis:
+
+### **ticket-analyzer**
+Systematically analyzes tickets to extract information and identify urgency signals.
+- Structured analysis workflow
+- Urgency and impact assessment
+- Priority recommendations with rationale
+
+### **ticket-categorizer**
+Classifies tickets into issue types and suggests appropriate handling.
+- Issue type classification (bug, feature, question, config, etc.)
+- Complexity estimation
+- Component and label suggestions
+
+### **response-generator**
+Creates professional customer responses based on ticket analysis.
+- Context-aware response generation
+- Empathetic communication style
+- Actionable next steps
+
+---
+
+## Common Workflows
+
+### Quick Single-Ticket Triage
+```bash
+# 1. View ticket details
+jira issue view SUPPORT-123
+
+# 2. Analyze with AI
+/analyze-ticket SUPPORT-123
+
+# 3. Apply suggested priority and labels
+jira issue update SUPPORT-123 --priority=High --labels={{ vars.triageLabel }}
+
+# 4. Generate and post response
+/generate-response SUPPORT-123
+```
+
+### Bulk Triage Session
+```bash
+# 1. Get list of untriaged tickets
+jira issue list --jql="project={{ vars.jiraProject }} AND labels NOT IN ({{ vars.triageLabel }}) AND status=Open"
+
+# 2. Run bulk triage skill
+Use the bulk-triage skill to process all untriaged {{ vars.jiraProject }} tickets
+
+# 3. Review AI recommendations and apply changes
+# 4. Mark tickets as triaged
+```
+
+### Priority Escalation Decision
+```bash
+# 1. Deep priority analysis
+Use the priority-analysis skill for SUPPORT-789
+
+# 2. Review SLA and business impact
+# 3. Escalate if needed
+jira issue update SUPPORT-789 --priority=Highest
+
+# 4. Notify stakeholders
+```
+
+---
+
+## JIRA CLI Quick Reference
+
+### Essential Commands
+
+```bash
+# List issues with filters
+jira issue list --project={{ vars.jiraProject }} --status=Open
+
+# View specific ticket (JSON format for parsing)
+jira issue view SUPPORT-123 --format=json
+
+# Search with JQL
+jira issue list --jql="project={{ vars.jiraProject }} AND priority=High AND labels NOT IN ({{ vars.triageLabel }})"
+
+# Update ticket fields
+jira issue update SUPPORT-123 --priority=High --assignee=john.doe --labels={{ vars.triageLabel }}
+
+# Add comment
+jira issue comment add SUPPORT-123 --comment="Triaged as High priority - production impact"
+
+# Transition ticket status
+jira issue move SUPPORT-123 --status="In Progress"
+
+# List available transitions
+jira issue list-transitions SUPPORT-123
+```
+
+### Useful JQL Query Patterns
+
+```bash
+# All untriaged tickets
+project={{ vars.jiraProject }} AND labels NOT IN ({{ vars.triageLabel }}) AND status=Open
+
+# High priority candidates (urgent keywords)
+project={{ vars.jiraProject }} AND (description ~ "urgent" OR description ~ "production" OR description ~ "critical")
+
+# Old untriaged tickets (>7 days)
+project={{ vars.jiraProject }} AND created < -7d AND labels NOT IN ({{ vars.triageLabel }})
+
+# Tickets missing assignee
+project={{ vars.jiraProject }} AND assignee=EMPTY AND status=Open
+
+# SLA at risk (created >{{ vars.slaHours }} hours ago)
+project={{ vars.jiraProject }} AND created < -{{ vars.slaHours }}h AND status=Open AND labels NOT IN ({{ vars.triageLabel }})
+
+# Tickets by priority
+project={{ vars.jiraProject }} AND priority IN (Highest, High) AND status=Open
+```
+
+---
+
+## Priority Mapping Guide
+
+Based on your configuration: **{{ vars.priorityMapping }}**
+
+### Urgency Signals to Look For
+
+**Highest Priority**:
+- Production system down
+- Data loss or corruption
+- Security vulnerability
+- Revenue-impacting issues
+- Multiple customers affected
+
+**High Priority**:
+- Major feature broken
+- Performance degradation
+- Single high-value customer affected
+- Workaround exists but complex
+
+**Medium Priority**:
+- Minor feature issue
+- Single standard customer affected
+- Documentation unclear
+- Non-blocking bugs
+
+**Low Priority**:
+- Enhancement requests
+- Nice-to-have features
+- Cosmetic issues
+- Documentation improvements
+
+---
+
+## Best Practices
+
+### Triage Workflow
+1. **Start with filters** - Use JQL to identify tickets needing triage
+2. **Batch similar tickets** - Group by type for efficiency
+3. **Always review AI suggestions** - Don't blindly apply recommendations
+4. **Document your reasoning** - Add comments explaining triage decisions
+5. **Track metrics** - Monitor triage time and accuracy
+6. **Update regularly** - Keep tickets fresh with status updates
+
+### Using AI Effectively
+- **Provide context** - Share relevant ticket details with agents
+- **Verify urgency signals** - Check for production impact, SLAs
+- **Review before applying** - Always confirm changes before updating JIRA
+- **Learn from patterns** - Use bulk analysis to identify systemic issues
+- **Iterate on responses** - Refine AI-generated drafts before posting
+
+### JIRA Hygiene
+- **Use consistent labels** - Apply `{{ vars.triageLabel }}` to all triaged tickets
+- **Update priority promptly** - Reflect true urgency
+- **Assign appropriately** - Match expertise to issue type
+- **Add informative comments** - Explain triage reasoning for audit trail
+- **Close resolved tickets** - Keep board clean
+
+---
+
+## Troubleshooting
+
+### JIRA CLI Not Found
+```bash
+# Check if jira CLI is installed
+which jira
+
+# If not installed, install via Homebrew
+brew install ankitpokhrel/jira-cli/jira-cli
+
+# Verify installation
+jira version
+```
+
+### Authentication Issues
+```bash
+# Reconfigure JIRA CLI
+jira init
+
+# Test connection
+jira issue list --project={{ vars.jiraProject }} --limit=1
+```
+
+### JQL Query Errors
+- Verify project key is correct: `{{ vars.jiraProject }}`
+- Check field names match your JIRA instance
+- Test queries in JIRA web interface first
+- Use `--debug` flag for detailed error messages
+
+### Skill Not Working
+- Ensure you're using the `Skill` tool to invoke skills
+- Check skill name is exact: `bulk-triage`, `priority-analysis`, `response-draft`
+- Verify JIRA CLI is configured and accessible
+- Review skill documentation in `reference.md` files
+
+---
+
+## Support
+
+For issues with this package:
+- Check `README.md` for setup instructions
+- Review skill `examples.md` files for usage patterns
+- Consult `reference.md` for JQL and CLI command references
+
+For JIRA CLI issues:
+- Documentation: https://github.com/ankitpokhrel/jira-cli
+- Report issues: https://github.com/ankitpokhrel/jira-cli/issues
+
+---
+
+**Ready to triage!** Use the skills, commands, and agents to efficiently process your JIRA tickets with AI-powered analysis.

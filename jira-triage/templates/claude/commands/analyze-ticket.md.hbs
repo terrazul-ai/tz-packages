@@ -1,0 +1,380 @@
+Perform detailed analysis of a single JIRA ticket.
+
+**JIRA Ticket Link/Number**: $ARGUMENTS
+
+---
+
+## Workflow
+
+### Step 1: Validate Input
+
+Ensure a ticket key is provided:
+- Format must be: `PROJECT-123` (project key + hyphen + number)
+- If no argument provided, prompt user: "Which ticket would you like to analyze?"
+
+---
+
+### Step 2: Fetch Comprehensive Ticket Data
+
+Use JIRA CLI to gather all relevant information:
+
+```bash
+# Get ticket details in JSON format
+jira issue view TICKET-KEY --format=json
+
+# Get full comment thread
+jira issue view TICKET-KEY --comments
+
+# Check for linked issues
+jira issue view TICKET-KEY | grep -A 10 "Links"
+
+# Check for attachments
+jira issue view TICKET-KEY | grep -A 5 "Attachments"
+```
+
+Extract all available fields:
+- Issue key, summary, description
+- Reporter (name, email)
+- Creation date, last updated
+- Current status, priority, resolution
+- Labels, components, fix versions
+- Assignee (current)
+- Comments (full thread)
+- Linked issues (blocks, is blocked by, relates to)
+- Attachments (count and types)
+- Custom fields (SLA, customer tier, etc.)
+- Watchers (if available)
+
+---
+
+### Step 3: Invoke Ticket Analyzer Agent
+
+Use the **ticket-analyzer** agent to perform systematic analysis.
+
+The agent will:
+1. **Extract key information** - Parse all ticket metadata and content
+2. **Analyze urgency** - Identify urgency signals and time-based factors
+3. **Assess business impact** - Evaluate scope, severity, and financial impact
+4. **Categorize issue** - Classify type and estimate complexity
+5. **Recommend priority** - Map urgency+impact to JIRA priority level
+6. **Suggest assignee** - Recommend team or individual based on expertise
+7. **Provide next steps** - Clear, actionable recommendations
+
+---
+
+### Step 4: Present Detailed Analysis
+
+Display the ticket-analyzer agent's comprehensive output:
+
+```markdown
+## Detailed Ticket Analysis: [TICKET-KEY]
+
+**Summary**: [One-line ticket summary]
+**Reporter**: [Name/Email]
+**Created**: [Date and time]
+**Last Updated**: [Date and time]
+**Current Status**: [Status]
+**Current Priority**: [Priority]
+**Assignee**: [Current assignee or "Unassigned"]
+
+---
+
+### Urgency Assessment
+
+**Urgency Level**: [Critical/High/Medium/Low]
+
+**Signals Identified**:
+- "[Quoted urgency keyword/phrase from ticket]"
+- "[Another signal]"
+- "[Time-based factor: ticket age, SLA deadline]"
+- "[Customer context: tier, previous escalations]"
+
+**Analysis**:
+[2-3 sentences explaining the urgency assessment]
+
+---
+
+### Business Impact Assessment
+
+**Impact Level**: [Critical/High/Medium/Low]
+
+**Impact Factors**:
+- **Users Affected**: [Scope: all users, enterprise customer, single user, etc.]
+- **Functionality**: [What's broken or requested]
+- **Financial Impact**: [Revenue/cost implications if any]
+- **Data Impact**: [Data loss, corruption, accuracy issues if any]
+- **Workaround**: [Available, complex, none]
+
+**Analysis**:
+[2-3 sentences explaining the impact assessment]
+
+---
+
+### Issue Classification
+
+**Type**: [Bug/Feature Request/Question/Configuration/Documentation/Performance/Security/Data Issue]
+**Complexity**: [Simple/Medium/Complex/Escalation]
+**Product Area**: [Component or area]
+
+**Rationale**:
+[2-3 sentences explaining why this classification]
+
+**Estimated Effort**: [Time estimate based on complexity]
+
+---
+
+### Priority Recommendation
+
+**Recommended Priority**: [Highest/High/Medium/Low]
+**Current Priority**: [Existing priority]
+**Change Needed**: [Yes/No]
+
+**Urgency + Impact Matrix**:
+- Urgency: [Level] + Impact: [Level] = Priority: [Recommended]
+
+**Full Rationale**:
+[Detailed explanation of priority recommendation including:
+- Why this urgency level
+- Why this impact level
+- How they map to priority
+- Any special considerations (SLA, customer tier, etc.)
+- Comparison to current priority if change recommended]
+
+---
+
+### Assignee Recommendation
+
+**Recommended Team/Person**: [Specific suggestion]
+**Current Assignee**: [Current or "Unassigned"]
+**Assignment Change Needed**: [Yes/No]
+
+**Skills/Expertise Needed**:
+- [Skill 1]
+- [Skill 2]
+- [Skill 3]
+
+**Rationale**:
+[2-3 sentences explaining assignee recommendation]
+
+---
+
+### Next Steps
+
+**Immediate Actions** (within 1 hour):
+1. [Action] - [Who should do it]
+2. [Action] - [Who should do it]
+
+**Short-term Actions** (within 24 hours):
+1. [Action] - [Who should do it]
+2. [Action] - [Who should do it]
+
+**Follow-up Actions**:
+1. [Action] - [Who/when]
+2. [Action] - [Who/when]
+
+---
+
+### Response Strategy
+
+**Customer Communication Needed**: [Yes/No/Urgency level]
+
+**Recommended Approach**: [Acknowledgment/Solution/Explanation/Escalation/Status Update]
+
+**Key Points to Address**:
+- [Point 1]
+- [Point 2]
+- [Point 3]
+
+**Suggested Tone**: [Professional/Empathetic/Technical/Apologetic/Urgent]
+
+**Timeline**: [When to respond - immediate, within 4 hours, within 24 hours, etc.]
+
+---
+
+### Related Context
+
+**Linked Issues**:
+- [TICKET-KEY]: [Relationship] - [Brief summary]
+- [TICKET-KEY]: [Relationship] - [Brief summary]
+
+**Similar Past Issues**:
+[If found through search, list similar historical tickets]
+
+**Documentation References**:
+[Relevant docs, guides, or KB articles]
+
+---
+
+### Additional Observations
+
+[Any other relevant notes, patterns, concerns, or recommendations]
+
+---
+
+### Recommended Commands
+
+Based on this analysis, consider using:
+
+[If response needed:]
+`/generate-response TICKET-KEY` - Draft customer response
+
+[If categorization useful:]
+`/categorize TICKET-KEY` - Get detailed categorization and labeling suggestions
+
+[If complex priority decision:]
+Use the `priority-analysis` skill for deeper priority assessment
+
+```
+
+---
+
+### Step 5: Offer to Apply Changes
+
+After presenting the analysis, ask if user wants to apply recommended changes:
+
+```markdown
+## Suggested Actions
+
+Based on this analysis, I recommend the following changes to the ticket:
+
+**Priority Update**:
+```bash
+jira issue update TICKET-KEY --priority=[Recommended]
+```
+
+**Labels to Add**:
+```bash
+jira issue update TICKET-KEY --labels=[current-labels],{{ vars.triageLabel }},[suggested-labels]
+```
+
+**Assignment**:
+```bash
+jira issue update TICKET-KEY --assignee=[recommended-assignee]
+```
+
+**Triage Comment**:
+```bash
+jira issue comment add TICKET-KEY --comment="[Analysis summary and rationale]"
+```
+
+**Would you like me to apply these changes?** [Yes/No/Some]
+```
+
+If user confirms:
+- Execute the JIRA CLI commands
+- Confirm each action completed
+- Provide summary of changes applied
+
+If user declines:
+- Provide commands for manual execution
+- Offer to modify recommendations
+
+---
+
+## Usage Examples
+
+### Basic Analysis
+```
+/analyze-ticket SUPPORT-456
+```
+Performs comprehensive analysis of ticket SUPPORT-456.
+
+---
+
+### After Bulk Triage
+```
+# After running /triage, identified a complex ticket
+/analyze-ticket SUPPORT-789
+```
+Get detailed analysis to make informed priority decision.
+
+---
+
+### Before Escalation
+```
+/analyze-ticket SUPPORT-321
+```
+Thorough analysis to justify escalation to engineering team.
+
+---
+
+### For Complex Priority Decisions
+```
+/analyze-ticket SUPPORT-654
+```
+When ticket has competing factors (high urgency, low impact; or vice versa).
+
+---
+
+## Integration with Other Commands
+
+**After analysis, you may want to**:
+
+**Generate customer response**:
+```
+/generate-response TICKET-KEY
+```
+
+**Get categorization details**:
+```
+/categorize TICKET-KEY
+```
+
+**For even deeper priority analysis**:
+```
+Use the priority-analysis skill for TICKET-KEY
+```
+
+**For multiple similar tickets**:
+```
+Use the bulk-triage skill with JQL query
+```
+
+---
+
+## Best Practices
+
+1. **Use for complex tickets** - When quick triage isn't sufficient
+2. **Before escalations** - Document reasoning for escalation
+3. **For priority disputes** - Provide objective analysis
+4. **When learning** - Understand how to assess urgency and impact
+5. **For documentation** - Create detailed record of triage decision
+6. **Review related tickets** - Check linked issues and historical patterns
+7. **Consider full context** - Don't just read summary, read all comments
+
+---
+
+## What Makes This Different from /triage
+
+| Feature | /analyze-ticket | /triage |
+|---------|----------------|---------|
+| **Scope** | Single ticket only | Single or multiple tickets |
+| **Depth** | Very detailed analysis | Streamlined analysis |
+| **Output** | Comprehensive report | Concise recommendations |
+| **Use Case** | Complex decisions, escalations | Routine triage, bulk processing |
+| **Speed** | Slower, thorough | Faster, efficient |
+| **Detail Level** | Full rationale for all recommendations | Summary with key points |
+
+---
+
+## Troubleshooting
+
+**Ticket not found**:
+- Verify ticket key format: `PROJECT-123`
+- Check you have permission to view the ticket
+- Confirm ticket exists: `jira issue view TICKET-KEY`
+
+**Insufficient data**:
+- Ticket may be very minimal (just title, no description)
+- Analysis will note lack of information
+- Recommend asking reporter for more details
+
+**Analysis seems incorrect**:
+- Review the signals and factors identified
+- Check if custom context is needed (industry-specific urgency)
+- Provide feedback on what's missing or incorrect
+- Use human judgment to override AI recommendations
+
+---
+
+Provide comprehensive, actionable analysis that supports informed triage decisions.

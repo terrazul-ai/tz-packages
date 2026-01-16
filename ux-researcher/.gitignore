@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Output directories
+ux-reports/
+screenshots/
+
+# Cache files
+agents-cache.toml
+.terrazul/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
