@@ -1,0 +1,20 @@
+[package]
+name = "@terrazul/ux-researcher"
+version = "0.1.1"
+description = "AI-powered UX evaluation using Puppeteer for browser automation, Nielsen's heuristics, WCAG accessibility, and user flow testing"
+homepage = "https://github.com/leourbina/ux-researcher"
+repository = "https://github.com/leourbina/ux-researcher.git"
+license = "MIT"
+keywords = ["ux", "accessibility", "wcag", "usability", "puppeteer", "heuristics", "nielsen", "testing", "a11y"]
+authors = ["Leonardo Urbina <leo@terrazul.com>"]
+is_private = false
+
+[compatibility]
+claude = ">=0.2.0"
+
+[exports.claude]
+template = "templates/CLAUDE.md.hbs"
+subagentsDir = "templates/claude/agents"
+commandsDir = "templates/claude/commands"
+skillsDir = "templates/claude/skills"
+mcpServers = "templates/claude/mcp_servers.json.hbs"

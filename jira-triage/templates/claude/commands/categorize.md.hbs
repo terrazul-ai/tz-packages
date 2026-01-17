@@ -1,0 +1,447 @@
+Quick AI-powered categorization and labeling for JIRA tickets.
+
+**Usage**: `/categorize <ticket-key>`
+
+**Example**: `/categorize SUPPORT-123`
+
+---
+
+## Purpose
+
+This command provides fast categorization focused on:
+- Issue type classification (bug, feature, question, etc.)
+- Label suggestions for filtering and tracking
+- Component identification
+- Complexity estimation
+- Workflow recommendations
+
+Use this when you need categorization without full triage analysis.
+
+For complete analysis, use `/analyze-ticket` instead.
+For full triage with priority assessment, use `/triage` instead.
+
+---
+
+## Workflow
+
+### Step 1: Validate Input
+
+Ensure ticket key is provided:
+- Format: `PROJECT-123`
+- If missing, prompt: "Which ticket would you like to categorize?"
+
+---
+
+### Step 2: Fetch Ticket Content
+
+Use JIRA CLI to retrieve ticket data:
+
+```bash
+# Get ticket details
+jira issue view TICKET-KEY --format=json
+
+# Extract:
+# - Summary (title)
+# - Description
+# - Comments
+# - Current labels
+# - Current components
+# - Current status
+```
+
+---
+
+### Step 3: Invoke Ticket Categorizer Agent
+
+Use the **ticket-categorizer** agent to classify the ticket.
+
+The agent will:
+1. **Classify issue type** - Identify primary type (bug, feature, question, etc.)
+2. **Assess complexity** - Estimate effort required (simple, medium, complex, escalation)
+3. **Suggest labels** - Recommend relevant labels for tracking
+4. **Identify components** - Determine product areas affected
+5. **Recognize patterns** - Match to common issue categories
+6. **Recommend workflow** - Suggest status transitions and assignments
+
+---
+
+### Step 4: Present Categorization
+
+Display structured categorization output:
+
+```markdown
+## Ticket Categorization: [TICKET-KEY]
+
+**Summary**: [One-line ticket summary]
+
+---
+
+### Primary Classification
+
+**Issue Type**: [Bug/Feature Request/Question/Configuration/Documentation/Performance/Security/Data Issue]
+**Confidence**: [High/Medium/Low]
+
+**Indicators Found**:
+- "[Quoted keyword/phrase from ticket]"
+- "[Another indicator]"
+- "[Another indicator]"
+
+**Rationale**: [1-2 sentences explaining this classification]
+
+---
+
+### Secondary Classifications
+
+[If ticket has multiple aspects]
+
+**Also classified as**: [Additional type]
+**Reason**: [Brief explanation]
+
+---
+
+### Complexity Assessment
+
+**Complexity**: [Simple/Medium/Complex/Escalation]
+**Estimated Effort**: [< 1 hour / 1-4 hours / > 4 hours / Requires engineering]
+
+**Reasoning**:
+[Brief explanation of complexity assessment]
+
+**Factors**:
+- [Factor 1: e.g., "Known issue with documented fix"]
+- [Factor 2: e.g., "Requires code changes"]
+- [Factor 3: e.g., "Needs cross-team coordination"]
+
+---
+
+### Label Recommendations
+
+**Current Labels**: [List existing labels or "None"]
+
+**Suggested Labels to Add**:
+- `[label1]` - [Why: e.g., "Identifies issue type"]
+- `[label2]` - [Why: e.g., "Marks product area"]
+- `[label3]` - [Why: e.g., "Indicates urgency"]
+- `{{ vars.triageLabel }}` - [Marks ticket as triaged]
+
+**Labels to Remove** (if any):
+- `[incorrect-label]` - [Why: e.g., "Misclassified"]
+
+**Priority Labels** (if urgency detected):
+- `urgent` / `high-priority` / `quick-win` - [Based on analysis]
+
+---
+
+### Component Recommendations
+
+**Current Components**: [List existing or "None"]
+
+**Suggested Components to Add**:
+- `[component1]` - [Why: e.g., "Backend service affected"]
+- `[component2]` - [Why: e.g., "API integration involved"]
+
+**Component Rationale**:
+[Brief explanation of why these components]
+
+---
+
+### Workflow Recommendations
+
+**Current Status**: [Existing status]
+**Recommended Status**: [Suggested status]
+**Transition**: [From] → [To]
+
+**Rationale**: [Why this workflow step]
+
+**Additional Workflow Actions**:
+- [ ] [Action 1: e.g., "Assign to [team]"]
+- [ ] [Action 2: e.g., "Link to related ticket"]
+- [ ] [Action 3: e.g., "Request more info from reporter"]
+
+---
+
+### Pattern Recognition
+
+[If this matches a known pattern]
+
+**Pattern**: [Pattern name or description]
+**Similar Tickets**: [TICKET-KEY, TICKET-KEY, ...] or [Approximate count]
+**Common Root Cause**: [If known]
+**Standard Resolution**: [If applicable]
+
+**Recommendation**: [How to handle based on pattern]
+
+---
+
+### Team/Assignee Suggestion
+
+**Recommended Team**: [Which team should handle]
+**Recommended Assignee**: [Specific person if applicable]
+
+**Based on**:
+- Issue type: [Type]
+- Product area: [Area/Component]
+- Complexity: [Level]
+- Expertise needed: [Skills]
+
+---
+
+### Quick Actions
+
+To apply these categorization changes:
+
+```bash
+# Add labels
+jira issue update TICKET-KEY --labels=[all-labels-comma-separated]
+
+# Set components
+jira issue update TICKET-KEY --component=[component1] --component=[component2]
+
+# Assign to team/person
+jira issue update TICKET-KEY --assignee=[username]
+
+# Transition status (if recommended)
+jira issue move TICKET-KEY --status="[New Status]"
+
+# Add categorization comment
+jira issue comment add TICKET-KEY --comment="Categorized as [type] - [brief rationale]"
+```
+
+**Would you like me to apply these categorizations?** [Yes/No/Some]
+```
+
+---
+
+### Step 5: Apply Categorization (if confirmed)
+
+If user approves, execute JIRA CLI commands:
+
+```bash
+# Update labels
+jira issue update TICKET-KEY --labels=[updated-label-list]
+
+# Update components
+jira issue update TICKET-KEY --component=[component1] --component=[component2]
+
+# Assign if recommended
+jira issue update TICKET-KEY --assignee=[recommended-assignee]
+
+# Add categorization comment
+jira issue comment add TICKET-KEY --comment="Categorized as [type]. Complexity: [level]. [Brief rationale]"
+```
+
+Confirm completion:
+```markdown
+✅ **Categorization applied to TICKET-KEY**
+
+Updated:
+- Labels: [new labels added]
+- Components: [components set]
+- Assignee: [if changed]
+- Comment: [Added categorization note]
+```
+
+---
+
+## Usage Examples
+
+### Quick Categorization
+```
+/categorize SUPPORT-456
+```
+Fast classification and labeling for newly created ticket.
+
+---
+
+### After Bulk Import
+```
+# Process newly imported tickets
+/categorize SUPPORT-789
+/categorize SUPPORT-790
+/categorize SUPPORT-791
+```
+Categorize each ticket individually for proper routing.
+
+---
+
+### Re-categorization
+```
+/categorize SUPPORT-123
+```
+Re-evaluate categorization after more information is available.
+
+---
+
+### Before Full Triage
+```
+/categorize SUPPORT-654
+```
+Quick classification before investing time in full analysis.
+
+---
+
+## Categorization Framework
+
+The **ticket-categorizer** agent uses this framework:
+
+### Issue Types
+
+| Type | Indicators | Typical Labels | Handling |
+|------|-----------|----------------|----------|
+| **Bug** | "error", "broken", "crash" | `bug`, `defect` | Debug and fix |
+| **Feature** | "add", "new", "enhance" | `feature-request`, `enhancement` | Product review |
+| **Question** | "how do I", "what is" | `question`, `how-to` | Provide guidance |
+| **Config** | "setup", "permissions" | `configuration`, `setup` | Config assistance |
+| **Docs** | "unclear", "missing docs" | `documentation`, `needs-docs` | Update docs |
+| **Performance** | "slow", "timeout" | `performance`, `latency` | Profile and optimize |
+| **Security** | "vulnerability", "breach" | `security`, `critical` | Immediate escalation |
+| **Data** | "data loss", "corrupted" | `data-issue`, `data-integrity` | Investigation |
+
+---
+
+### Complexity Levels
+
+**Simple (< 1 hour)**:
+- Known issue with solution
+- Quick configuration fix
+- Standard how-to question
+- Labels: `quick-win`, `easy`
+
+**Medium (1-4 hours)**:
+- Requires investigation
+- Code-level debugging
+- Multi-step resolution
+- Labels: `standard`
+
+**Complex (> 4 hours)**:
+- Deep technical investigation
+- Architectural issues
+- Cross-team coordination
+- Labels: `complex`, `investigation-needed`
+
+**Escalation**:
+- Beyond support scope
+- Engineering required
+- Security/compliance
+- Labels: `escalation`, `engineering-required`
+
+---
+
+## Integration with Other Commands
+
+**After categorization**:
+
+**For detailed analysis**:
+```
+/analyze-ticket TICKET-KEY
+```
+
+**For full triage**:
+```
+/triage TICKET-KEY
+```
+
+**For response generation**:
+```
+/generate-response TICKET-KEY
+```
+
+**For bulk categorization**:
+```
+Use the bulk-triage skill with focus on categorization
+```
+
+---
+
+## Pattern Recognition Examples
+
+### Authentication Issues Pattern
+**Indicators**: "login", "password", "session", "unauthorized"
+**Labels**: `auth`, `authentication`, `access`
+**Component**: `authentication-service`
+**Typical Resolution**: Check credentials, reset session, verify permissions
+
+### Payment Issues Pattern
+**Indicators**: "payment", "charge", "invoice", "billing"
+**Labels**: `payments`, `billing`, `revenue-impact`
+**Component**: `payment-system`
+**Priority**: Often high due to revenue impact
+
+### Email Delivery Pattern
+**Indicators**: "email", "notification", "didn't receive", "spam"
+**Labels**: `email`, `notifications`, `delivery`
+**Component**: `email-service`
+**Typical Resolution**: Check spam filters, verify email service status
+
+### API Integration Pattern
+**Indicators**: "API", "integration", "webhook", "endpoint"
+**Labels**: `api`, `integration`, `external-system`
+**Component**: `api-service`
+**Typical Resolution**: Verify API keys, check rate limits, review logs
+
+---
+
+## Best Practices
+
+1. **Categorize early** - Do this as soon as ticket is created
+2. **Be precise** - Use exact categories, not vague classifications
+3. **Use consistent labels** - Follow project labeling conventions
+4. **Link patterns** - Connect similar issues for trend analysis
+5. **Document reasoning** - Add comment explaining categorization
+6. **Review periodically** - Update categorization as more info becomes available
+7. **Train the team** - Share patterns and categorization guidelines
+
+---
+
+## Benefits of Good Categorization
+
+**Improves Filtering**:
+- Quickly find all bugs, all feature requests, etc.
+- Filter by product area or component
+- Track specific issue patterns
+
+**Speeds Routing**:
+- Auto-assign based on component
+- Route to appropriate team quickly
+- Identify escalation needs early
+
+**Enables Analytics**:
+- Track issue type distribution
+- Identify recurring problems
+- Measure complexity trends
+- Report on team workload
+
+**Better Context**:
+- Labels provide quick understanding
+- Patterns show relationships
+- Components clarify ownership
+
+---
+
+## Troubleshooting
+
+**Categorization seems wrong**:
+- Review the indicators found
+- Check if ticket has unusual context
+- Provide feedback on what's missing
+- Use human judgment to override
+
+**Too many labels suggested**:
+- Apply only the most relevant labels
+- Follow project's label guidelines
+- Consider if new labels are needed or consolidate
+
+**No clear category**:
+- Ticket may be hybrid (bug + feature request)
+- Apply multiple type labels if needed
+- Add comment explaining mixed nature
+- Mark for human review if very ambiguous
+
+**Component not found**:
+- Use generic component initially
+- Create new component if pattern emerges
+- Assign to triage coordinator for routing
+
+---
+
+Provide quick, accurate categorization to improve ticket routing and team efficiency.

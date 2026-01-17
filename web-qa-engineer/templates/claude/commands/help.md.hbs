@@ -1,0 +1,197 @@
+Display help information for the @terrazul/qa-engineer package.
+
+**Usage**: `/help`
+
+---
+
+# @terrazul/qa-engineer Help
+
+AI-powered QA Engineer for testing functionality based on product/feature specifications.
+
+## Quick Start
+
+```bash
+# Test a feature from a spec
+/test-feature "User can login with email and password"
+
+# Test an API endpoint
+/test-api /api/users
+
+# Generate QA report
+/qa-report
+```
+
+---
+
+## Commands
+
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `/test-feature` | `/test-feature <spec>` | Test frontend functionality based on a specification |
+| `/test-api` | `/test-api <endpoint>` | Test backend API endpoints |
+| `/qa-report` | `/qa-report [type]` | Generate QA report (summary, full, bugs, all) |
+| `/help` | `/help` | Show this help information |
+
+### /test-feature Examples
+```bash
+/test-feature "Test login with valid and invalid credentials"
+/test-feature "Verify checkout flow completes successfully"
+/test-feature --file=specs/auth-feature.md
+```
+
+### /test-api Examples
+```bash
+/test-api /api/users           # Test all methods on endpoint
+/test-api auth                  # Test authentication endpoints
+/test-api "POST /api/orders"    # Test specific method
+```
+
+### /qa-report Types
+```bash
+/qa-report              # Full detailed report (default)
+/qa-report summary      # Executive summary only
+/qa-report bugs         # Individual bug reports
+/qa-report all          # Generate all report types
+```
+
+---
+
+## Skills
+
+Use natural language to invoke skills:
+
+| Skill | Example Usage |
+|-------|---------------|
+| **regression-test** | "Use the regression-test skill to validate after deployment" |
+| **e2e-test** | "Use the e2e-test skill to test the signup-to-dashboard flow" |
+| **api-validation** | "Use the api-validation skill to validate /api/orders" |
+
+### Skill Examples
+
+**Regression Testing:**
+```
+Use the regression-test skill to run full regression before the v2.0 release
+Use the regression-test skill for a quick smoke test
+```
+
+**End-to-End Testing:**
+```
+Use the e2e-test skill to test the complete purchase flow
+Use the e2e-test skill to validate login → dashboard → logout
+```
+
+**API Validation:**
+```
+Use the api-validation skill to thoroughly test authentication endpoints
+Use the api-validation skill to verify schema compliance on /api/users
+```
+
+---
+
+## Specialized Agents
+
+The package includes three specialized agents:
+
+| Agent | Purpose |
+|-------|---------|
+| **Functional Tester** | Frontend testing via browser automation |
+| **API Tester** | Backend API testing via curl |
+| **Report Generator** | Creates comprehensive QA reports |
+
+---
+
+## Current Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Target URL** | {{ vars.targetUrl }} |
+| **API Base URL** | {{ vars.apiBaseUrl }} |
+| **Browser Engine** | {{ vars.browserEngine }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Output** | {{ vars.reportOutputDir }} |
+{{#if (eq vars.useRunDirs 'yes')}}
+| **Per-Run Directories** | yes |
+{{/if}}
+
+---
+
+## Severity Scale
+
+All issues are rated on this scale:
+
+| Severity | Label | Action |
+|----------|-------|--------|
+| 4 | Critical | Fix immediately - blocks release |
+| 3 | Major | Fix before release |
+| 2 | Minor | Schedule fix |
+| 1 | Cosmetic | Nice to have |
+
+---
+
+## Common Workflows
+
+### Pre-Release QA
+```bash
+/test-feature "Test all critical user flows"
+/test-api auth
+Use the regression-test skill for full coverage
+/qa-report full
+```
+
+### After Deployment
+```bash
+/test-feature "Quick smoke test"
+Use the regression-test skill on affected areas
+/qa-report summary
+```
+
+### New Feature Testing
+```bash
+/test-feature "Feature spec from PRD"
+/test-api /api/new-endpoint
+Use the e2e-test skill for complete flow
+/qa-report
+```
+
+---
+
+## Output Locations
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Each QA run creates a unique subdirectory:
+
+```
+{{ vars.reportOutputDir }}/
+├── YYYYMMDD-HHMMSS-[feature]/  # Run directory
+│   ├── README.md               # Run manifest
+│   ├── test-results.md         # Test results
+│   ├── api-tests.md            # API results (if applicable)
+│   ├── qa-report.md            # Generated report
+│   ├── qa-summary.md           # Executive summary
+│   ├── screenshots/
+│   │   └── TC-001-step-1.png
+│   └── bugs/
+│       └── BUG-001.md
+└── latest -> [most-recent-run]/  # Symlink to latest
+```
+
+Access most recent run: `{{ vars.reportOutputDir }}/latest/`
+{{else}}
+- **Reports**: `{{ vars.reportOutputDir }}/`
+- **Screenshots**: `{{ vars.screenshotDir }}/`
+- **Bug Reports**: `{{ vars.reportOutputDir }}/bugs/`
+{{/if}}
+
+---
+
+## Tips
+
+1. **Start with specs** - Provide detailed specs for better test coverage
+2. **Use screenshots** - Evidence is captured automatically
+3. **Check reports** - Always review generated reports for issues
+4. **Run regression** - After any code changes
+5. **Test APIs separately** - API tests are faster than UI tests
+
+---
+
+For more information, see the package README or documentation.

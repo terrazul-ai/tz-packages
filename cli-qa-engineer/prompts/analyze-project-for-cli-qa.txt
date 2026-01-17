@@ -1,0 +1,26 @@
+Analyze this project to identify CLI testing requirements. Return a flat JSON object where every value is a string.
+
+Examine the codebase for:
+1. CLI entry points (bin scripts, main commands)
+2. Subcommands and their arguments
+3. Interactive prompts or wizards
+4. Configuration file handling
+5. Environment variable usage
+6. Output formats (JSON, table, plain text)
+7. Error handling patterns
+
+{
+  "cliEntryPoint": "primary CLI command or script path",
+  "subcommands": "comma-separated list of subcommands",
+  "hasInteractivePrompts": "yes or no",
+  "interactivePatterns": "patterns that indicate prompts (e.g., ? for inquirer)",
+  "configFiles": "comma-separated list of config file patterns",
+  "envVars": "comma-separated list of environment variables used",
+  "outputFormats": "comma-separated list of output formats supported",
+  "errorPatterns": "common error message patterns",
+  "testableCommands": "comma-separated list of commands safe to test",
+  "destructiveCommands": "comma-separated list of commands that modify state"
+}
+
+Only include information you can confidently determine from the codebase.
+If a field cannot be determined, use "unknown" as the value.

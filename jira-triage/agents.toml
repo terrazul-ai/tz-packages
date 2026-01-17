@@ -1,0 +1,16 @@
+[package]
+name = "@terrazul/jira-triage"
+version = "0.1.0"
+description = "JIRA ticket triage using Atlassian CLI for analysis, categorization, and response generation"
+homepage = "https://github.com/leourbina/jira-triage"
+repository = "https://github.com/leourbina/jira-triage.git"
+license = "MIT"
+keywords = ["jira", "triage", "support", "ticket-management", "atlassian"]
+authors = ["Leonardo Urbina <leo@terrazul.com>"]
+is_private = false
+
+[compatibility]
+claude = ">=0.2.0"
+
+[exports.claude]
+template = "templates/CLAUDE.md.hbs"

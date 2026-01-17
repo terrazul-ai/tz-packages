@@ -1,0 +1,219 @@
+{{~ var targetUrl = askUser('What is the target URL for QA testing?', {
+  placeholder: 'https://example.com or http://localhost:3000'
+}) ~}}
+{{~ var apiBaseUrl = askUser('What is the API base URL?', {
+  default: 'auto-detect',
+  placeholder: 'https://api.example.com or leave for auto-detect'
+}) ~}}
+{{~ var browserEngine = askUser('Which browser automation do you prefer?', {
+  default: 'playwright',
+  placeholder: 'playwright, puppeteer, or both'
+}) ~}}
+{{~ var screenshotDir = askUser('Where should screenshots and evidence be saved?', {
+  default: './qa-reports/screenshots',
+  placeholder: './qa-reports/screenshots'
+}) ~}}
+{{~ var reportOutputDir = askUser('Where should QA reports be saved?', {
+  default: './qa-reports',
+  placeholder: './qa-reports'
+}) ~}}
+{{~ var specFormat = askUser('What format are your specs typically in?', {
+  default: 'freeform',
+  placeholder: 'markdown, prd, user-stories, jira, or freeform'
+}) ~}}
+{{~ var useRunDirs = askUser('Organize outputs into per-run subdirectories?', {
+  default: 'yes',
+  placeholder: 'yes or no'
+}) ~}}
+
+{{~ var projectAnalysis = askAgent('./prompts/analyze-project-for-qa.txt', { json: true }) ~}}
+
+# QA Engineer
+
+**Package**: `@terrazul/qa-engineer`
+**Version**: 1.0.0
+**Purpose**: AI-powered QA testing with browser automation and API validation
+
+This package provides comprehensive QA engineering capabilities:
+- **Functional Testing** via browser automation ({{ vars.browserEngine }})
+- **API Testing** with curl and scripted validation
+- **Regression Testing** after code changes
+- **E2E Testing** for complete user journeys
+- **Comprehensive Reporting** with findings and suggested fixes
+
+---
+
+## Project Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Target URL** | {{ vars.targetUrl }} |
+| **API Base URL** | {{ vars.apiBaseUrl }} |
+| **Browser Engine** | {{ vars.browserEngine }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Output** | {{ vars.reportOutputDir }} |
+| **Spec Format** | {{ vars.specFormat }} |
+| **Per-Run Directories** | {{ vars.useRunDirs }} |
+
+---
+
+## Detected Project Stack
+
+| Component | Detected |
+|-----------|----------|
+| **Frontend Framework** | {{ vars.projectAnalysis.frontendFramework }} |
+| **Frontend Patterns** | {{ vars.projectAnalysis.frontendPatterns }} |
+| **Backend Framework** | {{ vars.projectAnalysis.backendFramework }} |
+| **API Patterns** | {{ vars.projectAnalysis.apiPatterns }} |
+| **Auth Method** | {{ vars.projectAnalysis.authMethod }} |
+| **Existing Tests** | {{ vars.projectAnalysis.existingTestFramework }} |
+| **Key Features** | {{ vars.projectAnalysis.keyFeatures }} |
+| **Critical Flows** | {{ vars.projectAnalysis.criticalFlows }} |
+| **API Endpoints** | {{ vars.projectAnalysis.apiEndpoints }} |
+
+---
+
+## Prerequisites
+
+This package requires browser automation via MCP. The server(s) are configured in `mcp_servers.json` and will be installed via npx when first used.
+
+{{#if (or (eq vars.browserEngine 'playwright') (eq vars.browserEngine 'both'))}}
+### Playwright MCP
+The official Microsoft Playwright MCP server provides browser automation with vision and PDF capabilities.
+{{/if}}
+
+{{#if (or (eq vars.browserEngine 'puppeteer') (eq vars.browserEngine 'both'))}}
+### Puppeteer MCP
+The Puppeteer MCP server provides browser automation via Chrome DevTools Protocol.
+{{/if}}
+
+---
+
+## Available Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/test-feature <spec>` | Test a feature based on provided specification |
+| `/test-api <endpoint>` | Test backend API endpoints |
+| `/qa-report [type]` | Generate QA report (summary, full, bugs, all) |
+
+---
+
+## Available Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `regression-test` | Run regression testing after code changes |
+| `e2e-test` | Execute end-to-end user journey tests |
+| `api-validation` | Comprehensive API endpoint validation |
+
+---
+
+## Specialized Agents
+
+### Functional Tester
+Frontend testing specialist using browser automation. Tests UI functionality, user interactions, and visual elements.
+
+### API Tester
+Backend API testing specialist. Validates endpoints, authentication, request/response schemas, and error handling.
+
+### Report Generator
+Creates comprehensive QA reports with findings, severity ratings, and suggested fixes.
+
+---
+
+## Severity Scale
+
+All issues are rated on this scale:
+
+| Severity | Label | Definition | Priority |
+|----------|-------|------------|----------|
+| 4 | Critical | Feature completely broken or unusable | Fix immediately |
+| 3 | Major | Feature works incorrectly or has significant issues | Fix before release |
+| 2 | Minor | Feature works but has noticeable issues | Schedule fix |
+| 1 | Cosmetic | Visual or text issue only | Nice to have |
+
+---
+
+## Test Report Format
+
+All test reports follow this structure:
+
+```markdown
+# QA Test Report
+
+## Executive Summary
+- Overall Status: PASS / FAIL / PASS WITH ISSUES
+- Total Tests: X
+- Passed: X (X%)
+- Failed: X (X%)
+- Critical Issues: X
+
+## Issues Found
+[Organized by severity]
+
+## Recommendations
+[Prioritized action items]
+```
+
+---
+
+## Browser Tools Reference
+
+{{#if (or (eq vars.browserEngine 'playwright') (eq vars.browserEngine 'both'))}}
+### Playwright Tools
+| Tool | Purpose |
+|------|---------|
+| `browser_navigate` | Navigate to URL |
+| `browser_click` | Click on element |
+| `browser_type` | Type text into field |
+| `browser_fill_form` | Fill form fields |
+| `browser_snapshot` | Capture accessibility snapshot |
+| `browser_take_screenshot` | Capture visual screenshot |
+| `browser_wait_for` | Wait for element/text |
+| `browser_evaluate` | Execute JavaScript |
+| `browser_verify_text_visible` | Assert text presence |
+{{/if}}
+
+{{#if (or (eq vars.browserEngine 'puppeteer') (eq vars.browserEngine 'both'))}}
+### Puppeteer Tools
+| Tool | Purpose |
+|------|---------|
+| `puppeteer_launch` | Start browser instance |
+| `puppeteer_navigate` | Navigate to URL |
+| `puppeteer_click` | Click element |
+| `puppeteer_type` | Type text |
+| `puppeteer_wait_for_selector` | Wait for element |
+| `puppeteer_screenshot` | Capture screenshot |
+| `puppeteer_evaluate` | Execute JavaScript |
+| `puppeteer_get_text` | Extract text content |
+{{/if}}
+
+---
+
+## Quick Start
+
+### Test a Feature
+```
+/test-feature "User should be able to log in with email and password"
+```
+
+### Test an API Endpoint
+```
+/test-api /api/users
+```
+
+### Generate QA Report
+```
+/qa-report
+```
+
+### Run Regression Tests
+```
+Use the regression-test skill to validate existing functionality after recent changes
+```
+
+### Run E2E Tests
+```
+Use the e2e-test skill to test the complete signup-to-dashboard flow
+```

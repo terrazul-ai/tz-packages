@@ -1,0 +1,12 @@
+[package]
+name = "@terrazul/cli-qa-engineer"
+version = "0.0.1"
+description = "AI-powered QA Engineer for testing CLIs using tmux terminal automation"
+keywords = ["qa", "testing", "cli", "terminal", "tmux", "automation"]
+license = "MIT"
+
+[compatibility]
+claude = ">=0.2.0"
+
+[exports.claude]
+template = "templates/CLAUDE.md.hbs"

@@ -1,0 +1,309 @@
+Perform WCAG {{ vars.wcagLevel }} accessibility audit with detailed findings.
+
+**Usage**: `/accessibility-audit [url]`
+
+**Examples**:
+- `/accessibility-audit` - Audit {{ vars.targetUrl }}
+- `/accessibility-audit https://example.com` - Audit specific URL
+- `/accessibility-audit --level=AAA` - Override conformance level
+- `/accessibility-audit --focus=forms` - Focus on form accessibility
+- `/accessibility-audit --focus=navigation` - Focus on navigation
+
+---
+
+## Workflow
+
+### Step 1: Setup Browser Session
+
+```
+1. puppeteer_launch - Start browser
+2. puppeteer_navigate - Go to target URL
+3. puppeteer_wait_for_selector - Ensure page loaded
+4. puppeteer_screenshot - Capture initial state
+```
+
+### Step 2: Automated Analysis
+
+Use `puppeteer_evaluate` to run accessibility checks:
+
+#### Color Contrast Check
+```javascript
+// Check all text elements for contrast ratio
+// AA requirement: 4.5:1 normal text, 3:1 large text (18pt+)
+// AAA requirement: 7:1 normal text, 4.5:1 large text
+```
+
+#### Heading Structure
+```javascript
+// Extract all headings (h1-h6)
+// Verify single h1 per page
+// Check for skipped levels (h1 -> h3)
+// Ensure headings are descriptive
+```
+
+#### Image Alt Text
+```javascript
+// Find all img elements
+// Check alt attribute presence
+// Verify alt is descriptive (not "image.jpg")
+// Check decorative images have alt=""
+```
+
+#### Form Accessibility
+```javascript
+// Find all form inputs
+// Check for associated labels
+// Verify required fields indicated
+// Check error message associations
+```
+
+#### ARIA Implementation
+```javascript
+// Check ARIA roles are valid
+// Verify aria-label provides names
+// Check aria-describedby references exist
+// Verify state attributes updated
+```
+
+#### Focus Indicators
+```javascript
+// Check :focus styles exist
+// Verify focus is visible
+// Check focus order is logical
+```
+
+### Step 3: Keyboard Testing
+
+Simulate keyboard navigation:
+
+```
+1. Start at page top
+2. Tab through all interactive elements
+3. Document focus order
+4. Check for keyboard traps
+5. Test Enter/Space activation
+6. Test Escape for modals
+7. Test arrow keys for menus
+```
+
+**Check for each element**:
+- [ ] Receives focus via Tab
+- [ ] Has visible focus indicator
+- [ ] Can be activated (Enter/Space)
+- [ ] Can be escaped (if applicable)
+
+### Step 4: Document Findings
+
+For each issue:
+
+```markdown
+### Issue A.[X]: [Title]
+
+- **Criterion**: [WCAG number and name]
+- **Level**: [A / AA / AAA]
+- **Severity**: [Critical / Serious / Moderate / Minor]
+- **Location**: [Element / selector]
+- **Impact**: [Who is affected and how]
+- **Current State**: [What it is now]
+- **Required Fix**: [What it should be]
+
+**Code Example**:
+```html
+<!-- Before (Failing) -->
+<code>...</code>
+
+<!-- After (Compliant) -->
+<code>...</code>
+```
+```
+
+### Step 5: Generate Report
+
+```markdown
+# WCAG {{ vars.wcagLevel }} Accessibility Audit Report
+
+**URL**: [Target URL]
+**Date**: [Date]
+**Conformance Target**: Level {{ vars.wcagLevel }}
+**Application Type**: {{ vars.appType }}
+
+## Compliance Summary
+
+| Status | Count |
+|--------|-------|
+| Passed | X criteria |
+| Failed | X criteria |
+| Not Applicable | X criteria |
+
+**Overall**: [Compliant / Partially Compliant / Non-Compliant]
+
+## Issues by WCAG Principle
+
+| Principle | Critical | Serious | Moderate | Minor |
+|-----------|----------|---------|----------|-------|
+| 1. Perceivable | X | X | X | X |
+| 2. Operable | X | X | X | X |
+| 3. Understandable | X | X | X | X |
+| 4. Robust | X | X | X | X |
+
+## Detailed Findings
+
+### 1. Perceivable
+
+[Issues related to perceivable criteria]
+
+### 2. Operable
+
+[Issues related to operable criteria]
+
+### 3. Understandable
+
+[Issues related to understandable criteria]
+
+### 4. Robust
+
+[Issues related to robust criteria]
+
+## Keyboard Testing Results
+
+| Test | Status | Notes |
+|------|--------|-------|
+| Tab navigation | Pass/Fail | [Details] |
+| Focus visibility | Pass/Fail | [Details] |
+| No keyboard traps | Pass/Fail | [Details] |
+| Logical tab order | Pass/Fail | [Details] |
+| Enter activation | Pass/Fail | [Details] |
+| Escape behavior | Pass/Fail | [Details] |
+
+## Remediation Priority
+
+### Critical (Blocks access)
+1. [Issue] - [Estimated effort]
+
+### Serious (Major barrier)
+1. [Issue] - [Estimated effort]
+
+### Moderate (Inconvenience)
+1. [Issue] - [Estimated effort]
+
+### Minor (Enhancement)
+1. [Issue] - [Estimated effort]
+
+## Code Fixes Reference
+
+[Specific code examples for common fixes]
+
+## Resources
+
+- WCAG 2.1 Quick Reference: https://www.w3.org/WAI/WCAG21/quickref/
+- WebAIM Contrast Checker: https://webaim.org/resources/contrastchecker/
+```
+
+---
+
+## Focus Areas
+
+Use `--focus` to concentrate on specific areas:
+
+| Focus | What to check |
+|-------|---------------|
+| `forms` | Labels, errors, validation, required fields |
+| `navigation` | Skip links, landmarks, keyboard nav |
+| `images` | Alt text, decorative vs informative |
+| `color` | Contrast ratios, color-only information |
+| `keyboard` | Full keyboard accessibility |
+| `aria` | ARIA implementation correctness |
+| `headings` | Heading structure and hierarchy |
+| `links` | Link text, purpose clarity |
+
+---
+
+## WCAG Level Reference
+
+### Level A (Minimum)
+Essential accessibility - site is basically accessible.
+
+**Key criteria**:
+- 1.1.1 Non-text content has alternatives
+- 2.1.1 Keyboard accessible
+- 2.4.1 Skip navigation
+- 4.1.2 Name, role, value
+
+### Level AA (Standard)
+Addresses major barriers - recommended target.
+
+**Key criteria**:
+- 1.4.3 Contrast minimum (4.5:1)
+- 1.4.4 Text resizable to 200%
+- 2.4.7 Focus visible
+- 3.3.3 Error suggestions
+
+### Level AAA (Enhanced)
+Maximum accessibility - may not apply to all content.
+
+**Key criteria**:
+- 1.4.6 Enhanced contrast (7:1)
+- 2.4.9 Link purpose from link alone
+- 2.5.5 Target size 44x44px
+
+---
+
+## Severity Definitions
+
+| Severity | Impact | Priority |
+|----------|--------|----------|
+| Critical | Complete blocker for AT users | Fix immediately |
+| Serious | Major barrier, no workaround | Fix this sprint |
+| Moderate | Barrier with workaround | Fix next sprint |
+| Minor | Inconvenience | Fix when possible |
+
+---
+
+## Common Fixes Reference
+
+### Missing Alt Text
+```html
+<!-- Before -->
+<img src="product.jpg">
+
+<!-- After -->
+<img src="product.jpg" alt="Blue running shoes, size 10">
+```
+
+### Poor Contrast
+```css
+/* Before: 2.5:1 ratio */
+.text { color: #999; }
+
+/* After: 4.5:1 ratio */
+.text { color: #595959; }
+```
+
+### Missing Form Label
+```html
+<!-- Before -->
+<input type="email" placeholder="Email">
+
+<!-- After -->
+<label for="email">Email</label>
+<input type="email" id="email">
+```
+
+### No Focus Indicator
+```css
+/* Before: none */
+:focus { outline: none; }
+
+/* After: visible */
+:focus { outline: 2px solid #005fcc; outline-offset: 2px; }
+```
+
+---
+
+## Integration
+
+After `/accessibility-audit`, consider:
+- `/analyze-ux` - For heuristics evaluation
+- `/test-flow` - Test keyboard-only flow completion
+- `wcag-compliance` skill - For deep criterion analysis
+- `report-generator` skill - For consistent report format

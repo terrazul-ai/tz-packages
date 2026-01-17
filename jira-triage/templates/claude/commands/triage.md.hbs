@@ -1,0 +1,379 @@
+Perform AI-powered triage on one or more JIRA tickets.
+
+**Usage**: `/triage [ticket-key or JQL query]`
+
+**Examples**:
+- `/triage SUPPORT-123` - Analyze single ticket
+- `/triage project={{ vars.jiraProject }} AND status=Open` - Analyze tickets matching JQL
+- `/triage` - Will prompt for criteria (e.g., "all open untriaged tickets")
+
+---
+
+## Workflow
+
+### Step 1: Identify Tickets to Triage
+
+**If ticket key provided** (e.g., SUPPORT-123):
+- Proceed to analyze that specific ticket
+
+**If JQL query provided**:
+- Use the provided JQL to fetch matching tickets
+- Example: `project={{ vars.jiraProject }} AND labels NOT IN ({{ vars.triageLabel }})`
+
+**If no argument provided**:
+- Prompt user for scope:
+  - All untriaged tickets in {{ vars.jiraProject }}?
+  - Specific priority range?
+  - Specific date range?
+  - Custom JQL query?
+
+---
+
+### Step 2: Fetch Ticket Data
+
+Use JIRA CLI to retrieve ticket information:
+
+```bash
+# For single ticket
+jira issue view TICKET-123 --format=json
+jira issue view TICKET-123 --comments
+
+# For bulk tickets (via JQL)
+jira issue list --jql="[query]" --format=json
+
+# Get detailed data for each ticket in bulk
+for ticket in $(jira issue list --jql="[query]" --plain --columns=key --no-headers); do
+  jira issue view $ticket --format=json
+done
+```
+
+---
+
+### Step 3: Analyze Each Ticket
+
+For each ticket, use the **ticket-analyzer** agent to perform comprehensive analysis:
+
+**Analysis includes**:
+1. **Urgency Assessment**:
+   - Identify urgency signals in title, description, comments
+   - Check for keywords: "urgent", "production", "critical", "data loss"
+   - Consider SLA deadlines and ticket age
+   - Review customer tier (enterprise vs standard)
+
+2. **Impact Analysis**:
+   - Determine scope: How many users affected?
+   - Assess severity: What functionality is broken?
+   - Evaluate business impact: Revenue, data, operations
+   - Check for workaround availability
+
+3. **Categorization**:
+   - Classify issue type (bug, feature, question, config, docs, performance, security)
+   - Estimate complexity (simple, medium, complex, escalation)
+   - Identify product area/component
+
+4. **Priority Recommendation**:
+   - Map urgency + impact to priority level
+   - Consider: Highest, High, Medium, Low
+   - Provide clear rationale for recommendation
+
+5. **Assignee Suggestion**:
+   - Recommend appropriate team or individual
+   - Based on issue type, product area, expertise needed
+   - Consider workload and availability if known
+
+6. **Next Steps**:
+   - Provide actionable recommendations
+   - Suggest immediate actions (update priority, add labels, escalate)
+   - Identify if response draft is needed
+
+---
+
+### Step 4: Generate Triage Report
+
+**For single ticket**:
+Provide detailed analysis following the ticket-analyzer agent's output format:
+- Ticket summary with key metadata
+- Urgency assessment with signals identified
+- Business impact evaluation
+- Issue classification and complexity
+- Priority recommendation with rationale
+- Assignee suggestion
+- Next steps and recommended actions
+
+**For bulk tickets**:
+Provide consolidated report:
+
+```markdown
+## Triage Report: [JQL Query or Criteria]
+
+**Date**: [Current date/time]
+**Tickets Analyzed**: [Total count]
+**Query**: [JQL query used]
+
+---
+
+### Summary Statistics
+
+| Priority | Count |
+|----------|-------|
+| Highest  | [#]   |
+| High     | [#]   |
+| Medium   | [#]   |
+| Low      | [#]   |
+
+| Issue Type | Count |
+|------------|-------|
+| Bug        | [#]   |
+| Feature    | [#]   |
+| Question   | [#]   |
+| Other      | [#]   |
+
+---
+
+### Critical Priority Tickets (Immediate Attention)
+
+**[TICKET-KEY]**: [Summary]
+- **Urgency**: [Signals found]
+- **Impact**: [Business impact]
+- **Recommendation**: [Priority] - [Rationale]
+- **Assignee**: [Suggested]
+- **Next Steps**: [Actions]
+
+[Repeat for each critical ticket]
+
+---
+
+### High Priority Tickets
+
+**[TICKET-KEY]**: [Summary]
+- **Recommendation**: [Priority] - [Brief rationale]
+- **Assignee**: [Suggested]
+
+[Repeat for each high priority ticket]
+
+---
+
+### Medium Priority Tickets
+
+[List ticket keys with brief summaries]
+
+---
+
+### Low Priority Tickets
+
+[List ticket keys only]
+
+---
+
+### Patterns Identified
+
+[If similar issues found across multiple tickets]
+
+**Pattern**: [Description]
+**Tickets Affected**: [List keys]
+**Root Cause**: [If known or suspected]
+**Recommended Action**: [Bulk action or investigation needed]
+
+---
+
+### Recommended Bulk Actions
+
+1. **[Action description]**
+   - Affects: [Ticket list]
+   - Command: `[JIRA CLI command to execute]`
+
+2. **[Action description]**
+   - Affects: [Ticket list]
+   - Command: `[JIRA CLI command to execute]`
+
+---
+
+### Tickets Requiring Immediate Response
+
+[List tickets where customer response is needed urgently]
+
+**[TICKET-KEY]**: [Why response needed]
+- Suggested approach: [Brief guidance]
+- Use `/generate-response TICKET-KEY` to draft response
+
+```
+
+---
+
+### Step 5: Apply Changes (with User Confirmation)
+
+**IMPORTANT**: Always confirm with user before applying changes to JIRA.
+
+Present recommended actions:
+
+```markdown
+## Proposed Changes
+
+I've analyzed the ticket(s) and recommend the following changes. Please confirm before I apply them:
+
+### Priority Updates
+- SUPPORT-123: Open → High (currently Medium)
+- SUPPORT-456: Open → Highest (currently High)
+[etc.]
+
+### Label Additions
+- SUPPORT-123: Add labels: `{{ vars.triageLabel }}`, `bug`, `backend`
+- SUPPORT-456: Add labels: `{{ vars.triageLabel }}`, `urgent`, `data-issue`
+[etc.]
+
+### Assignments
+- SUPPORT-123: Assign to backend-team (currently unassigned)
+- SUPPORT-456: Assign to data-team (currently unassigned)
+[etc.]
+
+### Comments to Add
+- SUPPORT-123: "Triaged as High priority - production impact confirmed..."
+- SUPPORT-456: "Triaged as Highest - data loss requires immediate attention..."
+[etc.]
+
+---
+
+**Would you like me to apply these changes?** [Yes/No]
+```
+
+**If user confirms "Yes"**:
+Execute JIRA CLI commands to apply changes:
+
+```bash
+# Update priority
+jira issue update SUPPORT-123 --priority=High
+
+# Add labels
+jira issue update SUPPORT-123 --labels={{ vars.triageLabel }},bug,backend
+
+# Assign ticket
+jira issue update SUPPORT-123 --assignee=john.doe
+
+# Add triage comment
+jira issue comment add SUPPORT-123 --comment="Triaged as High priority - production impact confirmed. Backend team investigating."
+
+# Repeat for each ticket
+```
+
+**If user confirms "No"** or wants modifications:
+- Ask which changes to apply or skip
+- Provide individual commands they can run manually
+- Offer to re-analyze with different criteria
+
+---
+
+### Step 6: Provide Summary
+
+After applying changes (or if user declined):
+
+```markdown
+## Triage Complete
+
+**Tickets Processed**: [Count]
+**Changes Applied**: [Count]
+**Changes Pending**: [Count]
+
+### Actions Taken:
+- ✅ Updated [#] ticket priorities
+- ✅ Added labels to [#] tickets
+- ✅ Assigned [#] tickets
+- ✅ Added triage comments to [#] tickets
+
+### Next Steps:
+1. [Follow-up action if needed]
+2. [Monitoring or verification step]
+3. [Any escalations or responses needed]
+
+### High Priority Follow-ups:
+- [TICKET-KEY]: [What needs to happen next]
+- [TICKET-KEY]: [What needs to happen next]
+```
+
+---
+
+## Usage Tips
+
+### Quick Single Ticket Triage
+```
+/triage SUPPORT-123
+```
+Analyzes one ticket and provides detailed recommendations.
+
+---
+
+### Bulk Triage of Untriaged Tickets
+```
+/triage project={{ vars.jiraProject }} AND labels NOT IN ({{ vars.triageLabel }}) AND status=Open
+```
+Processes all open tickets that haven't been triaged yet.
+
+---
+
+### Priority-Based Triage
+```
+/triage project={{ vars.jiraProject }} AND priority=EMPTY AND status=Open
+```
+Triages tickets that don't have priority set.
+
+---
+
+### Old Ticket Review
+```
+/triage project={{ vars.jiraProject }} AND created < -7d AND labels NOT IN ({{ vars.triageLabel }})
+```
+Reviews tickets older than 7 days that haven't been triaged.
+
+---
+
+### SLA At-Risk Tickets
+```
+/triage project={{ vars.jiraProject }} AND created < -{{ vars.slaHours }}h AND status=Open
+```
+Triages tickets approaching SLA deadline.
+
+---
+
+## Integration with Other Commands/Skills
+
+After triage, you may want to use:
+
+- `/analyze-ticket TICKET-KEY` - For deeper analysis of complex tickets
+- `/generate-response TICKET-KEY` - To draft customer response for high-priority tickets
+- `bulk-triage` skill - For more sophisticated batch analysis with pattern recognition
+- `priority-analysis` skill - For complex priority decisions
+- `response-draft` skill - For batch response generation
+
+---
+
+## Best Practices
+
+1. **Start with filters** - Use specific JQL to target relevant tickets
+2. **Limit batch size** - Process 20-50 tickets at a time for manageability
+3. **Review before applying** - Always confirm changes before executing
+4. **Document reasoning** - Add comments explaining triage decisions
+5. **Follow up quickly** - Generate responses for high-priority tickets immediately
+6. **Track patterns** - Note recurring issues for systemic fixes
+7. **Monitor metrics** - Track triage time and accuracy over time
+
+---
+
+## Troubleshooting
+
+**No tickets found**:
+- Verify JQL syntax in JIRA web interface first
+- Check project key is correct: {{ vars.jiraProject }}
+- Ensure tickets exist matching criteria
+
+**Permission errors**:
+- Verify JIRA CLI is authenticated: `jira init`
+- Check user has permission to view/update tickets
+- Confirm user can update priority, labels, and assignee fields
+
+**Too many tickets**:
+- Add more filters to narrow scope
+- Process in smaller batches
+- Use date ranges or priority filters
+
+---
+
+Execute triage systematically, provide clear recommendations, and always confirm before making changes to JIRA tickets.

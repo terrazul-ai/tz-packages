@@ -1,0 +1,214 @@
+Test backend API endpoints based on specifications.
+
+**Usage**: `/test-api <endpoint-or-spec>`
+
+**Examples**:
+- `/test-api /api/users` - Test users endpoint (all methods)
+- `/test-api auth` - Test authentication endpoints
+- `/test-api "POST /api/orders creates new order"`
+- `/test-api --file=api-spec.yaml` - Test from OpenAPI spec
+
+---
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **API Base URL** | {{ vars.apiBaseUrl }} |
+| **Auth Method** | {{ vars.projectAnalysis.authMethod }} |
+| **API Patterns** | {{ vars.projectAnalysis.apiPatterns }} |
+| **Known Endpoints** | {{ vars.projectAnalysis.apiEndpoints }} |
+| **Report Output** | {{ vars.reportOutputDir }} |
+
+---
+
+## Workflow
+
+{{#if (eq vars.useRunDirs 'yes')}}
+### Step 0: Initialize Run Directory
+
+Before executing tests, create a unique run directory for this test execution:
+
+1. **Generate timestamp**: Use format `YYYYMMDD-HHMMSS` (e.g., `20250114-150512`)
+2. **Extract endpoint slug**:
+   - Parse the endpoint path to create a slug
+   - Example: `/api/users` → `api-users`
+   - Example: `POST /api/orders` → `api-orders`
+   - Example: `auth` → `auth`
+   - Fallback: Use `api-test` if endpoint cannot be determined
+3. **Create run directory**: `{{ vars.reportOutputDir }}/[timestamp]-[endpoint-slug]/`
+4. **Create subdirectories**:
+   - `bugs/` - For individual bug reports
+5. **Initialize manifest**: Create `README.md` with run metadata:
+   ```markdown
+   # QA Run: [endpoint-slug]
+   **Run ID**: [timestamp]-[endpoint-slug]
+   **Started**: [datetime]
+   **Type**: test-api
+   **Status**: IN_PROGRESS
+
+   ## Scope
+   - Endpoint: "[original endpoint/spec]"
+   - API Base URL: {{ vars.apiBaseUrl }}
+   - Auth Method: {{ vars.projectAnalysis.authMethod }}
+   ```
+6. **Update latest symlink**: Point `{{ vars.reportOutputDir }}/latest` to this run directory
+
+**Store the run directory path** for use in subsequent steps.
+{{/if}}
+
+### Step 1: Identify Endpoints
+
+Based on input, determine:
+- HTTP method(s) to test (GET, POST, PUT, PATCH, DELETE)
+- Endpoint path
+- Required authentication
+- Request body format
+- Expected response structure
+
+### Step 2: Design API Tests
+
+For each endpoint, create tests for:
+- **Success case** - Valid request succeeds
+- **Authentication** - Auth required and validated
+- **Input validation** - Invalid data rejected
+- **Not found** - Missing resources handled
+- **Permissions** - Authorization enforced
+
+Use the **api-tester** agent methodology.
+
+### Step 3: Setup Authentication
+
+{{#if vars.projectAnalysis.authMethod}}
+**Auth Method**: {{ vars.projectAnalysis.authMethod }}
+
+Get authentication token before testing protected endpoints:
+```bash
+# Store token in environment variable
+export TOKEN="your-token-here"
+
+# Or get dynamically
+TOKEN=$(curl -X POST "{{ vars.apiBaseUrl }}/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@example.com", "password": "password"}' \
+  -s | jq -r '.token')
+```
+{{else}}
+Determine authentication method from API documentation.
+{{/if}}
+
+### Step 4: Execute Tests
+
+Run API calls using curl:
+
+**GET Request:**
+```bash
+curl -X GET "{{ vars.apiBaseUrl }}/endpoint" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -w "\nStatus: %{http_code}, Time: %{time_total}s" \
+  -s
+```
+
+**POST Request:**
+```bash
+curl -X POST "{{ vars.apiBaseUrl }}/endpoint" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"field": "value"}' \
+  -w "\nStatus: %{http_code}, Time: %{time_total}s" \
+  -s
+```
+
+### Step 5: Validate Responses
+
+For each response, check:
+- Status code matches expected
+- Response body structure correct
+- Required fields present
+- Data types correct
+- Error format consistent
+- Response time acceptable (< 500ms typical)
+
+### Step 6: Document Results
+
+Create results for each endpoint:
+- Endpoint and method
+- Request made
+- Response received
+- Pass/fail status
+- Issues found with severity
+
+---
+
+## Common Test Patterns
+
+### CRUD Testing
+```
+/test-api "Test full CRUD for /api/users"
+```
+Tests:
+- POST creates resource (201)
+- GET retrieves resource (200)
+- PUT/PATCH updates resource (200)
+- DELETE removes resource (204)
+- GET after delete returns 404
+
+### Auth Testing
+```
+/test-api auth
+```
+Tests:
+- Login with valid credentials (200 + token)
+- Login with invalid credentials (401)
+- Access protected route with token (200)
+- Access protected route without token (401)
+- Token refresh works (if applicable)
+
+### Validation Testing
+```
+/test-api "Validate input for POST /api/users"
+```
+Tests:
+- Required fields missing (400)
+- Invalid email format (400)
+- Invalid data types (400)
+- Duplicate unique fields (409)
+- Valid data succeeds (201)
+
+### Pagination Testing
+```
+/test-api "Test pagination on GET /api/items"
+```
+Tests:
+- Default page returns results
+- Page parameter works
+- Limit parameter works
+- Total count accurate
+- Empty page handled
+
+---
+
+## Output
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Results saved to the run directory:
+- `[run-dir]/api-tests.md` - API test results
+- `[run-dir]/bugs/` - Bug reports (if issues found)
+- `[run-dir]/README.md` - Run manifest with metadata
+
+The run directory is also accessible via: `{{ vars.reportOutputDir }}/latest/`
+{{else}}
+Results saved to:
+- `{{ vars.reportOutputDir }}/api-tests/[endpoint]-[date].md`
+- Full responses captured for debugging
+{{/if}}
+
+---
+
+## Next Steps
+
+After running `/test-api`:
+- Use `/qa-report` to generate comprehensive report
+- Use `/test-feature` for related frontend testing
+- Use `api-validation` skill for deeper validation

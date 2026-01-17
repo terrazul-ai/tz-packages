@@ -1,0 +1,115 @@
+---
+name: test-cli
+description: Test a specific CLI command with functional tests using tmux automation
+arguments: command
+---
+
+# Test CLI Command
+
+You are a QA engineer testing the CLI command: `$ARGUMENTS`
+
+## Configuration
+
+- **CLI Command**: `{{ vars.cliCommand }}`
+- **Working Directory**: `{{ vars.workingDir }}`
+- **Success Patterns**: `{{ vars.successPatterns }}`
+- **Error Patterns**: `{{ vars.errorPatterns }}`
+- **Session Prefix**: `{{ vars.sessionPrefix }}`
+- **Timeout**: `{{ vars.commandTimeout }}s`
+
+## Test Execution Steps
+
+### 1. Create Test Session
+
+Use `mcp__tmux__create-session` to create an isolated test environment:
+- Session name: `{{ vars.sessionPrefix }}-test-<timestamp>`
+
+### 2. Navigate to Working Directory
+
+Use `mcp__tmux__execute-command` to change directory:
+```
+cd {{ vars.workingDir }}
+```
+
+### 3. Run the Command
+
+Execute the full command: `{{ vars.cliCommand }} $ARGUMENTS`
+
+Use `mcp__tmux__execute-command` to run the command in the tmux session.
+
+### 4. Wait and Capture Output
+
+Wait briefly for the command to complete, then use `mcp__tmux__capture-pane` to capture the output.
+
+### 5. Analyze Results
+
+Check the captured output for:
+
+**Success indicators** (should contain one of):
+- {{ vars.successPatterns }}
+
+**Error indicators** (should NOT contain):
+- {{ vars.errorPatterns }}
+
+### 6. Run Additional Tests
+
+Based on the command, run these functional tests:
+
+#### If testing help/version:
+- Verify output is non-empty
+- Check for usage information
+- Verify version format if applicable
+
+#### If testing with arguments:
+- Test with valid arguments (current test)
+- Test with `--help` flag: `{{ vars.cliCommand }} $ARGUMENTS --help`
+- Test error handling with intentionally bad input
+
+#### If testing a subcommand:
+- Verify subcommand help: `{{ vars.cliCommand }} $ARGUMENTS --help`
+- Test with minimal required arguments
+- Test with all optional arguments
+
+### 7. Cleanup
+
+Use `mcp__tmux__kill-session` to destroy the test session.
+
+## Report Format
+
+Report your findings as:
+
+```markdown
+## Test: {{ vars.cliCommand }} $ARGUMENTS
+
+### Setup
+- Session: <session-name>
+- Working Directory: {{ vars.workingDir }}
+
+### Execution
+- **Command**: `{{ vars.cliCommand }} $ARGUMENTS`
+- **Status**: PASS / FAIL
+- **Duration**: <time>
+
+### Output
+```
+<captured output>
+```
+
+### Assertions
+- [ ] Command executed without crash
+- [ ] Output contains success pattern: <pattern found or not>
+- [ ] No error patterns detected: <patterns checked>
+
+### Additional Tests
+<results of any additional tests run>
+
+### Notes
+<any observations or recommendations>
+```
+
+## Important
+
+1. Always create a fresh tmux session for isolation
+2. Always cleanup the session after tests
+3. Do not run destructive commands without explicit user confirmation
+4. Report all findings clearly with pass/fail status

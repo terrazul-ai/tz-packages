@@ -1,0 +1,316 @@
+Test user flows and journeys through the application.
+
+**Usage**: `/test-flow <flow-type> [url]`
+
+**Flow Types**:
+- `signup` - User registration flow
+- `login` - Authentication flow
+- `checkout` - E-commerce checkout process
+- `onboarding` - New user onboarding
+- `search` - Search and filter flow
+- `settings` - Account settings update
+- `custom` - Define custom flow with --steps
+
+**Examples**:
+- `/test-flow signup` - Test signup on {{ vars.targetUrl }}
+- `/test-flow checkout https://shop.example.com` - Test specific site
+- `/test-flow login --include-2fa` - Include 2FA testing
+- `/test-flow custom --steps="login,add-to-cart,checkout"`
+
+---
+
+## Workflow
+
+### Step 1: Prepare Test Environment
+
+```
+1. puppeteer_launch - Start browser
+2. puppeteer_new_page - Create tab
+3. puppeteer_navigate - Go to starting URL
+4. puppeteer_screenshot - Capture initial state
+```
+
+### Step 2: Define Flow Steps
+
+Based on flow type, execute appropriate steps:
+
+#### Signup Flow
+```
+1. Navigate to homepage
+2. Locate and click signup CTA
+3. Fill registration form:
+   - puppeteer_type for name field
+   - puppeteer_type for email field
+   - puppeteer_type for password field
+4. Accept terms (if present)
+5. Submit form
+6. Handle verification step
+7. Verify success state
+```
+
+#### Login Flow
+```
+1. Navigate to login page
+2. Enter credentials:
+   - puppeteer_type for email/username
+   - puppeteer_type for password
+3. Click login button
+4. Handle 2FA (if enabled)
+5. Verify authenticated state
+6. Test logout
+```
+
+#### Checkout Flow
+```
+1. Navigate to product page
+2. Add item to cart
+3. View cart
+4. Proceed to checkout
+5. Enter shipping info
+6. Select shipping method
+7. Enter payment info
+8. Review order
+9. Place order
+10. Verify confirmation
+```
+
+#### Onboarding Flow
+```
+1. Complete signup
+2. Progress through onboarding steps
+3. Complete or skip each step
+4. Verify final dashboard state
+```
+
+#### Search Flow
+```
+1. Locate search input
+2. Enter search query
+3. Submit search
+4. Review results
+5. Apply filters
+6. Sort results
+7. Select result
+8. Return to results
+```
+
+#### Custom Flow
+Parse `--steps` argument and execute each step.
+
+### Step 3: Execute Each Step
+
+For each step in the flow:
+
+```
+1. puppeteer_screenshot - Before state
+2. puppeteer_wait_for_selector - Element ready
+3. Record start time
+4. Perform action (click/type/navigate)
+5. puppeteer_wait_for_selector - Response
+6. Record end time
+7. puppeteer_screenshot - After state
+8. puppeteer_get_text - Verify feedback
+9. Evaluate friction level (1-5)
+10. Note any issues
+```
+
+### Step 4: Test Error States
+
+For each flow, test error scenarios:
+
+| Scenario | How to test |
+|----------|-------------|
+| Invalid input | Enter wrong format data |
+| Empty required field | Skip required fields |
+| Network failure | Test with slow connection |
+| Session timeout | Wait or simulate timeout |
+| Back button | Navigate back mid-flow |
+| Page refresh | Refresh mid-flow |
+| Duplicate submit | Click submit multiple times |
+
+### Step 5: Evaluate Friction
+
+Rate each step on friction scale:
+
+| Score | Description | User Experience |
+|-------|-------------|-----------------|
+| 1 | Smooth | Intuitive, no hesitation |
+| 2 | Easy | Minor thought required |
+| 3 | Moderate | Some friction |
+| 4 | Difficult | Significant barrier |
+| 5 | Blocking | Cannot proceed |
+
+### Step 6: Generate Report
+
+```markdown
+# Flow Test Report: [Flow Type]
+
+**URL**: {{ vars.targetUrl }}
+**Application Type**: {{ vars.appType }}
+**Date**: [Date]
+**Total Duration**: [Time]
+
+## Executive Summary
+
+| Metric | Value |
+|--------|-------|
+| Flow Status | Pass / Partial / Fail |
+| Total Steps | X |
+| Friction Points | X (scores 3+) |
+| Critical Issues | X |
+| Completion Rate | X% predicted |
+
+### Key Findings
+1. [Most important finding]
+2. [Second finding]
+3. [Third finding]
+
+## Flow Visualization
+
+```mermaid
+graph TD
+    A[Start] --> B[Step 1]
+    B --> C[Step 2]
+    C --> D{Decision}
+    D -->|Success| E[Step 3]
+    D -->|Error| F[Recovery]
+    E --> G[Complete]
+```
+
+## Step Analysis
+
+### Step 1: [Name]
+
+| Attribute | Value |
+|-----------|-------|
+| URL | [Page URL] |
+| Duration | [Xs] |
+| Friction | [1-5] |
+
+**Action**: [What user does]
+**Result**: [What happens]
+
+**Positives**:
+- [What works well]
+
+**Issues**:
+- [Problems identified]
+
+**Screenshot**: [Reference]
+
+---
+
+[Repeat for each step...]
+
+---
+
+## Error State Results
+
+| Scenario | Expected | Actual | Status |
+|----------|----------|--------|--------|
+| Invalid email | Error shown | [Result] | Pass/Fail |
+| Empty password | Validation | [Result] | Pass/Fail |
+| Network error | Retry option | [Result] | Pass/Fail |
+| Back button | State preserved | [Result] | Pass/Fail |
+
+## Performance
+
+| Metric | Value | Target | Status |
+|--------|-------|--------|--------|
+| Total time | [X]s | < 60s | Pass/Fail |
+| Avg step | [X]s | < 10s | Pass/Fail |
+| Max wait | [X]s | < 3s | Pass/Fail |
+
+## Friction Summary
+
+### High Friction (Score 4-5)
+1. **Step X**: [Issue and fix]
+
+### Moderate (Score 3)
+1. **Step X**: [Issue and fix]
+
+### Low (Score 1-2)
+1. **Step X**: [Minor improvement]
+
+## Recommendations
+
+### Critical
+1. [Issue] - [Solution]
+
+### High Priority
+1. [Issue] - [Solution]
+
+### Nice to Have
+1. [Issue] - [Solution]
+
+## A/B Test Ideas
+
+1. **Test**: [Hypothesis]
+   - Current: [Variant A]
+   - Proposed: [Variant B]
+   - Metric: [What to measure]
+```
+
+---
+
+## Flow Templates by App Type
+
+### E-commerce ({{ vars.appType }})
+Primary flows: `checkout`, `search`, `signup`
+- Focus on cart abandonment points
+- Check guest checkout availability
+- Verify payment trust indicators
+
+### SaaS
+Primary flows: `signup`, `onboarding`, `settings`
+- Focus on trial-to-paid conversion
+- Check feature discovery
+- Verify upgrade prompts
+
+### Dashboard
+Primary flows: `login`, `search`, `settings`
+- Focus on data loading states
+- Check navigation efficiency
+- Verify customization options
+
+---
+
+## Custom Flow Syntax
+
+```
+--steps="step1,step2,step3"
+```
+
+Each step can be:
+- `navigate:URL` - Go to URL
+- `click:selector` - Click element
+- `type:selector:text` - Type text
+- `wait:selector` - Wait for element
+- `screenshot:name` - Capture screenshot
+
+**Example**:
+```
+/test-flow custom --steps="navigate:/products,click:.add-to-cart,click:.checkout-btn"
+```
+
+---
+
+## Best Practices
+
+1. **Use realistic data** - Real-looking test data
+2. **Test complete flows** - Start to finish
+3. **Document everything** - Screenshot each state
+4. **Test errors** - Not just happy path
+5. **Measure objectively** - Use timing, not guesses
+6. **Consider context** - Mobile, interruptions, etc.
+7. **Focus on friction** - Where users struggle
+
+---
+
+## Integration
+
+After `/test-flow`, consider:
+- `/analyze-ux` - Deeper heuristics on problem areas
+- `/accessibility-audit --focus=keyboard` - Keyboard-only flow
+- `flow-analysis` skill - Compare multiple flows
+- `report-generator` skill - Consistent formatting

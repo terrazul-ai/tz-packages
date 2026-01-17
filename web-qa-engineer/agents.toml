@@ -1,0 +1,23 @@
+[package]
+name = "@terrazul/web-qa-engineer"
+version = "0.0.1"
+description = "AI-powered QA Engineer for testing web functionality based on specs, supporting frontend (Puppeteer/Playwright) and backend API testing with comprehensive reporting"
+homepage = "https://github.com/terrazul-ai/tz-packages"
+repository = "https://github.com/terrazul-ai/tz-packages.git"
+license = "MIT"
+keywords = ["qa", "testing", "e2e", "api", "puppeteer", "playwright", "regression", "functional-testing", "automation"]
+authors = ["Terrazul Team"]
+is_private = false
+
+[compatibility]
+claude = ">=0.2.0"
+
+[exports.claude]
+template = "templates/CLAUDE.md.hbs"
+subagentsDir = "templates/claude/agents"
+commandsDir = "templates/claude/commands"
+skillsDir = "templates/claude/skills"
+mcpServers = "templates/claude/mcp_servers.json.hbs"
+
+[metadata]
+tz_spec_version = 1

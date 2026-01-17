@@ -1,5 +1,5 @@
 [package]
-name = "@leourbina/general-coder"
+name = "@terrazul/tdd-engineer"
 version = "1.0.3"
 description = "A comprehensive AI coding assistant package that provides deep codebase understanding, TDD workflow enforcement, and intelligent debugging support"
 homepage = "https://github.com/terrazul-ai/tz-packages"

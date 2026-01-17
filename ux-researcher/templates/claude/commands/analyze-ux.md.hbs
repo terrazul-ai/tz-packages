@@ -1,0 +1,222 @@
+Perform comprehensive UX analysis using Nielsen's 10 Usability Heuristics.
+
+**Usage**: `/analyze-ux [url]`
+
+**Examples**:
+- `/analyze-ux` - Analyze {{ vars.targetUrl }}
+- `/analyze-ux https://example.com` - Analyze specific URL
+- `/analyze-ux --heuristic=visibility` - Focus on specific heuristic
+- `/analyze-ux --page=checkout` - Analyze specific page
+
+---
+
+## Workflow
+
+### Step 1: Setup Browser Session
+
+Launch browser and navigate to target:
+
+```
+1. puppeteer_launch - Start browser instance
+2. puppeteer_new_page - Create new tab
+3. puppeteer_navigate - Go to target URL (argument or {{ vars.targetUrl }})
+4. puppeteer_wait_for_selector - Ensure page loaded
+5. puppeteer_screenshot - Capture initial state
+```
+
+### Step 2: Capture Page Context
+
+```
+1. puppeteer_get_text - Extract page content
+2. puppeteer_evaluate - Get page metadata:
+   - Title
+   - Heading structure
+   - Interactive elements count
+   - Form fields present
+   - Navigation structure
+```
+
+### Step 3: Evaluate Each Heuristic
+
+Use the **heuristics-evaluator** agent methodology for each:
+
+#### H1: Visibility of System Status
+- Check for loading indicators
+- Verify feedback for user actions
+- Test state visibility
+- Note: Use puppeteer_click on buttons and observe feedback
+
+#### H2: Match Between System and Real World
+- Review terminology clarity
+- Check icon recognition
+- Evaluate information hierarchy
+
+#### H3: User Control and Freedom
+- Test undo capabilities
+- Check for cancel options
+- Verify back navigation works
+
+#### H4: Consistency and Standards
+- Compare elements across page
+- Check platform conventions
+- Note visual inconsistencies
+
+#### H5: Error Prevention
+- Test form validation
+- Check for confirmation dialogs
+- Verify input constraints
+
+#### H6: Recognition Rather Than Recall
+- Check option visibility
+- Look for helpful suggestions
+- Verify labels on all elements
+
+#### H7: Flexibility and Efficiency
+- Test keyboard shortcuts
+- Look for power user features
+- Check for customization
+
+#### H8: Aesthetic and Minimalist Design
+- Evaluate visual hierarchy
+- Note unnecessary elements
+- Check information density
+
+#### H9: Error Recovery
+- Trigger errors intentionally
+- Evaluate error messages
+- Check recovery guidance
+
+#### H10: Help and Documentation
+- Look for help options
+- Test contextual guidance
+- Check tooltip availability
+
+### Step 4: Document Findings
+
+For each issue found, record:
+
+```markdown
+### Issue [H#.X]: [Title]
+
+- **Heuristic**: [Which of the 10]
+- **Severity**: [0-4]
+- **Location**: [Page area / element selector]
+- **Description**: [What the issue is]
+- **Screenshot**: [Reference]
+- **Recommendation**: [How to fix]
+```
+
+### Step 5: Generate Report
+
+Output comprehensive report:
+
+```markdown
+# UX Heuristics Evaluation Report
+
+**URL**: [Target URL]
+**Date**: [Current date]
+**Application Type**: {{ vars.appType }}
+
+## Executive Summary
+
+**Overall UX Score**: [X/100]
+
+| Severity | Count |
+|----------|-------|
+| Critical (4) | X |
+| Major (3) | X |
+| Minor (2) | X |
+| Cosmetic (1) | X |
+
+### Top 3 Issues
+1. [Most critical issue]
+2. [Second issue]
+3. [Third issue]
+
+## Scores by Heuristic
+
+| Heuristic | Score | Issues |
+|-----------|-------|--------|
+| H1: Visibility of System Status | X/5 | Y |
+| H2: Match System & Real World | X/5 | Y |
+| H3: User Control & Freedom | X/5 | Y |
+| H4: Consistency & Standards | X/5 | Y |
+| H5: Error Prevention | X/5 | Y |
+| H6: Recognition vs Recall | X/5 | Y |
+| H7: Flexibility & Efficiency | X/5 | Y |
+| H8: Aesthetic & Minimalist | X/5 | Y |
+| H9: Error Recovery | X/5 | Y |
+| H10: Help & Documentation | X/5 | Y |
+
+## Detailed Findings
+
+[Organized by heuristic, with all issues documented]
+
+## Priority Matrix
+
+### Quick Wins (High Impact, Low Effort)
+1. [Issue] - [Brief fix description]
+
+### Strategic Improvements (High Impact, Higher Effort)
+1. [Issue] - [Brief fix description]
+
+### Minor Fixes (Lower Impact)
+1. [Issue] - [Brief fix description]
+
+## Recommendations Summary
+
+1. **Immediate**: [Critical fixes needed now]
+2. **Short-term**: [Major issues for next sprint]
+3. **Long-term**: [Strategic improvements]
+```
+
+---
+
+## Heuristic Focus Mode
+
+If `--heuristic` flag is provided, focus evaluation on single heuristic:
+
+| Flag Value | Heuristic |
+|------------|-----------|
+| `visibility` | H1: Visibility of System Status |
+| `realworld` | H2: Match System & Real World |
+| `control` | H3: User Control & Freedom |
+| `consistency` | H4: Consistency & Standards |
+| `prevention` | H5: Error Prevention |
+| `recognition` | H6: Recognition vs Recall |
+| `efficiency` | H7: Flexibility & Efficiency |
+| `aesthetic` | H8: Aesthetic & Minimalist |
+| `errors` | H9: Error Recovery |
+| `help` | H10: Help & Documentation |
+
+---
+
+## Severity Rating Guide
+
+| Rating | Definition | Example |
+|--------|------------|---------|
+| 0 | Not a problem | Working as expected |
+| 1 | Cosmetic | Button color slightly off-brand |
+| 2 | Minor | Labels unclear but functional |
+| 3 | Major | Cannot find primary navigation |
+| 4 | Critical | Cannot complete core task |
+
+---
+
+## Best Practices
+
+1. **Be systematic** - Don't skip heuristics
+2. **Capture evidence** - Screenshot every issue
+3. **Be specific** - Reference exact elements
+4. **Rate objectively** - Use severity scale consistently
+5. **Provide solutions** - Always suggest a fix
+6. **Consider context** - Factor in {{ vars.appType }} expectations
+
+---
+
+## Integration with Other Commands
+
+After `/analyze-ux`, consider:
+- `/accessibility-audit` - For WCAG compliance
+- `/test-flow signup` - For journey testing
+- `report-generator` skill - For formatted output
