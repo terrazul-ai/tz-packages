@@ -1,8 +1,8 @@
 [package]
 name = "@terrazul/impeccable-style"
-version = "1.0.1"
+version = "1.0.2"
 description = "The vocabulary you didn't know you needed. 1 skill, 17 commands, and curated anti-patterns for impeccable frontend design."
-repository = "https://github.com/terrazul-ai/tz-packages"
+repository = "https://github.com/pbakaus/impeccable"
 license = "MIT"
 keywords = ["design", "frontend", "ui", "ux", "css", "accessibility"]
 

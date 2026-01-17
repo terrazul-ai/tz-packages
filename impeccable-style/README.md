@@ -67,49 +67,10 @@ The skill includes explicit guidance on what to avoid:
 
 Visit [impeccable.style](https://impeccable.style#casestudies) to see before/after case studies of real projects transformed with Impeccable commands.
 
-## Installation
+## Run it
 
-### Option 1: Download from Website (Recommended)
-
-Visit [impeccable.style](https://impeccable.style), download the ZIP for your tool, and extract to your project.
-
-### Option 2: Copy from Repository
-
-**Cursor:**
-```bash
-cp -r dist/cursor/.cursor your-project/
 ```
-
-> **Note:** Cursor skills require setup:
-> 1. Switch to Nightly channel in Cursor Settings → Beta
-> 2. Enable Agent Skills in Cursor Settings → Rules
->
-> [Learn more about Cursor skills](https://cursor.com/docs/context/skills)
-
-**Claude Code:**
-```bash
-# Project-specific
-cp -r dist/claude-code/.claude your-project/
-
-# Or global (applies to all projects)
-cp -r dist/claude-code/.claude/* ~/.claude/
-```
-
-**Gemini CLI:**
-```bash
-cp -r dist/gemini/.gemini your-project/
-```
-
-> **Note:** Gemini CLI skills require setup:
-> 1. Install preview version: `npm i -g @google/gemini-cli@preview`
-> 2. Run `/settings` and enable "Skills"
-> 3. Run `/skills list` to verify installation
->
-> [Learn more about Gemini CLI skills](https://geminicli.com/docs/cli/skills/)
-
-**Codex CLI:**
-```bash
-cp -r dist/codex/.codex/* ~/.codex/
+tz run @terrazul/impeccable-style
 ```
 
 ## Usage
@@ -132,22 +93,15 @@ Most commands accept an optional argument to focus on a specific area:
 
 **Note:** Codex CLI uses a different syntax: `/prompts:audit`, `/prompts:polish`, etc.
 
-## Supported Tools
-
-- [Cursor](https://cursor.com)
-- [Claude Code](https://claude.ai/code)
-- [Gemini CLI](https://github.com/google-gemini/gemini-cli)
-- [Codex CLI](https://github.com/openai/codex)
-
 ## Contributing
 
-See [DEVELOP.md](DEVELOP.md) for contributor guidelines and build instructions.
+See [DEVELOP.md](https://github.com/pbakaus/impeccable/blob/main/DEVELOP.md) for contributor guidelines and build instructions.
 
 ## License
 
 Apache 2.0. See [LICENSE](LICENSE).
 
-The frontend-design skill builds on [Anthropic's original](https://github.com/anthropics/skills/tree/main/skills/frontend-design). See [NOTICE.md](NOTICE.md) for attribution.
+The frontend-design skill builds on [Anthropic's original](https://github.com/anthropics/skills/tree/main/skills/frontend-design). See [NOTICE.md](https://github.com/pbakaus/impeccable/blob/main/NOTICE.md) for attribution.
 
 ---
 
