@@ -5,6 +5,10 @@ description = "Package that helps in package creation"
 repository = "https://github.com/terrazul-ai/tz-packages"
 license = "MIT"
 
+[compatibility]
+claude = ">=0.2.0"
+codex = ">=1.0.0"
+gemini = ">=2.0.0"
 
 [exports.claude]
 template = "templates/CLAUDE.md"
@@ -12,6 +16,18 @@ subagentsDir = "templates/claude/agents"
 commandsDir = "templates/claude/commands"
 skillsDir = "templates/claude/skills"
 mcpServers = "templates/claude/mcp_servers.json.hbs"
+
+[exports.codex]
+template = "templates/AGENTS.md"
+skillsDir = "templates/codex/skills"
+promptsDir = "templates/codex/prompts"
+mcpServers = "templates/codex/mcp_servers.toml.hbs"
+
+[exports.gemini]
+template = "templates/GEMINI.md"
+commandsDir = "templates/gemini/commands"
+skillsDir = "templates/gemini/skills"
+mcpServers = "templates/gemini/mcp_servers.json.hbs"
 
 [metadata]
 tz_spec_version = 1

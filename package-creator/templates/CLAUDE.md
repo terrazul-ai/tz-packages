@@ -1,6 +1,6 @@
 # Package Creator
 
-This project is a Terrazul package which helps in the creation of Terrazul packages. Currently only Claude packages are supported.
+This project is a Terrazul package which helps in the creation of Terrazul packages. Supported tools include Claude, Codex, and Gemini.
 
 ## Directory Structure
 
@@ -17,8 +17,7 @@ my-package/
 └── templates/               # Templates directory
     ├── CLAUDE.md.hbs        # Context file for Claude
     ├── AGENTS.md.hbs        # Context file for Codex
-    ├── cursor.rules.mdc.hbs # Context file for Cursor
-    ├── COPILOT.md.hbs       # Context file for GitHub Copilot
+    ├── GEMINI.md.hbs        # Context file for Gemini
     ├── claude/              # Claude-specific operational files
     │   ├── settings.json.hbs
     │   ├── settings.local.json.hbs
@@ -29,9 +28,13 @@ my-package/
     │       ├── planner.md.hbs
     │       └── utils/
     │           └── helper.md.hbs
-    └── codex/               # Codex-specific configuration
-        ├── config.toml.hbs
-        └── agents.toml.hbs  # Codex MCP servers
+    ├── codex/               # Codex-specific configuration
+    │   ├── config.toml.hbs
+    │   └── agents.toml.hbs  # Codex MCP servers
+    └── gemini/              # Gemini-specific configuration
+        ├── commands/        # Command definitions (TOML files)
+        ├── skills/          # Skill directories (with SKILL.md)
+        └── mcp_servers.json.hbs  # Gemini MCP servers (JSON format)
 ```
 
 ### Required vs Optional
@@ -45,6 +48,78 @@ my-package/
 | Operational templates | **OPTIONAL** | Settings, MCP config, agents |
 | `prompts/` | **OPTIONAL** | External prompt files for `askAgent` |
 | `.gitignore` | **OPTIONAL** | Standard gitignore |
+
+---
+
+## ⚠️ IMPORTANT: Command Format Differences
+
+**Commands have different formats for each tool. They CANNOT be symlinked between tools.**
+
+### Claude Commands (Markdown with YAML frontmatter)
+
+Location: `templates/claude/commands/`
+
+```markdown
+---
+name: my-command
+description: Short description of the command
+---
+
+# Command Title
+
+Full prompt content in markdown format.
+
+## Instructions
+
+1. Step one
+2. Step two
+```
+
+### Gemini Commands (TOML format)
+
+Location: `templates/gemini/commands/`
+
+```toml
+description = "Short description of the command"
+prompt = """
+# Command Title
+
+Full prompt content in markdown format.
+
+## Instructions
+
+1. Step one
+2. Step two
+"""
+```
+
+### Key Differences
+
+| Aspect | Claude | Gemini |
+|--------|--------|--------|
+| File format | `.md` (Markdown) | `.toml` (TOML) |
+| Metadata | YAML frontmatter (`---`) | TOML fields |
+| Name field | `name:` in frontmatter | Filename (without `.toml`) |
+| Description | `description:` in frontmatter | `description = "..."` |
+| Prompt content | Everything after frontmatter | `prompt = """..."""` |
+| Arguments | Custom handling | `{{args}}` placeholder |
+
+### Why This Matters
+
+- **You cannot symlink** Claude commands to Gemini (or vice versa)
+- **Each tool requires its own command files** in the correct format
+- **Skills CAN be shared** between tools (same directory structure with `SKILL.md`)
+- **MCP servers CAN be shared** if both tools use the same format (Claude and Gemini both use JSON)
+
+### Converting Commands
+
+When creating a package that supports both Claude and Gemini:
+
+1. Write your command logic once
+2. Create two versions:
+   - `templates/claude/commands/my-command.md` (Markdown + YAML frontmatter)
+   - `templates/gemini/commands/my-command.toml` (TOML format)
+3. Keep the prompt content identical, just change the wrapper format
 
 ---
 
@@ -97,15 +172,13 @@ Declares which AI tools the package supports and their version requirements.
 [compatibility]
 claude = ">=0.2.0"     # Requires Claude Code v0.2.0 or higher
 codex = "*"            # Compatible with any Codex version
-cursor = "^1.0.0"      # Requires Cursor v1.x.x
-copilot = "~2.5.0"     # Requires GitHub Copilot v2.5.x
+gemini = "*"           # Compatible with any Gemini CLI version
 ```
 
 **Valid Tool Names:**
 - `claude` - Claude Code
 - `codex` - Codex
-- `cursor` - Cursor
-- `copilot` - GitHub Copilot
+- `gemini` - Gemini CLI
 
 **Validation Rules:**
 - Keys must be one of the valid tool names (others trigger warnings, not errors)
@@ -157,11 +230,6 @@ template = "templates/CLAUDE.md.hbs"
 [exports.codex]
 template = "templates/AGENTS.md.hbs"
 
-[exports.cursor]
-template = "templates/cursor.rules.mdc.hbs"
-
-[exports.copilot]
-template = "templates/COPILOT.md.hbs"
 ```
 
 **Type Definition:**
@@ -175,7 +243,7 @@ interface ExportEntry {
 ```
 
 **Valid Tool Keys:**
-- `claude`, `codex`, `cursor`, `copilot`
+- `claude`, `codex`, `gemini`
 - Unknown tool keys trigger warnings (ignored, not errors)
 
 **Validation Rules:**
@@ -395,7 +463,7 @@ The `agents.toml` manifest is the heart of Terrazul CLI's package system. It sup
 
 - **6 top-level sections**: `[package]`, `[dependencies]`, `[compatibility]`, `[tasks]`, `[exports]`, `[profiles]`
 - **10 package metadata fields**: name, version, description, homepage, repository, documentation, license, keywords, authors, is_private
-- **4 supported tools**: claude, codex, cursor, copilot
+- **3 supported tools**: claude, codex, gemini
 - **Type-safe validation**: Zod schemas enforce structure, `validateManifest` enforces semantics
 - **Deterministic output**: Sorted keys, deduplicated arrays, alphabetical ordering
 - **Security-first**: Path validation, symlink safety, no executable code
@@ -456,7 +524,7 @@ Prompts the user for information during template rendering.
 
 ## `askAgent` - AI-Powered Code Analysis
 
-Invokes an AI tool (Claude, Codex, Cursor, Copilot) to analyze the codebase and generate content.
+Invokes an AI tool (Claude, Codex, Gemini) to analyze the codebase and generate content.
 
 ### Syntax
 
@@ -494,7 +562,7 @@ File paths are resolved relative to the package directory.
 ```typescript
 {
   json?: boolean;           // Expect JSON response
-  tool?: ToolType;          // Override tool: 'claude' | 'codex' | 'cursor' | 'copilot'
+  tool?: ToolType;          // Override tool: 'claude' | 'codex' | 'gemini'
   schema?: SchemaReference; // Validate JSON against schema
   safeMode?: boolean;       // Disable if agent can modify files (default: true)
   timeoutMs?: number;       // Custom timeout in milliseconds
