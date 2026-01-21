@@ -1,0 +1,53 @@
+description = "List all available package-creator commands and skills"
+prompt = """
+# Package Creator Help
+
+Display a summary of all available commands and skills for the package-creator.
+
+## Instructions
+
+Present the following information in a clear, organized format:
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/help` | Show this help message |
+
+### Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `create-agent` | Scaffold new Claude Code agent definitions with proper structure and best practices |
+| `create-skill` | Scaffold new Claude Code skill definitions with YAML frontmatter and clear instructions |
+
+### Quick Tips
+
+- Use `create-agent` when you need to add specialized agents to your package
+- Use `create-skill` when building reusable workflows or tool integrations
+- Follow the templates provided for consistent structure
+
+### Package Structure
+
+When creating a new Terrazul package, follow this structure:
+
+```
+my-package/
+├── agents.toml              # REQUIRED: Package manifest
+├── README.md                # RECOMMENDED: Package documentation
+└── templates/               # Templates directory
+    ├── CLAUDE.md.hbs        # Context file for Claude
+    ├── AGENTS.md.hbs        # Context file for Codex
+    ├── GEMINI.md.hbs        # Context file for Gemini
+    ├── claude/              # Claude-specific files
+    ├── codex/               # Codex-specific files
+    └── gemini/              # Gemini-specific files
+```
+
+### Multi-Platform Support
+
+This package supports:
+- **Claude Code** - Markdown commands, JSON MCP config
+- **OpenAI Codex** - TOML prompts, TOML MCP config
+- **Google Gemini** - TOML commands, JSON MCP config
+"""

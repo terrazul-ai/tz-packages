@@ -67,13 +67,35 @@ my-package/
 └── templates/               # Templates directory
     ├── CLAUDE.md.hbs        # Context file for Claude
     ├── AGENTS.md.hbs        # Context file for Codex
-    └── claude/              # Claude-specific operational files
-        ├── settings.json.hbs
+    ├── GEMINI.md.hbs        # Context file for Gemini
+    ├── claude/              # Claude-specific files
+    │   ├── mcp_servers.json.hbs
+    │   ├── agents/          # Agent definitions
+    │   ├── commands/        # Slash commands (Markdown)
+    │   └── skills/          # Reusable skills
+    ├── codex/               # Codex-specific files
+    │   ├── mcp_servers.toml.hbs
+    │   ├── prompts/         # Prompts (can symlink to claude/commands)
+    │   └── skills/          # Skills (can symlink to claude/skills)
+    └── gemini/              # Gemini-specific files
         ├── mcp_servers.json.hbs
-        ├── agents/          # Agent definitions
-        ├── commands/        # Slash commands
-        └── skills/          # Reusable skills
+        ├── commands/        # Commands (TOML format)
+        └── skills/          # Skills (can symlink to claude/skills)
 ```
+
+---
+
+## 🌐 Multi-Platform Support
+
+This package supports **Claude**, **Codex**, and **Gemini**:
+
+| Platform | Context File | Commands | MCP Config |
+|----------|-------------|----------|------------|
+| Claude   | `CLAUDE.md` | Markdown | JSON       |
+| Codex    | `AGENTS.md` | TOML     | TOML       |
+| Gemini   | `GEMINI.md` | TOML     | JSON       |
+
+Use symlinks to share content across platforms (e.g., skills are often identical).
 
 ---
 
@@ -97,17 +119,33 @@ my-package/
 
    [compatibility]
    claude = ">=0.2.0"
+   codex = ">=1.0.0"
+   gemini = ">=2.0.0"
 
    [exports.claude]
    template = "templates/CLAUDE.md.hbs"
    commandsDir = "templates/claude/commands"
-   subagentsDir = "templates/claude/agents"
    skillsDir = "templates/claude/skills"
+   mcpServers = "templates/claude/mcp_servers.json.hbs"
+
+   [exports.codex]
+   template = "templates/AGENTS.md.hbs"
+   promptsDir = "templates/codex/prompts"
+   skillsDir = "templates/codex/skills"
+   mcpServers = "templates/codex/mcp_servers.toml.hbs"
+
+   [exports.gemini]
+   template = "templates/GEMINI.md.hbs"
+   commandsDir = "templates/gemini/commands"
+   skillsDir = "templates/gemini/skills"
+   mcpServers = "templates/gemini/mcp_servers.json.hbs"
    ```
 
 3. **Create templates directory**:
    ```bash
    mkdir -p templates/claude/{agents,commands,skills}
+   mkdir -p templates/codex/{prompts,skills}
+   mkdir -p templates/gemini/{commands,skills}
    ```
 
 4. **Use create-agent skill** to add agents

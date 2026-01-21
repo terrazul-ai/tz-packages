@@ -1,10 +1,10 @@
 # Package Creator
 
-This project is a Terrazul package which helps in the creation of Terrazul packages. Currently only Claude packages are supported.
+This project is a Terrazul package which helps in the creation of Terrazul packages. It supports **Claude**, **Codex**, and **Gemini**.
 
 ## Directory Structure
 
-A Terrazul package consits of a directory with the following structure:
+A Terrazul package consists of a directory with the following structure:
 
 ```
 my-package/
@@ -17,21 +17,64 @@ my-package/
 └── templates/               # Templates directory
     ├── CLAUDE.md.hbs        # Context file for Claude
     ├── AGENTS.md.hbs        # Context file for Codex
-    ├── cursor.rules.mdc.hbs # Context file for Cursor
-    ├── COPILOT.md.hbs       # Context file for GitHub Copilot
+    ├── GEMINI.md.hbs        # Context file for Gemini
     ├── claude/              # Claude-specific operational files
-    │   ├── settings.json.hbs
-    │   ├── settings.local.json.hbs
-    │   ├── user.settings.json.hbs
     │   ├── mcp_servers.json.hbs
-    │   └── agents/          # Agent definitions
-    │       ├── reviewer.md.hbs
-    │       ├── planner.md.hbs
-    │       └── utils/
-    │           └── helper.md.hbs
-    └── codex/               # Codex-specific configuration
-        ├── config.toml.hbs
-        └── agents.toml.hbs  # Codex MCP servers
+    │   ├── agents/          # Agent definitions
+    │   ├── commands/        # Slash commands (Markdown)
+    │   └── skills/          # Reusable skills
+    ├── codex/               # Codex-specific configuration
+    │   ├── mcp_servers.toml.hbs
+    │   ├── prompts/         # Prompts (can symlink to claude/commands)
+    │   └── skills/          # Skills (can symlink to claude/skills)
+    └── gemini/              # Gemini-specific configuration
+        ├── mcp_servers.json.hbs
+        ├── commands/        # Commands (TOML format)
+        └── skills/          # Skills (can symlink to claude/skills)
+```
+
+## Multi-Platform Support
+
+| Platform | Context File | Commands Format | MCP Format | Skills |
+|----------|-------------|-----------------|------------|--------|
+| Claude   | `CLAUDE.md` | Markdown (.md)  | JSON       | Markdown with YAML frontmatter |
+| Codex    | `AGENTS.md` | TOML (.toml)    | TOML       | Markdown with YAML frontmatter |
+| Gemini   | `GEMINI.md` | TOML (.toml)    | JSON       | Markdown with YAML frontmatter |
+
+### Sharing Content Across Platforms
+
+Use symlinks to share content that's identical across platforms:
+
+```bash
+# In templates/codex/
+ln -s ../claude/skills skills
+ln -s ../claude/commands prompts
+
+# In templates/gemini/
+ln -s ../claude/skills skills
+ln -s ../claude/mcp_servers.json.hbs mcp_servers.json.hbs
+```
+
+### Platform-Specific Exports in agents.toml
+
+```toml
+[exports.claude]
+template = "templates/CLAUDE.md.hbs"
+commandsDir = "templates/claude/commands"
+skillsDir = "templates/claude/skills"
+mcpServers = "templates/claude/mcp_servers.json.hbs"
+
+[exports.codex]
+template = "templates/AGENTS.md.hbs"
+promptsDir = "templates/codex/prompts"
+skillsDir = "templates/codex/skills"
+mcpServers = "templates/codex/mcp_servers.toml.hbs"
+
+[exports.gemini]
+template = "templates/GEMINI.md.hbs"
+commandsDir = "templates/gemini/commands"
+skillsDir = "templates/gemini/skills"
+mcpServers = "templates/gemini/mcp_servers.json.hbs"
 ```
 
 ### Required vs Optional
