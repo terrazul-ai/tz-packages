@@ -1,0 +1,17 @@
+{{~ var github_token = askUser('GitHub Personal Access Token (leave empty to skip GitHub integration)', { default: '' }) ~}}
+[mcp_servers.context7]
+command = "npx"
+args = [ "-y", "@upstash/context7-mcp" ]
+
+[mcp_servers.exa]
+command = "npx"
+args = [ "-y", "mcp-remote", "https://mcp.exa.ai/mcp" ]
+{{#if vars.github_token}}
+
+[mcp_servers.github]
+command = "docker"
+args = [ "run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server" ]
+
+[mcp_servers.github.env]
+GITHUB_PERSONAL_ACCESS_TOKEN = "{{vars.github_token}}"
+{{/if}}

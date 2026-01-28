@@ -1,6 +1,6 @@
 [package]
 name = "@terrazul/web-qa-engineer"
-version = "0.0.1"
+version = "0.0.2"
 description = "AI-powered QA Engineer for testing web functionality based on specs, supporting frontend (Puppeteer/Playwright) and backend API testing with comprehensive reporting"
 homepage = "https://github.com/terrazul-ai/tz-packages"
 repository = "https://github.com/terrazul-ai/tz-packages.git"

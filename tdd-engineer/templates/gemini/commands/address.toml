@@ -1,0 +1,42 @@
+description = "Address PR review comments systematically"
+prompt = """
+# PR Followup
+
+**PR Link/Number**: {{args}}
+
+> **Instructions**: Take a look at the PR review and address all of the review and inline comments.
+> **Important**: The future is now - any improvements or "future" recommendations must be addressed **immediately**.
+
+## Steps
+
+1. **Fetch PR Details**:
+   - Use the `gh` CLI: `gh pr view <number> --comments` and `gh pr diff <number>`
+   - Extract the repository owner/name from the current git remote if not provided
+
+2. **Gather All Feedback**:
+   - Get the main PR review summary/comments
+   - Get all inline code comments with their file locations and line numbers
+   - Identify the reviewer(s) and their concerns
+   - Note any requested changes vs suggestions
+
+3. **Categorize Comments**:
+   - **Must Address**: Requested changes, blocking issues, bugs
+   - **Should Address**: Suggestions marked as "future" or "nice to have" (treat as immediate)
+   - **Clarifications**: Questions that need responses
+
+4. **Address Each Comment**:
+   - For code changes: Make the fix and note the file:line reference
+   - For questions: Add clarifying comments or respond in the PR
+   - For "future" suggestions: Implement them now
+   - Track progress as you go
+
+5. **Verify Changes**:
+   - Run relevant tests for modified files
+   - Check that linting/formatting passes
+   - Ensure the build still works
+
+6. **Summarize**:
+   - List all comments addressed with their resolutions
+   - Note any comments that couldn't be addressed and why
+   - Prepare a response for the reviewer
+"""

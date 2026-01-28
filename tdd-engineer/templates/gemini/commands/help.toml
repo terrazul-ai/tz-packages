@@ -1,0 +1,115 @@
+description = "List all available TDD Engineer commands and agents"
+prompt = """
+# @terrazul/tdd-engineer - Package Help
+
+Welcome to the **@terrazul/tdd-engineer** package! This package provides a comprehensive AI coding assistant experience with deep codebase understanding, pragmatic TDD workflow enforcement, and intelligent debugging support.
+
+---
+
+## Quick Overview
+
+This package includes:
+- **Dynamic context generation** that analyzes your codebase automatically
+- **4 custom commands** for common workflows
+- **MCP server integration** (context7, exa, github)
+- **Pragmatic TDD workflow** enforcement
+
+---
+
+## Available Commands
+
+### `/run-tests`
+**Description**: Runs the project's test suite and analyzes failures
+
+**What it does**:
+- Identifies and runs the test command
+- Reports pass/fail summary
+- Analyzes failing tests with root cause analysis
+- Suggests fixes for failures
+- Checks test coverage if available
+
+---
+
+### `/debug [error|file]`
+**Description**: Debug an error or issue systematically
+
+**What it does**:
+- Analyzes error messages and stack traces
+- Reproduces the issue if possible
+- Identifies root cause
+- Suggests concrete fixes with explanations
+- Recommends tests to prevent regression
+
+---
+
+### `/review [file|PR]`
+**Description**: Review code changes for quality and best practices
+
+**What it does**:
+- Reviews specific files or PRs
+- Checks code quality, functionality, tests, security
+- Identifies issues by priority (Critical > Low)
+- Provides specific, actionable feedback
+
+---
+
+### `/address [PR]`
+**Description**: Address PR review comments systematically
+
+**What it does**:
+- Fetches PR details using GitHub MCP or `gh` CLI
+- Gathers all review comments
+- Implements fixes for each comment
+- Runs tests to verify changes
+- Provides summary of addressed comments
+
+---
+
+## MCP Servers
+
+### context7 (Required)
+Fetch up-to-date library documentation. Always prefer context7 over web search for library docs.
+
+### exa (Required)
+Web research and finding code examples, implementation patterns, and solutions.
+
+### github (Optional)
+GitHub integration for fetching PR details, reading issues, and analyzing repositories.
+
+---
+
+## Typical Workflows
+
+### Adding a New Feature
+1. Plan the feature
+2. Write tests first (RED)
+3. Implement to pass tests (GREEN)
+4. Refactor while keeping tests green
+5. Run `/run-tests` to verify
+6. Run `/review` to self-review
+
+### Debugging an Issue
+1. Run `/debug [error message]` for initial analysis
+2. Implement fix
+3. Run `/run-tests` to verify
+
+### Code Review
+1. Run `/review [file or PR URL]`
+2. Address feedback
+3. Re-review until satisfied
+
+### Addressing PR Feedback
+1. Run `/address [PR URL or number]`
+2. Run `/run-tests` to verify
+3. Commit and push
+
+---
+
+## Best Practices
+
+- **Always** write tests for features and bug fixes
+- Try max 3 times, then STOP and ask for help
+- Keep functions short (<60 lines)
+- Follow existing patterns in the codebase
+- Use context7 first for library documentation
+"""
