@@ -1,9 +1,4 @@
-{{~ var enable_github = askUser('Do you want to enable GitHub integration? (requires Personal Access Token)', { default: 'no' }) ~}}
-{{~ var github_token = '' ~}}
-{{~ if (vars.enable_github === 'yes') ~}}
-  {{~ github_token = askUser('Enter your GitHub Personal Access Token') ~}}
-{{~ /if ~}}
-
+{{~ var github_token = askUser('GitHub Personal Access Token (leave empty to skip GitHub integration)', { default: '' }) ~}}
 {
   "mcpServers": {
     "context7": {
@@ -15,11 +10,8 @@
     },
     "exa": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@upstash/exa-mcp"
-      ]
-    }{{#if (eq vars.enable_github 'yes')}},
+      "args": ["-y", "mcp-remote", "https://mcp.exa.ai/mcp"]
+    }{{#if vars.github_token}},
     "github": {
       "command": "docker",
       "args": [
