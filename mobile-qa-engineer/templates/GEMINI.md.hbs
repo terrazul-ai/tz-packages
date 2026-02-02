@@ -1,0 +1,205 @@
+{{~ var targetPlatform = askUser('Which platform(s) are you testing?', { default: 'both', placeholder: 'ios, android, or both' }) ~}}
+{{~ var deviceType = askUser('Device type?', { default: 'simulator', placeholder: 'simulator, emulator, real-device, auto-detect' }) ~}}
+{{~ var appIdentifier = askUser('App bundle ID (iOS) or package name (Android)?', { placeholder: 'com.example.myapp' }) ~}}
+{{~ var appPath = askUser('Path to .ipa/.apk file (optional)?', { default: 'none' }) ~}}
+{{~ var screenshotDir = askUser('Screenshot directory?', { default: './qa-reports/screenshots' }) ~}}
+{{~ var reportOutputDir = askUser('Report output directory?', { default: './qa-reports' }) ~}}
+{{~ var specFormat = askUser('Spec format for test cases?', { default: 'freeform', placeholder: 'freeform, markdown, prd, user-stories' }) ~}}
+{{~ var githubRepo = askUser('GitHub repo for issue creation (optional)?', { default: 'none', placeholder: 'owner/repo' }) ~}}
+{{~ var useRunDirs = askUser('Organize into per-run subdirectories?', { default: 'yes' }) ~}}
+
+# Mobile QA Engineer
+
+AI-powered QA testing for mobile applications using mobile-mcp for iOS and Android automation.
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Platform** | {{ vars.targetPlatform }} |
+| **Device Type** | {{ vars.deviceType }} |
+| **App Identifier** | {{ vars.appIdentifier }} |
+{{#if (ne vars.appPath 'none')}}
+| **App Path** | {{ vars.appPath }} |
+{{/if}}
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Dir** | {{ vars.reportOutputDir }} |
+| **Spec Format** | {{ vars.specFormat }} |
+{{#if (ne vars.githubRepo 'none')}}
+| **GitHub Repo** | {{ vars.githubRepo }} |
+{{/if}}
+| **Per-Run Dirs** | {{ vars.useRunDirs }} |
+
+## Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `explore-app` | Full app exploration and assessment |
+| `test-flow` | Test specific flows against specs |
+| `accessibility-audit` | Mobile accessibility testing |
+| `regression-test` | Re-run documented test cases |
+| `screenshot-catalog` | Generate visual documentation |
+| `qa-report` | Generate comprehensive QA reports |
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/explore` | Full app exploration and assessment |
+| `/test-flow` | Test a specific flow against spec |
+| `/accessibility-audit` | Run accessibility audit |
+| `/screenshot-catalog` | Generate visual documentation |
+| `/regression-test` | Re-run documented test cases |
+| `/qa-report` | Generate QA report |
+| `/setup-mcp` | Configure MCP server credentials |
+| `/help` | Show available commands |
+
+## MCP Tools (mobile-mcp)
+
+The `@mobilenext/mobile-mcp` server provides these tools:
+
+### Device Management
+| Tool | Description |
+|------|-------------|
+| `mobile_list_available_devices` | List simulators/emulators/devices |
+| `mobile_launch_app` | Start the app under test |
+| `mobile_terminate_app` | Clean up after tests |
+
+### Screenshot & Visual
+| Tool | Description |
+|------|-------------|
+| `mobile_take_screenshot` | Capture current screen state |
+| `mobile_save_screenshot` | Save screenshot to specific path |
+
+### UI Interaction
+| Tool | Description |
+|------|-------------|
+| `mobile_list_elements_on_screen` | Get UI hierarchy with coordinates |
+| `mobile_click_on_screen_at_coordinates` | Tap at specific coordinates |
+| `mobile_swipe_on_screen` | Scroll, swipe gestures |
+| `mobile_type_keys` | Text input |
+| `mobile_press_button` | HOME, BACK, VOLUME buttons |
+| `mobile_open_url` | Deep link testing |
+
+## Testing Workflow
+
+### Before Testing
+
+1. **Verify device availability**:
+   ```
+   Use mobile_list_available_devices to see available devices
+   ```
+
+   > **Physical Device Not Found?** If you're trying to use a physical iOS or Android device and it doesn't appear in the device list, automatically run `/setup-mcp` to help the user configure WebDriverAgent (iOS) or USB debugging (Android).
+
+2. **Launch the app**:
+   ```
+   Use mobile_launch_app with bundle ID: {{ vars.appIdentifier }}
+   ```
+
+3. **Create run directory** (if per-run dirs enabled):
+   ```
+   {{ vars.reportOutputDir }}/[timestamp]-[feature-slug]/
+   ├── screenshots/
+   ├── bugs/
+   └── README.md
+   ```
+
+### During Testing
+
+1. **Capture UI state**: Use `mobile_list_elements_on_screen` before interactions
+2. **Take screenshots**: Use `mobile_take_screenshot` for evidence
+3. **Interact**: Use tap, swipe, type tools as needed
+4. **Validate**: Compare actual vs expected state
+
+### After Testing
+
+1. **Terminate app**: Use `mobile_terminate_app` to clean up
+2. **Generate report**: Use `/qa-report` to compile findings
+{{#if (ne vars.githubRepo 'none')}}
+3. **Create GitHub issues**: Use `gh issue create` for bugs
+{{/if}}
+
+## Platform-Specific Guidelines
+
+### iOS Testing
+
+- **Touch Targets**: Minimum 44x44 points
+- **Safe Area**: Respect notch and home indicator
+- **Dynamic Type**: Test with larger text sizes
+- **Accessibility Labels**: Required for all interactive elements
+- **Gesture Support**: Test swipe-to-delete, pull-to-refresh
+
+### Android Testing
+
+- **Touch Targets**: Minimum 48x48 dp
+- **Material Guidelines**: Follow Material Design patterns
+- **Back Button**: Test hardware back button behavior
+- **Accessibility**: TalkBack compatibility
+- **Screen Sizes**: Test multiple screen densities
+
+## Severity Scale
+
+| Severity | Label | Definition | Example |
+|----------|-------|------------|---------|
+| 4 | Critical | App crashes, data loss, security issue | Crash on login, data not saved |
+| 3 | Major | Feature broken, blocking issue | Button doesn't respond, wrong navigation |
+| 2 | Minor | Feature works incorrectly | Misaligned elements, slow response |
+| 1 | Cosmetic | Visual/text issue only | Typo, color mismatch |
+
+## Bug Report Format
+
+```markdown
+## BUG-[ID]: [Title]
+
+**Severity**: Critical / Major / Minor / Cosmetic
+**Platform**: iOS / Android / Both
+**Device**: [Device name and OS version]
+
+### Description
+[What went wrong]
+
+### Steps to Reproduce
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+
+### Expected Behavior
+[What should happen]
+
+### Actual Behavior
+[What actually happened]
+
+### Evidence
+- Screenshot: [path]
+- Video: [path] (if applicable)
+
+### Environment
+- App Version: [version]
+- Device: [device]
+- OS Version: [version]
+```
+
+## Best Practices
+
+1. **Fresh state**: Terminate and relaunch app between test scenarios
+2. **Screenshot everything**: Capture before and after each action
+3. **Test both platforms**: Bugs often appear on only one platform
+4. **Check accessibility**: Run accessibility audit on all new screens
+5. **Document flows**: Keep test cases updated as app evolves
+6. **Use realistic data**: Test with production-like content
+7. **Test edge cases**: Empty states, long text, special characters
+
+## Definition of Done
+
+Before marking QA complete:
+
+- [ ] All critical flows tested
+- [ ] Screenshots captured for all screens
+- [ ] Accessibility audit passed
+- [ ] Bugs documented with severity
+- [ ] Report generated and saved
+- [ ] Test cases updated
+{{#if (ne vars.githubRepo 'none')}}
+- [ ] GitHub issues created for bugs
+{{/if}}

@@ -1,0 +1,183 @@
+Generate visual documentation of all app screens.
+
+**Usage**: `/screenshot-catalog [options]`
+
+**Examples**:
+- `/screenshot-catalog` - Full app catalog
+- `/screenshot-catalog --section=auth` - Catalog auth screens only
+- `/screenshot-catalog --states=all` - Include empty/error/loading states
+
+---
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Platform** | {{ vars.targetPlatform }} |
+| **Device Type** | {{ vars.deviceType }} |
+| **App Identifier** | {{ vars.appIdentifier }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Dir** | {{ vars.reportOutputDir }} |
+
+---
+
+## Workflow
+
+{{#if (eq vars.useRunDirs 'yes')}}
+### Step 0: Initialize Run Directory
+
+1. Generate timestamp (YYYYMMDD-HHMMSS)
+2. Create: `{{ vars.reportOutputDir }}/[timestamp]-screenshots/`
+3. Create platform subdirectories:
+{{#if (eq vars.targetPlatform 'both')}}
+   - `ios/`
+   - `android/`
+{{else}}
+   - `{{ vars.targetPlatform }}/`
+{{/if}}
+4. Create feature folders within each platform
+{{/if}}
+
+### Step 1: Plan Navigation
+
+1. **Define scope**:
+   - All screens or specific section?
+   - Which states to capture?
+
+2. **Plan navigation path**:
+   - Start from app launch
+   - Logical order by feature
+
+### Step 2: Launch App
+
+```
+mcp__mobile-mcp__mobile_launch_app
+Bundle ID: {{ vars.appIdentifier }}
+```
+
+### Step 3: Systematic Capture
+
+For each screen:
+
+1. **Navigate to screen**
+2. **Wait for stable state**
+3. **Capture screenshot**:
+   ```
+   mcp__mobile-mcp__mobile_save_screenshot
+   Path: [platform]/[feature]/[screen-name]-[state].png
+   ```
+4. **Capture variations**:
+   - Scroll to reveal more
+   - Toggle states
+   - Open modals
+
+### Step 4: State Capture
+
+Capture these states when applicable:
+
+| State | Description |
+|-------|-------------|
+| Default | Normal loaded state |
+| Empty | No data present |
+| Loading | Data being fetched |
+| Error | Network/server error |
+| Populated | With realistic data |
+
+### Step 5: Organization
+
+#### Naming Convention
+```
+[feature]/[screen]-[state]-[variation].png
+
+Examples:
+auth/login-default.png
+auth/login-error-invalid.png
+home/feed-empty.png
+home/feed-populated.png
+```
+
+#### Folder Structure
+```
+screenshots/
+├── auth/
+│   ├── login-default.png
+│   ├── login-error.png
+│   └── signup.png
+├── home/
+│   ├── feed-default.png
+│   └── feed-empty.png
+└── settings/
+    ├── main.png
+    └── profile.png
+```
+
+### Step 6: Generate Catalog
+
+Create `catalog.md`:
+
+```markdown
+# Screenshot Catalog
+
+**App**: {{ vars.appIdentifier }}
+**Date**: [Date]
+**Platform**: {{ vars.targetPlatform }}
+
+## Summary
+
+| Category | Screens | Screenshots |
+|----------|---------|-------------|
+| Auth | X | X |
+| Home | X | X |
+| Settings | X | X |
+
+---
+
+## Auth
+
+### Login
+![Login](auth/login-default.png)
+
+| State | Screenshot |
+|-------|------------|
+| Default | [link] |
+| Error | [link] |
+
+---
+
+[More sections...]
+```
+
+---
+
+## Output
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Results saved to:
+- `[run-dir]/catalog.md` - Main index
+- `[run-dir]/[feature]/` - Organized screenshots
+- `[run-dir]/README.md` - Metadata
+
+Access via: `{{ vars.reportOutputDir }}/latest/`
+{{else}}
+- `{{ vars.reportOutputDir }}/catalog-[date].md`
+- Screenshots organized in `{{ vars.screenshotDir }}/`
+{{/if}}
+
+---
+
+## Best Practices
+
+1. **Consistent device**: Same device throughout
+2. **Clean state**: Clear notifications
+3. **Realistic data**: Not "test" content
+4. **Complete coverage**: Every screen
+5. **Version tracking**: Note app version
+
+---
+
+## Next Steps
+
+After `/screenshot-catalog`:
+- Use for design review
+- Create visual baseline for regression
+- Share with stakeholders

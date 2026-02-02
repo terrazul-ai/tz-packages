@@ -1,0 +1,72 @@
+description = "Test a specific user flow against specification"
+prompt = """
+Test a specific user flow against a specification.
+
+**Usage**: `/test-flow <spec-or-description>`
+
+**Arguments**: {{args}}
+
+## Examples
+
+- `/test-flow "User can log in with email and password"`
+- `/test-flow specs/checkout-flow.md`
+- `/test-flow "Test the password reset flow"`
+
+## Workflow
+
+### Step 1: Parse Specification
+
+Analyze the spec to extract:
+- **Flow Goal**: What user accomplishes
+- **Preconditions**: Required starting state
+- **Steps**: Ordered list of actions
+- **Expected Results**: What should happen at each step
+- **Success Criteria**: How to verify completion
+
+### Step 2: Environment Setup
+
+1. Launch the app with the configured bundle ID
+2. Navigate to starting point
+3. Set up required state
+4. Document initial state with screenshot
+
+### Step 3: Execute Flow Steps
+
+For each step:
+
+1. **Pre-action**: Screenshot + verify expected screen
+2. **Execute action**: Tap, type, swipe, or navigate
+3. **Post-action**: Wait for UI, screenshot, validate
+4. **Record**: PASS or FAIL
+
+### Step 4: Handle Deviations
+
+For any failures, document:
+- Severity (Critical/Major/Minor/Cosmetic)
+- Expected vs actual behavior
+- Impact on user
+- Screenshot evidence
+
+### Step 5: Generate Report
+
+Create test report with:
+- Summary (pass/fail counts)
+- Step-by-step results
+- Deviations with severity
+- Recommendations
+
+## Severity Guidelines
+
+| Severity | Criteria |
+|----------|----------|
+| Critical | Cannot complete flow, data loss |
+| Major | Feature works incorrectly |
+| Minor | Works with issues |
+| Cosmetic | Visual only |
+
+## Output
+
+- Test results document
+- Screenshots for each step
+- Bug reports for failures
+"""

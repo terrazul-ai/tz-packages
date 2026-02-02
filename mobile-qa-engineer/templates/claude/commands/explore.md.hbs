@@ -1,0 +1,146 @@
+Perform full exploration and assessment of the mobile app.
+
+**Usage**: `/explore [options]`
+
+**Examples**:
+- `/explore` - Full app exploration
+- `/explore --section=settings` - Explore only settings section
+- `/explore --depth=2` - Limit navigation depth
+
+---
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Platform** | {{ vars.targetPlatform }} |
+| **Device Type** | {{ vars.deviceType }} |
+| **App Identifier** | {{ vars.appIdentifier }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Dir** | {{ vars.reportOutputDir }} |
+
+---
+
+## Workflow
+
+{{#if (eq vars.useRunDirs 'yes')}}
+### Step 0: Initialize Run Directory
+
+1. Generate timestamp (YYYYMMDD-HHMMSS)
+2. Create: `{{ vars.reportOutputDir }}/[timestamp]-explore/`
+3. Create subdirectories: `screenshots/`, `bugs/`
+4. Initialize README.md with run metadata
+{{/if}}
+
+### Step 1: Device Setup
+
+1. **List available devices**:
+   ```
+   mcp__mobile-mcp__mobile_list_available_devices
+   ```
+
+2. **Select appropriate device** based on target platform ({{ vars.targetPlatform }})
+
+3. **Launch the app**:
+   ```
+   mcp__mobile-mcp__mobile_launch_app
+   Bundle ID: {{ vars.appIdentifier }}
+   ```
+
+### Step 2: Systematic Exploration
+
+Use breadth-first exploration:
+
+1. **Capture launch screen**:
+   - Screenshot
+   - Get UI elements: `mobile_list_elements_on_screen`
+
+2. **Identify navigation elements**:
+   - Tab bars
+   - Navigation buttons
+   - Menu items
+   - Interactive elements
+
+3. **Visit each reachable screen**:
+   - Navigate systematically
+   - Screenshot each unique screen
+   - Document navigation path
+   - Identify further navigation options
+
+4. **Track visited screens** to avoid loops
+
+### Step 3: Design Evaluation
+
+For each screen, assess:
+
+#### Touch Targets
+{{#if (eq vars.targetPlatform 'ios')}}
+- Minimum: 44x44 points
+{{else if (eq vars.targetPlatform 'android')}}
+- Minimum: 48x48 dp
+{{else}}
+- iOS: 44x44 points
+- Android: 48x48 dp
+{{/if}}
+
+#### Visual Hierarchy
+- Information structure
+- Spacing and alignment
+- Typography usage
+
+#### Design Consistency
+- Color consistency
+- Button styles
+- Navigation patterns
+
+### Step 4: UX Assessment
+
+- Navigation clarity
+- Task efficiency
+- Feedback quality
+- Error handling
+
+### Step 5: Bug Detection
+
+Look for:
+- App crashes
+- UI rendering issues
+- Layout problems
+- Placeholder text
+- Broken images
+- Unresponsive elements
+
+### Step 6: Generate Report
+
+Create exploration report with:
+- Summary of screens found
+- Navigation map
+- Design observations
+- Issues found
+- Recommendations
+
+---
+
+## Output
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Results saved to run directory:
+- `[run-dir]/README.md` - Run metadata
+- `[run-dir]/screenshots/` - All captured screens
+- `[run-dir]/bugs/` - Bug reports
+- `[run-dir]/exploration-report.md` - Full report
+
+Access via: `{{ vars.reportOutputDir }}/latest/`
+{{else}}
+- `{{ vars.reportOutputDir }}/exploration-report-[date].md`
+- Screenshots in `{{ vars.screenshotDir }}/`
+{{/if}}
+
+---
+
+## Next Steps
+
+After `/explore`:
+- Use `/test-flow` for specific flow testing
+- Use `/accessibility-audit` for a11y verification
+- Use `/qa-report` to compile findings

@@ -1,0 +1,88 @@
+description = "Generate visual documentation of all app screens"
+prompt = """
+Generate visual documentation of all app screens.
+
+**Usage**: `/screenshot-catalog [options]`
+
+**Arguments**: {{args}}
+
+## Workflow
+
+### Step 1: Plan Navigation
+
+1. Define scope (all screens or section)
+2. Determine which states to capture
+3. Plan navigation path
+
+### Step 2: Launch App
+
+Start the app and prepare for systematic capture.
+
+### Step 3: Systematic Capture
+
+For each screen:
+
+1. Navigate to screen
+2. Wait for stable state
+3. Capture screenshot with organized path:
+   ```
+   [platform]/[feature]/[screen-name]-[state].png
+   ```
+4. Capture variations:
+   - Scroll to reveal more
+   - Toggle states
+   - Open modals
+
+### Step 4: States to Capture
+
+| State | Description |
+|-------|-------------|
+| Default | Normal loaded state |
+| Empty | No data present |
+| Loading | Data being fetched |
+| Error | Network/server error |
+| Populated | With realistic data |
+
+### Step 5: Organization
+
+```
+screenshots/
+├── auth/
+│   ├── login-default.png
+│   └── signup.png
+├── home/
+│   ├── feed-default.png
+│   └── feed-empty.png
+└── settings/
+    └── profile.png
+```
+
+### Step 6: Generate Catalog
+
+Create `catalog.md`:
+
+```markdown
+# Screenshot Catalog
+
+## Summary
+
+| Category | Screens | Screenshots |
+|----------|---------|-------------|
+| Auth | X | X |
+| Home | X | X |
+| Settings | X | X |
+
+## Auth
+
+### Login
+![Login](auth/login-default.png)
+
+[State variations...]
+```
+
+## Output
+
+- `catalog.md` - Main index
+- Organized screenshot directories
+- Summary of screens and states
+"""

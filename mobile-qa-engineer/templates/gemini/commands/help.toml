@@ -1,0 +1,113 @@
+description = "Show available Mobile QA Engineer commands and skills"
+prompt = """
+# Mobile QA Engineer - Help
+
+AI-powered QA testing for mobile applications using mobile-mcp for iOS and Android automation.
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/explore` | Full app exploration and assessment |
+| `/test-flow <spec>` | Test a specific flow against specification |
+| `/accessibility-audit` | Run mobile accessibility audit |
+| `/screenshot-catalog` | Generate visual documentation |
+| `/regression-test <cases>` | Re-run documented test cases |
+| `/qa-report [type]` | Generate QA report (summary/full/bugs) |
+| `/setup-mcp` | **Interactive setup wizard** (iOS & Android, simulators & devices) |
+| `/help` | Show this help message |
+
+## Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `explore-app` | Full app exploration and assessment |
+| `test-flow` | Test specific flows against specs |
+| `accessibility-audit` | Mobile accessibility testing |
+| `regression-test` | Re-run documented test cases |
+| `screenshot-catalog` | Generate visual documentation |
+| `qa-report` | Generate comprehensive QA reports |
+
+## Quick Start
+
+### 1. Setup (Interactive Wizard)
+```
+/setup-mcp
+```
+
+This wizard **automates everything possible**:
+
+**iOS (macOS only):**
+- Clones WebDriverAgent, boots simulator
+- Sets up go-ios for physical devices
+- Only manual: Xcode signing for physical devices
+
+**Android:**
+- Verifies ANDROID_HOME, starts emulator
+- Guides USB debugging for physical devices
+- Fully automated for emulators
+
+### 3. Explore the App
+```
+/explore
+```
+
+### 4. Test Specific Flows
+```
+/test-flow "User can log in with email and password"
+```
+
+### 5. Run Accessibility Audit
+```
+/accessibility-audit
+```
+
+### 6. Generate Report
+```
+/qa-report
+```
+
+## MCP Tools (mobile-mcp)
+
+| Tool | Description |
+|------|-------------|
+| `mobile_list_available_devices` | List devices |
+| `mobile_launch_app` | Start app |
+| `mobile_terminate_app` | Stop app |
+| `mobile_take_screenshot` | Capture screen |
+| `mobile_list_elements_on_screen` | Get UI hierarchy |
+| `mobile_click_on_screen_at_coordinates` | Tap |
+| `mobile_swipe_on_screen` | Scroll/swipe |
+| `mobile_type_keys` | Text input |
+| `mobile_press_button` | Hardware buttons |
+| `mobile_open_url` | Deep links |
+
+## Platform Guidelines
+
+### iOS
+- Touch targets: minimum 44x44 points
+- Accessibility labels required
+- Dynamic Type support recommended
+
+### Android
+- Touch targets: minimum 48x48 dp
+- Content descriptions required
+- Material Design guidelines
+
+## Severity Scale
+
+| Level | Description |
+|-------|-------------|
+| **Critical** | Crash, data loss, security |
+| **Major** | Feature broken |
+| **Minor** | Works with issues |
+| **Cosmetic** | Visual only |
+
+## Best Practices
+
+1. Start with `/explore` to understand the app
+2. Test critical flows with `/test-flow`
+3. Run `/accessibility-audit` on all screens
+4. Use `/qa-report` to compile findings
+5. Document bugs with screenshots and steps
+"""

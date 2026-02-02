@@ -1,0 +1,87 @@
+description = "Generate comprehensive QA report from testing results"
+prompt = """
+Generate a comprehensive QA report from testing results.
+
+**Usage**: `/qa-report [type]`
+
+**Arguments**: {{args}}
+
+## Types
+
+- `summary` - High-level overview (default)
+- `full` - Complete detailed report
+- `bugs` - Bugs-only report
+
+## Options
+
+- `--github` - Create GitHub issues for bugs
+
+## Workflow
+
+### Step 1: Data Collection
+
+1. Locate test run directories
+2. Parse test results
+3. Gather bug reports
+4. Collect screenshots
+
+### Step 2: Analysis
+
+1. Categorize by severity
+2. Group by feature area
+3. Identify patterns
+4. Assess release readiness
+
+### Step 3: Generate Report
+
+#### Summary Report
+```markdown
+# QA Summary Report
+
+## Status: READY / NEEDS FIXES / BLOCKED
+
+## Overview
+- Tests Run: X
+- Pass: X (X%)
+- Critical Issues: X
+
+## Key Findings
+[Top issues]
+
+## Recommendations
+[Priority actions]
+```
+
+#### Full Report
+- All test results
+- Every bug with details
+- Complete analysis
+- Screenshots
+
+#### Bugs-Only Report
+- Bug list
+- Reproducible steps
+- Evidence
+
+### Step 4: GitHub Integration (Optional)
+
+If `--github` flag used:
+1. Format bugs for GitHub
+2. Create issues via `gh issue create`
+3. Track issue numbers
+
+## Severity Guidelines
+
+| Severity | Criteria |
+|----------|----------|
+| Critical | Crash, data loss, security |
+| Major | Feature broken |
+| Minor | Works with issues |
+| Cosmetic | Visual only |
+
+## Output
+
+- QA report document
+- Bug reports
+- GitHub issues (if enabled)
+"""

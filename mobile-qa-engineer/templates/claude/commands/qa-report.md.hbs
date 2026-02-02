@@ -1,0 +1,193 @@
+Generate a comprehensive QA report from testing results.
+
+**Usage**: `/qa-report [type]`
+
+**Types**:
+- `summary` - High-level overview (default)
+- `full` - Complete detailed report
+- `bugs` - Bugs-only report
+
+**Examples**:
+- `/qa-report` - Generate summary report
+- `/qa-report full` - Generate full report
+- `/qa-report bugs` - Generate bugs-only report
+- `/qa-report --github` - Create GitHub issues for bugs
+
+---
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Platform** | {{ vars.targetPlatform }} |
+| **App Identifier** | {{ vars.appIdentifier }} |
+| **Report Dir** | {{ vars.reportOutputDir }} |
+{{#if (ne vars.githubRepo 'none')}}
+| **GitHub Repo** | {{ vars.githubRepo }} |
+{{/if}}
+
+---
+
+## Report Types
+
+### Summary Report
+- Executive overview
+- Pass/fail statistics
+- Critical issues only
+- Key recommendations
+
+### Full Report
+- All test results
+- Every bug with details
+- All screenshots
+- Complete analysis
+
+### Bugs-Only Report
+- Bug list
+- Reproducible steps
+- Evidence
+- Ready for developers
+
+---
+
+## Workflow
+
+### Step 1: Data Collection
+
+1. **Locate run directories**:
+   ```
+   {{ vars.reportOutputDir }}/[timestamp]-*/
+   ```
+
+2. **Parse results**:
+   - Test outcomes (PASS/FAIL)
+   - Bug reports
+   - Screenshots
+   - Observations
+
+### Step 2: Analysis
+
+1. **Categorize issues**:
+   - By severity
+   - By feature
+   - By platform
+
+2. **Identify patterns**:
+   - Recurring issues
+   - Platform-specific
+   - Regressions
+
+3. **Assess release readiness**:
+   - Critical blockers?
+   - Risk level?
+
+### Step 3: Generate Report
+
+#### Summary Template
+
+```markdown
+# QA Summary Report
+
+**App**: {{ vars.appIdentifier }}
+**Date**: [Date]
+
+## Status: [READY / NEEDS FIXES / BLOCKED]
+
+## Overview
+
+| Metric | Value |
+|--------|-------|
+| Tests Run | X |
+| Pass | X (X%) |
+| Fail | X (X%) |
+| Critical Issues | X |
+
+## Critical Issues
+
+[List of blockers]
+
+## Recommendations
+
+1. [Action 1]
+2. [Action 2]
+```
+
+#### Full Template
+
+```markdown
+# QA Full Report
+
+[Complete details including all tests,
+bugs, screenshots, analysis]
+```
+
+### Step 4: GitHub Integration
+
+{{#if (ne vars.githubRepo 'none')}}
+If `--github` flag is used:
+
+1. **Create issues** for each bug:
+   ```bash
+   gh issue create \
+     --repo {{ vars.githubRepo }} \
+     --title "[BUG-ID]: [Title]" \
+     --body "[Formatted bug report]" \
+     --label "bug,mobile"
+   ```
+
+2. **Track created issues** in report
+
+GitHub Repo: `{{ vars.githubRepo }}`
+{{else}}
+GitHub integration not configured.
+Set `githubRepo` during setup to enable.
+{{/if}}
+
+---
+
+## Severity Guidelines
+
+| Severity | Criteria |
+|----------|----------|
+| Critical | Crash, data loss, security |
+| Major | Feature broken |
+| Minor | Works with issues |
+| Cosmetic | Visual only |
+
+---
+
+## Output
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Report saved to:
+- `[run-dir]/qa-report-summary.md` or
+- `[run-dir]/qa-report-full.md`
+- `[run-dir]/bugs/` - Individual bugs
+{{#if (ne vars.githubRepo 'none')}}
+- `[run-dir]/github-issues.md` - Created issues
+{{/if}}
+
+Access via: `{{ vars.reportOutputDir }}/latest/`
+{{else}}
+- `{{ vars.reportOutputDir }}/qa-report-[type]-[date].md`
+{{/if}}
+
+---
+
+## Best Practices
+
+1. **Be concise** in summaries
+2. **Be thorough** in bug details
+3. **Include evidence** for every bug
+4. **Prioritize clearly**
+5. **Recommend actions**
+
+---
+
+## Next Steps
+
+After generating report:
+- Share with stakeholders
+- Fix critical issues
+- Retest after fixes
+- Plan next testing cycle

@@ -1,0 +1,71 @@
+description = "Full app exploration and assessment"
+prompt = """
+Perform full exploration and assessment of the mobile app.
+
+**Usage**: `/explore [options]`
+
+**Arguments**: {{args}}
+
+## Workflow
+
+### Step 1: Device Setup
+
+1. List available devices using `mobile_list_available_devices`
+2. Select appropriate device based on target platform
+3. Launch the app with the configured bundle ID
+
+### Step 2: Systematic Exploration
+
+Use breadth-first exploration:
+
+1. Capture launch screen (screenshot + UI elements)
+2. Identify navigation elements:
+   - Tab bars
+   - Navigation buttons
+   - Menu items
+3. Visit each reachable screen:
+   - Navigate systematically
+   - Screenshot each unique screen
+   - Document navigation path
+4. Track visited screens to avoid loops
+
+### Step 3: Design Evaluation
+
+For each screen, assess:
+
+- **Touch Targets**: iOS 44x44 points, Android 48x48 dp
+- **Visual Hierarchy**: Information structure, spacing
+- **Design Consistency**: Colors, button styles, patterns
+
+### Step 4: UX Assessment
+
+- Navigation clarity
+- Task efficiency
+- Feedback quality
+- Error handling
+
+### Step 5: Bug Detection
+
+Look for:
+- App crashes
+- UI rendering issues
+- Layout problems
+- Placeholder text
+- Broken images
+
+### Step 6: Generate Report
+
+Create exploration report with:
+- Summary of screens found
+- Navigation map
+- Design observations
+- Issues found with severity
+- Recommendations
+
+## Output
+
+- Exploration report with screen catalog
+- Screenshots of all discovered screens
+- Bug reports for issues found
+- Navigation documentation
+"""

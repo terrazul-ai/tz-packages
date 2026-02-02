@@ -1,0 +1,87 @@
+description = "Run mobile accessibility audit"
+prompt = """
+Run a mobile accessibility audit on the app.
+
+**Usage**: `/accessibility-audit [options]`
+
+**Arguments**: {{args}}
+
+## Accessibility Standards
+
+### iOS Requirements
+| Criterion | Requirement |
+|-----------|-------------|
+| Touch Target | Minimum 44x44 points |
+| Accessibility Label | Required on interactive elements |
+| Dynamic Type | Support 1x-3x scaling |
+| Color Contrast | 4.5:1 normal, 3:1 large |
+
+### Android Requirements
+| Criterion | Requirement |
+|-----------|-------------|
+| Touch Target | Minimum 48x48 dp |
+| Content Description | Required on interactive elements |
+| Font Scaling | Support up to 200% |
+| Color Contrast | 4.5:1 normal, 3:1 large |
+
+## Workflow
+
+### Step 1: Launch App
+
+Start the app and navigate to initial screen.
+
+### Step 2: Touch Target Analysis
+
+For each screen:
+1. Get UI element hierarchy
+2. Identify interactive elements
+3. Measure dimensions
+4. Flag undersized elements
+
+### Step 3: Accessibility Label Audit
+
+1. Check all interactive elements for labels
+2. Evaluate label quality (descriptive, unique)
+3. Flag missing or generic labels
+
+### Step 4: Navigation Order
+
+1. Map focus sequence
+2. Verify logical order
+3. Check for focus traps
+
+### Step 5: Color Contrast
+
+1. Identify text elements
+2. Assess contrast ratios
+3. Flag low contrast
+
+### Step 6: Generate Report
+
+```markdown
+# Accessibility Audit Report
+
+## Summary
+
+| Category | Pass | Fail |
+|----------|------|------|
+| Touch Targets | X | X |
+| Labels | X | X |
+| Navigation | X | X |
+| Contrast | X | X |
+
+## Issues Found
+
+[List by severity]
+
+## Recommendations
+
+[Prioritized fixes]
+```
+
+## Output
+
+- Accessibility audit report
+- Screenshots of issues
+- Prioritized recommendations
+"""

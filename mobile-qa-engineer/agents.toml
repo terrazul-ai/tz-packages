@@ -1,0 +1,37 @@
+[package]
+name = "@terrazul/mobile-qa-engineer"
+version = "0.0.1"
+description = "AI-powered QA Engineer for mobile app testing using mobile-mcp for iOS and Android automation"
+homepage = "https://github.com/terrazul-ai/tz-packages"
+repository = "https://github.com/terrazul-ai/tz-packages.git"
+license = "MIT"
+keywords = ["qa", "testing", "mobile", "ios", "android", "automation", "accessibility", "react-native", "flutter"]
+authors = ["Terrazul Team"]
+is_private = false
+
+[compatibility]
+claude = ">=0.2.0"
+codex = ">=1.0.0"
+gemini = ">=2.0.0"
+
+[exports.claude]
+template = "templates/CLAUDE.md.hbs"
+subagentsDir = "templates/claude/agents"
+commandsDir = "templates/claude/commands"
+skillsDir = "templates/claude/skills"
+mcpServers = "templates/claude/mcp_servers.json.hbs"
+
+[exports.codex]
+template = "templates/AGENTS.md.hbs"
+promptsDir = "templates/codex/prompts"
+skillsDir = "templates/claude/skills"
+mcpServers = "templates/codex/mcp_servers.toml.hbs"
+
+[exports.gemini]
+template = "templates/GEMINI.md.hbs"
+commandsDir = "templates/gemini/commands"
+skillsDir = "templates/claude/skills"
+mcpServers = "templates/gemini/mcp_servers.json.hbs"
+
+[metadata]
+tz_spec_version = 1

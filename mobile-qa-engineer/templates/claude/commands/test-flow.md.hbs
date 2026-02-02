@@ -1,0 +1,181 @@
+Test a specific user flow against a specification.
+
+**Usage**: `/test-flow <spec-or-description>`
+
+**Examples**:
+- `/test-flow "User can log in with email and password"`
+- `/test-flow specs/checkout-flow.md`
+- `/test-flow "Test the password reset flow"`
+- `/test-flow --file=specs/onboarding.md`
+
+---
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Platform** | {{ vars.targetPlatform }} |
+| **Device Type** | {{ vars.deviceType }} |
+| **App Identifier** | {{ vars.appIdentifier }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Dir** | {{ vars.reportOutputDir }} |
+| **Spec Format** | {{ vars.specFormat }} |
+
+---
+
+## Workflow
+
+{{#if (eq vars.useRunDirs 'yes')}}
+### Step 0: Initialize Run Directory
+
+1. Generate timestamp (YYYYMMDD-HHMMSS)
+2. Extract flow slug from spec (e.g., "login", "checkout")
+3. Create: `{{ vars.reportOutputDir }}/[timestamp]-[flow-slug]/`
+4. Create subdirectories: `screenshots/`, `bugs/`
+5. Initialize README.md with:
+   ```markdown
+   # QA Run: [flow-slug]
+   **Run ID**: [timestamp]-[flow-slug]
+   **Type**: test-flow
+   **Spec**: "[original spec]"
+   **Status**: IN_PROGRESS
+   ```
+{{/if}}
+
+### Step 1: Parse Specification
+
+Analyze the spec ({{ vars.specFormat }} format) to extract:
+- **Flow Goal**: What user accomplishes
+- **Preconditions**: Required starting state
+- **Steps**: Ordered list of actions
+- **Expected Results**: What should happen at each step
+- **Success Criteria**: How to verify completion
+
+### Step 2: Environment Setup
+
+1. **Launch app**:
+   ```
+   mcp__mobile-mcp__mobile_launch_app
+   Bundle ID: {{ vars.appIdentifier }}
+   ```
+
+2. **Set preconditions**:
+   - Navigate to starting point
+   - Set up required state
+
+3. **Document initial state**:
+   - Screenshot
+   - Get UI elements
+
+### Step 3: Execute Flow Steps
+
+For each step:
+
+1. **Pre-action**:
+   - Screenshot current state
+   - Verify expected screen
+
+2. **Execute action**:
+   - Tap: `mobile_click_on_screen_at_coordinates`
+   - Type: `mobile_type_keys`
+   - Swipe: `mobile_swipe_on_screen`
+   - Navigate: `mobile_open_url`
+
+3. **Post-action**:
+   - Wait for UI to settle
+   - Screenshot result
+   - Validate expected outcome
+   - Record PASS/FAIL
+
+### Step 4: Document Results
+
+For each step, record:
+```markdown
+### Step [N]: [Description]
+
+**Action**: [What was done]
+**Expected**: [What should happen]
+**Actual**: [What happened]
+**Status**: PASS / FAIL
+**Evidence**: [Screenshot references]
+```
+
+### Step 5: Handle Deviations
+
+For any failures:
+```markdown
+## Deviation: Step [N]
+
+**Severity**: Critical / Major / Minor / Cosmetic
+**Expected**: [Expected behavior]
+**Actual**: [Actual behavior]
+**Impact**: [User impact]
+**Screenshot**: [Reference]
+```
+
+### Step 6: Generate Report
+
+Create flow test report with:
+- Summary (pass/fail counts)
+- Step-by-step results
+- Deviations with severity
+- Recommendations
+
+---
+
+## Spec Format Examples
+
+### Freeform
+```
+User should be able to log in with email and password, see the home screen, and their name displayed.
+```
+
+### Markdown
+```markdown
+## Login Flow
+
+### Steps
+1. Open app
+2. Enter email
+3. Enter password
+4. Tap Sign In
+5. Verify home screen
+
+### Success Criteria
+- [ ] Login completes successfully
+- [ ] User name displayed
+```
+
+### User Story
+```
+Given I am on the login screen
+When I enter valid credentials
+And I tap sign in
+Then I should see the home screen
+```
+
+---
+
+## Output
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Results saved to:
+- `[run-dir]/README.md` - Run metadata
+- `[run-dir]/screenshots/` - Step evidence
+- `[run-dir]/bugs/` - Bug reports
+- `[run-dir]/test-results.md` - Full results
+
+Access via: `{{ vars.reportOutputDir }}/latest/`
+{{else}}
+- `{{ vars.reportOutputDir }}/test-results-[flow]-[date].md`
+- Screenshots in `{{ vars.screenshotDir }}/`
+{{/if}}
+
+---
+
+## Next Steps
+
+After `/test-flow`:
+- Use `/qa-report` to compile findings
+- Use `/accessibility-audit` for a11y verification
+- Use `/regression-test` for broader coverage

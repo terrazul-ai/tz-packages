@@ -1,0 +1,97 @@
+description = "Re-run documented test cases to verify app functionality"
+prompt = """
+Re-run documented test cases to verify app functionality.
+
+**Usage**: `/regression-test <test-cases-path>`
+
+**Arguments**: {{args}}
+
+## Examples
+
+- `/regression-test qa-reports/test-cases/`
+- `/regression-test test-cases/auth/`
+- `/regression-test --priority=critical`
+
+## Test Case Format
+
+Test cases should be markdown files:
+
+```markdown
+# TC-[ID]: [Test Name]
+
+**Priority**: Critical / High / Medium / Low
+**Preconditions**: [Required state]
+
+## Steps
+
+1. **[Action]**
+   - Expected: [Result]
+
+2. **[Action]**
+   - Expected: [Result]
+
+## Success Criteria
+
+- [ ] [Criterion 1]
+- [ ] [Criterion 2]
+```
+
+## Workflow
+
+### Step 1: Test Discovery
+
+1. Load test cases from specified path
+2. Parse ID, steps, expected results
+3. Order by priority (Critical first)
+
+### Step 2: Environment Setup
+
+Launch app and initialize tracking.
+
+### Step 3: Execute Tests
+
+For each test case:
+
+1. Reset state if needed
+2. Execute steps with screenshots
+3. Validate expected results
+4. Record: PASS / FAIL / BLOCKED / SKIP
+
+### Step 4: Baseline Comparison (Optional)
+
+If previous run exists:
+- Identify regressions (newly failed)
+- Identify fixes (newly passed)
+- Track consistent failures
+
+### Step 5: Generate Report
+
+```markdown
+# Regression Test Report
+
+## Summary
+
+| Status | Count | % |
+|--------|-------|---|
+| PASS | X | X% |
+| FAIL | X | X% |
+| BLOCKED | X | X% |
+
+**Result**: PASS / FAIL
+
+## Failures
+
+[List with details]
+
+## Regressions
+
+[Newly failed tests]
+```
+
+## Output
+
+- Regression test report
+- Individual test results
+- Screenshots as evidence
+- Pass/fail summary
+"""

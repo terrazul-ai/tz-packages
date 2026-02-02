@@ -1,0 +1,202 @@
+Run a mobile accessibility audit on the app.
+
+**Usage**: `/accessibility-audit [options]`
+
+**Examples**:
+- `/accessibility-audit` - Full accessibility audit
+- `/accessibility-audit --screen=login` - Audit specific screen
+- `/accessibility-audit --focus=touch-targets` - Focus on touch targets only
+
+---
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Platform** | {{ vars.targetPlatform }} |
+| **Device Type** | {{ vars.deviceType }} |
+| **App Identifier** | {{ vars.appIdentifier }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Dir** | {{ vars.reportOutputDir }} |
+
+---
+
+## Accessibility Standards
+
+{{#if (eq vars.targetPlatform 'ios')}}
+### iOS Requirements
+| Criterion | Requirement |
+|-----------|-------------|
+| Touch Target | Minimum 44x44 points |
+| Accessibility Label | Required on interactive elements |
+| Dynamic Type | Support 1x-3x scaling |
+| Color Contrast | 4.5:1 normal, 3:1 large |
+{{else if (eq vars.targetPlatform 'android')}}
+### Android Requirements
+| Criterion | Requirement |
+|-----------|-------------|
+| Touch Target | Minimum 48x48 dp |
+| Content Description | Required on interactive elements |
+| Font Scaling | Support up to 200% |
+| Color Contrast | 4.5:1 normal, 3:1 large |
+{{else}}
+### iOS Requirements
+| Criterion | Requirement |
+|-----------|-------------|
+| Touch Target | Minimum 44x44 points |
+| Accessibility Label | Required on interactive elements |
+
+### Android Requirements
+| Criterion | Requirement |
+|-----------|-------------|
+| Touch Target | Minimum 48x48 dp |
+| Content Description | Required on interactive elements |
+{{/if}}
+
+---
+
+## Workflow
+
+{{#if (eq vars.useRunDirs 'yes')}}
+### Step 0: Initialize Run Directory
+
+1. Generate timestamp (YYYYMMDD-HHMMSS)
+2. Create: `{{ vars.reportOutputDir }}/[timestamp]-a11y-audit/`
+3. Create subdirectories: `screenshots/`, `issues/`
+4. Initialize README.md
+{{/if}}
+
+### Step 1: Launch App
+
+```
+mcp__mobile-mcp__mobile_launch_app
+Bundle ID: {{ vars.appIdentifier }}
+```
+
+### Step 2: Touch Target Analysis
+
+For each screen:
+
+1. **Get element hierarchy**:
+   ```
+   mcp__mobile-mcp__mobile_list_elements_on_screen
+   ```
+
+2. **Identify interactive elements**:
+   - Buttons
+   - Links
+   - Text inputs
+   - Switches, checkboxes
+
+3. **Measure dimensions**:
+   - Compare to minimum size
+   - Flag violations
+
+4. **Document issues**:
+   ```markdown
+   ## Touch Target Issue
+
+   **Element**: [Description]
+   **Actual**: [width]x[height]
+   **Required**: [Minimum]
+   ```
+
+### Step 3: Accessibility Label Audit
+
+1. **Check all interactive elements**:
+   - Has label?
+   - Is descriptive?
+   - Is unique?
+
+2. **Flag issues**:
+   - Missing labels
+   - Generic labels ("button")
+   - Duplicates
+
+### Step 4: Navigation Order
+
+1. **Map focus sequence**
+2. **Verify logical order**
+3. **Check for focus traps**
+
+### Step 5: Color Contrast
+
+1. **Identify text elements**
+2. **Assess contrast ratios**
+3. **Flag low contrast**
+
+### Step 6: Generate Report
+
+```markdown
+# Accessibility Audit Report
+
+## Summary
+
+| Category | Pass | Fail |
+|----------|------|------|
+| Touch Targets | X | X |
+| Labels | X | X |
+| Navigation | X | X |
+| Contrast | X | X |
+
+**Overall**: PASS / FAIL
+
+## Issues Found
+
+[List by category and severity]
+
+## Recommendations
+
+[Prioritized fixes]
+```
+
+---
+
+## Common Issues
+
+### Touch Targets
+- Small icons without padding
+- Inline links
+- Close buttons in corners
+- Tab bar items
+
+### Labels
+- Images without descriptions
+- Icon-only buttons
+- Generic text
+
+### Navigation
+- Focus traps
+- Illogical order
+- Off-screen elements
+
+### Contrast
+- Light gray on white
+- Placeholder text
+- Error messages
+
+---
+
+## Output
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Results saved to:
+- `[run-dir]/README.md` - Metadata
+- `[run-dir]/screenshots/` - Evidence
+- `[run-dir]/issues/` - Individual issues
+- `[run-dir]/accessibility-report.md` - Full report
+
+Access via: `{{ vars.reportOutputDir }}/latest/`
+{{else}}
+- `{{ vars.reportOutputDir }}/accessibility-report-[date].md`
+- Screenshots in `{{ vars.screenshotDir }}/`
+{{/if}}
+
+---
+
+## Next Steps
+
+After `/accessibility-audit`:
+- Use `/qa-report` to include in final report
+- Use `/test-flow` for flow testing
+- Fix critical issues before release

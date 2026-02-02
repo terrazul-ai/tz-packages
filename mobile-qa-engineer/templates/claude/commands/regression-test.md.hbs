@@ -1,0 +1,217 @@
+Re-run documented test cases to verify app functionality.
+
+**Usage**: `/regression-test <test-cases-path>`
+
+**Examples**:
+- `/regression-test qa-reports/test-cases/` - Run all test cases
+- `/regression-test test-cases/auth/` - Run auth tests only
+- `/regression-test --priority=critical` - Run critical tests only
+- `/regression-test test-cases/login.md` - Run single test case
+
+---
+
+## Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Platform** | {{ vars.targetPlatform }} |
+| **Device Type** | {{ vars.deviceType }} |
+| **App Identifier** | {{ vars.appIdentifier }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Dir** | {{ vars.reportOutputDir }} |
+
+---
+
+## Test Case Format
+
+Test cases should be markdown files:
+
+```markdown
+# TC-[ID]: [Test Name]
+
+**Priority**: Critical / High / Medium / Low
+**Category**: [Feature area]
+**Preconditions**: [Required state]
+
+## Steps
+
+1. **[Action]**
+   - Expected: [Result]
+
+2. **[Action]**
+   - Expected: [Result]
+
+## Success Criteria
+
+- [ ] [Criterion 1]
+- [ ] [Criterion 2]
+```
+
+---
+
+## Workflow
+
+{{#if (eq vars.useRunDirs 'yes')}}
+### Step 0: Initialize Run Directory
+
+1. Generate timestamp (YYYYMMDD-HHMMSS)
+2. Create: `{{ vars.reportOutputDir }}/[timestamp]-regression/`
+3. Create subdirectories: `screenshots/`, `results/`
+4. Initialize summary
+{{/if}}
+
+### Step 1: Test Discovery
+
+1. **Load test cases** from specified path
+2. **Parse each test case**:
+   - Extract ID, name, priority
+   - Parse steps and expected results
+3. **Order by priority**:
+   - Critical first
+   - Then High, Medium, Low
+
+### Step 2: Environment Setup
+
+1. **Launch app**:
+   ```
+   mcp__mobile-mcp__mobile_launch_app
+   Bundle ID: {{ vars.appIdentifier }}
+   ```
+
+2. **Initialize tracking**:
+   ```markdown
+   ## Regression Run
+
+   **Date**: [Date]
+   **Test Cases**: [Count]
+   **Status**: IN_PROGRESS
+   ```
+
+### Step 3: Execute Tests
+
+For each test case:
+
+1. **Reset state** if needed:
+   - Terminate and relaunch app
+   - Navigate to precondition state
+
+2. **Execute steps**:
+   - Perform each action
+   - Screenshot before/after
+   - Validate expected result
+
+3. **Record result**:
+   - PASS: Matches expected
+   - FAIL: Deviates from expected
+   - BLOCKED: Cannot proceed
+   - SKIP: Intentionally skipped
+
+### Step 4: Baseline Comparison (Optional)
+
+If previous run exists:
+1. Load baseline results
+2. Compare:
+   - New failures (regressions)
+   - Fixed issues
+   - Consistent failures
+
+### Step 5: Generate Report
+
+```markdown
+# Regression Test Report
+
+**Date**: [Date]
+**Duration**: [Time]
+
+## Summary
+
+| Status | Count | % |
+|--------|-------|---|
+| PASS | X | X% |
+| FAIL | X | X% |
+| BLOCKED | X | X% |
+
+**Result**: PASS / FAIL
+
+## Failures
+
+[List of failures with details]
+
+## Regressions
+
+[Tests that newly failed]
+
+## Test Details
+
+[Full results for each test]
+```
+
+---
+
+## Test Organization
+
+### Recommended Structure
+
+```
+test-cases/
+├── auth/
+│   ├── TC-001-login.md
+│   └── TC-002-logout.md
+├── navigation/
+│   └── TC-010-tabs.md
+├── features/
+│   └── TC-020-create.md
+└── test-suite.md
+```
+
+### Test Suite File
+
+```markdown
+# Test Suite
+
+## Critical
+- @auth/TC-001-login.md
+- @auth/TC-002-logout.md
+
+## High
+- @navigation/TC-010-tabs.md
+
+## Medium
+- @features/TC-020-create.md
+```
+
+---
+
+## Output
+
+{{#if (eq vars.useRunDirs 'yes')}}
+Results saved to:
+- `[run-dir]/README.md` - Metadata
+- `[run-dir]/screenshots/` - Evidence
+- `[run-dir]/results/` - Individual results
+- `[run-dir]/regression-report.md` - Summary
+
+Access via: `{{ vars.reportOutputDir }}/latest/`
+{{else}}
+- `{{ vars.reportOutputDir }}/regression-report-[date].md`
+- Screenshots in `{{ vars.screenshotDir }}/`
+{{/if}}
+
+---
+
+## Best Practices
+
+1. **Atomic tests**: Each test independent
+2. **Clear preconditions**: Document exactly
+3. **Consistent naming**: TC-[Category]-[Number]
+4. **Priority assignment**: Critical for core flows
+5. **Regular updates**: Keep tests current
+
+---
+
+## Next Steps
+
+After `/regression-test`:
+- Use `/qa-report` for full report
+- Investigate failures
+- Update test cases as needed
