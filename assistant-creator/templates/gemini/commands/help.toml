@@ -1,0 +1,81 @@
+description = "Show help for @terrazul/assistant-creator package"
+prompt = """
+# @terrazul/assistant-creator - Package Help
+
+Welcome to the **@terrazul/assistant-creator** package! This package helps you create AI assistant packages with skill and MCP server integration.
+
+## Available Skills
+
+| Skill | Description |
+|-------|-------------|
+| `create-skill` | Create skills for any platform |
+| `create-gemini-command` | Create Gemini slash commands (TOML format) |
+| `create-command` | Create Claude slash commands (for reference) |
+| `create-agent` | Create Claude agents (Claude-only feature) |
+| `search-skills` | Search skillregistry.io and install skills |
+| `add-mcp` | Search mcp.so and configure MCP servers |
+| `convert-skill-to-gemini` | Convert Claude skills to Gemini format |
+
+## Quick Start
+
+### Creating a Skill
+"Create a skill for our coding standards"
+
+### Creating a Command
+"Create a Gemini command for code review"
+
+### Finding Skills
+"Search for testing skills on skillregistry.io"
+
+### Adding MCP Servers
+"Add GitHub integration for Gemini"
+
+## Gemini-Specific Features
+
+### Command Format (TOML)
+```toml
+description = "Command description"
+prompt = \"\"\"
+Your prompt with {{args}} for user input.
+\"\"\"
+```
+
+### Special Syntax
+- `{{args}}` - User arguments
+- `!{command}` - Shell command output
+- `@{filepath}` - File content embedding
+
+### Namespaced Commands
+Create directories for related commands:
+- `git/status.toml` -> `/git:status`
+- `git/commit.toml` -> `/git:commit`
+
+## File Locations
+
+```
+.gemini/
+├── settings.json         # MCP configuration
+├── commands/             # TOML command files
+└── skills/               # Skill directories
+```
+
+## Tips
+
+1. Use `{{args}}` for flexible commands
+2. Use `!{git status}` for dynamic context
+3. Test commands after creation
+4. Convert Claude skills with `convert-skill-to-gemini`
+
+## Troubleshooting
+
+### Command not working
+Check TOML syntax and file location in `.gemini/commands/`
+
+### Skill not appearing
+Verify SKILL.md exists in `.gemini/skills/[name]/`
+
+### MCP server issues
+Check `.gemini/settings.json` and environment variables
+
+Need more help? Ask about specific features!
+"""
