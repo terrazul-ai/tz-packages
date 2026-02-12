@@ -1,0 +1,97 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "separate-pull-requests": true,
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "include-component-in-tag": true,
+  "packages": {
+    "assistants/tdd-engineer": {
+      "release-type": "simple",
+      "component": "tdd-engineer",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "agents.toml",
+          "jsonpath": "$.package.version"
+        }
+      ]
+    },
+    "assistants/assistant-creator": {
+      "release-type": "simple",
+      "component": "assistant-creator",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "agents.toml",
+          "jsonpath": "$.package.version"
+        }
+      ]
+    },
+    "assistants/package-creator": {
+      "release-type": "simple",
+      "component": "package-creator",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "agents.toml",
+          "jsonpath": "$.package.version"
+        }
+      ]
+    },
+    "assistants/cli-qa-engineer": {
+      "release-type": "simple",
+      "component": "cli-qa-engineer",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "agents.toml",
+          "jsonpath": "$.package.version"
+        }
+      ]
+    },
+    "assistants/impeccable-style": {
+      "release-type": "simple",
+      "component": "impeccable-style",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "agents.toml",
+          "jsonpath": "$.package.version"
+        }
+      ]
+    },
+    "assistants/jira-triage": {
+      "release-type": "simple",
+      "component": "jira-triage",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "agents.toml",
+          "jsonpath": "$.package.version"
+        }
+      ]
+    },
+    "assistants/ux-researcher": {
+      "release-type": "simple",
+      "component": "ux-researcher",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "agents.toml",
+          "jsonpath": "$.package.version"
+        }
+      ]
+    },
+    "assistants/web-qa-engineer": {
+      "release-type": "simple",
+      "component": "web-qa-engineer",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "agents.toml",
+          "jsonpath": "$.package.version"
+        }
+      ]
+    }
+  }
+}
