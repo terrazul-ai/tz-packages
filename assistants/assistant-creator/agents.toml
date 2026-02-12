@@ -1,6 +1,6 @@
 [package]
 name = "@terrazul/assistant-creator"
-version = "0.1.0"
+version = "0.1.1"
 description = "Create AI assistant packages with skill/MCP integration for Claude, Codex, and Gemini"
 repository = "https://github.com/terrazul-ai/tz-packages"
 license = "MIT"
