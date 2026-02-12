@@ -1,6 +1,6 @@
 [package]
 name = "@terrazul/ux-researcher"
-version = "0.1.1"
+version = "0.1.2"
 description = "AI-powered UX evaluation using Puppeteer for browser automation, Nielsen's heuristics, WCAG accessibility, and user flow testing"
 homepage = "https://github.com/leourbina/ux-researcher"
 repository = "https://github.com/leourbina/ux-researcher.git"
