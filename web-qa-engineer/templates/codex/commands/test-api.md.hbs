@@ -1,0 +1,32 @@
+Test backend API endpoints based on specifications.
+
+Usage: `/test-api <endpoint-or-spec>`
+
+Examples:
+- `/test-api /api/users` - Test users endpoint (all methods)
+- `/test-api auth` - Test authentication endpoints
+- `/test-api "POST /api/orders creates new order"`
+
+## Configuration
+
+- **API Base URL**: {{ vars.apiBaseUrl }}
+- **Auth Method**: {{ vars.projectAnalysis.authMethod }}
+- **Known Endpoints**: {{ vars.projectAnalysis.apiEndpoints }}
+- **Report Output**: {{ vars.reportOutputDir }}
+
+## Workflow
+
+1. **Identify Endpoints**: Determine HTTP methods, path, auth requirements, request body, expected responses
+2. **Design Tests**: Success case, authentication, input validation, not found, permissions
+3. **Setup Authentication**: Get token via login endpoint if needed
+4. **Execute Tests**: Run API calls using curl with status code and timing capture
+5. **Validate Responses**: Status codes, body structure, required fields, data types, error format, response time
+6. **Document Results**: Endpoint, method, request, response, pass/fail, issues with severity
+
+## Common Patterns
+
+- **CRUD**: POST (201), GET (200), PUT (200), DELETE (204), GET after delete (404)
+- **Auth**: Valid credentials (200+token), invalid (401), with/without token
+- **Validation**: Missing fields (400), invalid formats (400), duplicates (409)
+
+After testing, use `/qa-report` to generate a comprehensive report.

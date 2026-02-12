@@ -1,0 +1,54 @@
+# @terrazul/web-qa-engineer Help
+
+AI-powered QA Engineer for testing functionality based on product/feature specifications.
+
+## Commands
+
+| Command | Usage | Description |
+|---------|-------|-------------|
+| `/test-feature` | `/test-feature <spec>` | Test frontend functionality based on a specification |
+| `/test-api` | `/test-api <endpoint>` | Test backend API endpoints |
+| `/qa-report` | `/qa-report [type]` | Generate QA report (summary, full, bugs, all) |
+| `/help` | `/help` | Show this help information |
+
+## Skills
+
+| Skill | Example Usage |
+|-------|---------------|
+| **regression-test** | "Use the regression-test skill to validate after deployment" |
+| **e2e-test** | "Use the e2e-test skill to test the signup-to-dashboard flow" |
+| **api-validation** | "Use the api-validation skill to validate /api/orders" |
+
+## Current Configuration
+
+| Setting | Value |
+|---------|-------|
+| **Target URL** | {{ vars.targetUrl }} |
+| **API Base URL** | {{ vars.apiBaseUrl }} |
+| **Browser Engine** | {{ vars.browserEngine }} |
+| **Screenshot Dir** | {{ vars.screenshotDir }} |
+| **Report Output** | {{ vars.reportOutputDir }} |
+
+## Severity Scale
+
+| Severity | Label | Action |
+|----------|-------|--------|
+| 4 | Critical | Fix immediately |
+| 3 | Major | Fix before release |
+| 2 | Minor | Schedule fix |
+| 1 | Cosmetic | Nice to have |
+
+## Common Workflows
+
+### Pre-Release QA
+```
+/test-feature "Test all critical user flows"
+/test-api auth
+/qa-report full
+```
+
+### After Deployment
+```
+/test-feature "Quick smoke test"
+/qa-report summary
+```

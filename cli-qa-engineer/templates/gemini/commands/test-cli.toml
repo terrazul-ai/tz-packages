@@ -1,0 +1,52 @@
+description = "Test a specific CLI command with functional tests using tmux automation"
+prompt = """
+Test a specific CLI command with functional tests.
+
+Usage: `/test-cli <command>`
+
+Arguments: {{args}}
+
+## Test Execution Steps
+
+### 1. Create Test Session
+Create an isolated tmux session for the test using the tmux MCP `create-session` tool.
+
+### 2. Navigate to Working Directory
+Change to the project's working directory in the tmux session.
+
+### 3. Run the Command
+Execute the CLI command with the provided arguments in the tmux session using `execute-command`.
+
+### 4. Wait and Capture Output
+Wait for the command to complete, then use `capture-pane` to capture the output.
+
+### 5. Analyze Results
+Check the captured output for:
+- **Success indicators**: Output patterns suggesting the command worked correctly
+- **Error indicators**: Output patterns suggesting failure
+
+### 6. Run Additional Tests
+Based on the command type:
+- **Help/version**: Verify output is non-empty, check for usage info
+- **With arguments**: Test with `--help` flag, test error handling with bad input
+- **Subcommand**: Verify subcommand help, test with minimal required arguments
+
+### 7. Cleanup
+Destroy the tmux test session.
+
+## Report Format
+
+Report findings with:
+- Command executed and status (PASS/FAIL)
+- Captured output
+- Assertions checked (success patterns, error patterns)
+- Additional test results
+- Observations and recommendations
+
+## Important
+
+1. Always create a fresh tmux session for isolation
+2. Always cleanup the session after tests
+3. Do not run destructive commands without explicit user confirmation
+4. Report all findings clearly with pass/fail status
+"""

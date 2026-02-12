@@ -1,0 +1,81 @@
+description = "Test interactive CLI prompts, wizards, and multi-step flows using tmux automation"
+prompt = """
+Test interactive CLI prompts, wizards, and multi-step flows.
+
+Usage: `/test-interactive <scenario>`
+
+Arguments: {{args}}
+
+## Interactive Testing Strategy
+
+Interactive CLIs require detecting prompts and responding appropriately via tmux.
+
+### Common Prompt Patterns
+
+| Pattern | Type | Response Method |
+|---------|------|-----------------|
+| `? ` (inquirer style) | Question prompt | Text + Enter |
+| `[Y/n]` or `[y/N]` | Yes/No confirmation | 'y' or 'n' + Enter |
+| `>` with options listed | Selection menu | Arrow keys + Enter |
+| `[ ]` / `[x]` | Multi-select | Space to toggle + Enter |
+| `:` at end of line | Input prompt | Text + Enter |
+| `Password:` | Hidden input | Text + Enter |
+| `(default: X)` | Optional with default | Enter for default, or text |
+
+### Sending Keystrokes via tmux
+
+Use tmux MCP `execute-command` with send-keys:
+- Text + Enter: `send-keys "my input" Enter`
+- Accept default: `send-keys Enter`
+- Arrow navigation: `send-keys Down` / `send-keys Up`
+- Toggle: `send-keys Space`
+- Cancel: `send-keys C-c`
+
+## Test Execution Steps
+
+### 1. Create Test Session
+Create an isolated tmux session using the `create-session` tool.
+
+### 2. Start the Interactive Command
+Execute the command that triggers the interactive flow.
+
+### 3. Interactive Loop
+Repeat until flow completes:
+1. Wait briefly for prompt to appear
+2. Capture pane output
+3. Detect prompt type from output
+4. Send appropriate response
+5. Verify response accepted
+6. Continue until flow completes or error occurs
+
+### 4. Verify Final State
+Check for success patterns, verify created files/config, check for errors.
+
+### 5. Cleanup
+Destroy test session.
+
+## Test Scenarios
+
+- **Init/Setup Wizard**: Start init, respond to prompts, verify configuration created
+- **Confirmation Dialogs**: Test 'n' (decline) and 'y' (accept) paths
+- **Selection Menus**: Navigate with arrows, select, verify correct option
+- **Multi-step Workflows**: Complete each step, verify intermediate and final states
+- **Error Recovery**: Provide invalid input, verify re-prompt, provide valid input
+
+## Report Format
+
+Report with:
+- Flow overview (command, total steps)
+- Step-by-step results (prompt detected, response sent, result)
+- Final state (status, output)
+- Assertions (prompts detected, responses accepted, flow completed)
+- Issues found and recommendations
+
+## Important Guidelines
+
+1. Be patient - interactive prompts may take time to appear
+2. Capture output before and after each input
+3. Report timeout if prompt doesn't appear within expected time
+4. Verify Ctrl+C properly cancels the flow
+5. Document every prompt and response
+"""

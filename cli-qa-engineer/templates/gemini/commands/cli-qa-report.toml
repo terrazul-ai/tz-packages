@@ -1,0 +1,76 @@
+description = "Generate a comprehensive QA test report for CLI testing"
+prompt = """
+Generate a comprehensive QA test report for CLI testing.
+
+Usage: `/cli-qa-report [scope]`
+
+Arguments: {{args}}
+
+Scope options: `functional`, `interactive`, `all` (default: all)
+
+## Report Generation Process
+
+### 1. Collect Test Results
+Review any existing test results from previous test-cli and test-interactive runs in this session.
+
+### 2. Run Comprehensive Test Suite
+If no prior results exist or scope is "all", run a comprehensive test suite:
+
+**Functional Tests:**
+| Test | Command | Expected |
+|------|---------|----------|
+| Help | `<cli> --help` | Shows usage |
+| Version | `<cli> --version` | Shows version |
+| No args | `<cli>` | Shows help or error |
+| Invalid flag | `<cli> --invalid-flag` | Shows error |
+
+Plus subcommand tests and interactive tests as detected.
+
+### 3. Generate Report
+
+Create a markdown report with:
+
+```markdown
+# CLI QA Test Report
+
+## Executive Summary
+- Total Tests: <count>
+- Passed: <count> (<percentage>%)
+- Failed: <count> (<percentage>%)
+- Overall Status: PASS / FAIL / PARTIAL
+
+## Test Results
+
+### Functional Tests
+| Test | Status | Notes |
+|------|--------|-------|
+| --help | PASS/FAIL | <notes> |
+| --version | PASS/FAIL | <notes> |
+
+### Interactive Tests (if applicable)
+| Flow | Steps | Status | Notes |
+|------|-------|--------|-------|
+
+## Issues Found
+### Critical / Major / Minor
+
+## Recommendations
+
+## Coverage Analysis
+- Command coverage: <percentage>%
+- Argument coverage: <percentage>%
+- Error path coverage: <percentage>%
+```
+
+### 4. Save Report
+- Markdown report: `qa-reports/cli-qa-report-YYYY-MM-DD.md`
+- JSON summary: `qa-reports/cli-qa-summary-YYYY-MM-DD.json`
+
+## Important
+
+1. Run actual tests if results don't exist from prior skill invocations
+2. Create the report directory if it doesn't exist
+3. Include timestamps in filenames
+4. Provide actionable recommendations
+5. Be thorough but concise in summaries
+"""

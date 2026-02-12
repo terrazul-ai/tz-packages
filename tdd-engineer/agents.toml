@@ -18,16 +18,20 @@ template = "templates/CLAUDE.md.hbs"
 promptsDir = "templates/prompts"
 subagentsDir = "templates/claude/agents"
 commandsDir = "templates/claude/commands"
+skillsDir = "templates/claude/skills"
 mcpServers = "templates/claude/mcp_servers.json.hbs"
 
 [exports.codex]
 template = "templates/AGENTS.md.hbs"
-promptsDir = "templates/codex/prompts"
+promptsDir = "prompts"
+commandsDir = "templates/codex/commands"
+skillsDir = "templates/codex/skills"
 mcpServers = "templates/codex/mcp_servers.toml.hbs"
 
 [exports.gemini]
 template = "templates/GEMINI.md.hbs"
 commandsDir = "templates/gemini/commands"
+skillsDir = "templates/gemini/skills"
 mcpServers = "templates/gemini/mcp_servers.json.hbs"
 
 [metadata]

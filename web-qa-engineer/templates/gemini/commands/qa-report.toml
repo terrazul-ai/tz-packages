@@ -1,0 +1,121 @@
+description = "Generate a comprehensive QA report from testing findings"
+prompt = """
+Generate a comprehensive QA report from testing findings.
+
+Usage: `/qa-report [type]`
+
+Arguments: {{args}}
+
+Types:
+- `summary` - Executive summary only (quick overview)
+- `full` - Complete detailed report (default)
+- `bugs` - Bug reports only (for issue tracking)
+- `all` - Generate all report types
+
+Examples:
+- `/qa-report` - Generate full report
+- `/qa-report summary` - Executive summary for stakeholders
+- `/qa-report bugs` - Individual bug reports for tracking
+- `/qa-report all` - Generate all report formats
+
+---
+
+## Workflow
+
+### Step 1: Gather Findings
+
+Collect results from all test executions:
+- Functional test results
+- API test results
+- Screenshots and evidence
+- Any notes or observations
+
+### Step 2: Analyze Results
+
+Calculate metrics:
+- Total tests executed
+- Pass/fail counts and percentages
+- Issue counts by severity (4, 3, 2, 1)
+- Test coverage by feature/endpoint
+- Identify patterns across issues
+
+### Step 3: Generate Report
+
+#### Executive Summary
+```markdown
+## Executive Summary
+
+### Overall Status: [PASS / PASS WITH ISSUES / FAIL]
+
+| Metric | Value |
+|--------|-------|
+| Total Tests | X |
+| Passed | X (X%) |
+| Failed | X (X%) |
+| Critical Issues | X |
+
+### Key Findings
+1. [Finding 1]
+2. [Finding 2]
+
+### Recommendation
+[Ship / Fix first / Investigate]
+```
+
+#### Detailed Report
+- Complete test coverage
+- All issues with full details
+- Priority matrix
+- Remediation recommendations
+
+#### Bug Reports
+- Individual issue reports
+- Reproduction steps
+- Suggested fixes
+
+### Step 4: Save Reports
+
+Output locations:
+- **Full Report**: `qa-reports/qa-report-[date].md`
+- **Summary**: `qa-reports/qa-summary-[date].md`
+- **Bug Reports**: `qa-reports/bugs/BUG-[id].md`
+
+---
+
+## Report Types
+
+### Summary Report (`/qa-report summary`)
+Quick overview: overall status, key metrics, critical findings, top recommendations, go/no-go.
+Best for: standup updates, quick status checks, stakeholder briefings.
+
+### Full Report (`/qa-report full`)
+Complete documentation: executive summary, test coverage, all issues, evidence, priority matrix, recommendations.
+Best for: release sign-off, audit trails, detailed analysis.
+
+### Bug Reports (`/qa-report bugs`)
+Individual issues: reproduction steps, expected vs actual, evidence, suggested fixes, impact assessment.
+Best for: issue tracking integration, developer handoff.
+
+### All Reports (`/qa-report all`)
+Generates all three formats for comprehensive documentation.
+
+---
+
+## Severity Reference
+
+| Severity | Label | Meaning |
+|----------|-------|---------|
+| 4 | Critical | Blocks release - must fix immediately |
+| 3 | Major | Should fix before release |
+| 2 | Minor | Schedule fix - not blocking |
+| 1 | Cosmetic | Nice to have - lowest priority |
+
+---
+
+## Priority Matrix
+
+|  | Low Effort | High Effort |
+|---|------------|-------------|
+| **High Impact** | Quick Wins - Do First | Plan Carefully |
+| **Low Impact** | Nice to Have | Deprioritize |
+"""

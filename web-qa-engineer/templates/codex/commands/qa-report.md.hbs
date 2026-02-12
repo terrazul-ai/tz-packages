@@ -1,0 +1,49 @@
+Generate a comprehensive QA report from testing findings.
+
+Usage: `/qa-report [type]`
+
+Types:
+- `summary` - Executive summary only (quick overview)
+- `full` - Complete detailed report (default)
+- `bugs` - Bug reports only (for issue tracking)
+- `all` - Generate all report types
+
+## Configuration
+
+- **Report Output**: {{ vars.reportOutputDir }}
+- **Screenshot Dir**: {{ vars.screenshotDir }}
+- **Target URL**: {{ vars.targetUrl }}
+- **API Base URL**: {{ vars.apiBaseUrl }}
+
+## Workflow
+
+1. **Gather Findings**: Collect functional test results, API test results, screenshots, observations
+2. **Analyze Results**: Calculate pass/fail counts, issue counts by severity, coverage by feature/endpoint
+3. **Generate Report**: Use report-generator methodology for professional documentation
+4. **Save Reports**: Write to report output directory with timestamps
+
+## Report Structure
+
+```markdown
+# QA Test Report
+
+## Executive Summary
+- Overall Status: PASS / FAIL / PASS WITH ISSUES
+- Total Tests: X | Passed: X (X%) | Failed: X (X%)
+- Critical Issues: X
+
+## Issues Found
+[Organized by severity 4→1]
+
+## Recommendations
+[Prioritized action items]
+```
+
+## Severity Reference
+
+| Severity | Label | Meaning |
+|----------|-------|---------|
+| 4 | Critical | Blocks release |
+| 3 | Major | Fix before release |
+| 2 | Minor | Schedule fix |
+| 1 | Cosmetic | Nice to have |

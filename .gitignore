@@ -4,3 +4,4 @@ agent_modules
 .terrazul
 settings.local.json
 .claude
+agent_modules/

@@ -1,0 +1,123 @@
+description = "Test backend API endpoints based on specifications"
+prompt = """
+Test backend API endpoints based on specifications.
+
+Usage: `/test-api <endpoint-or-spec>`
+
+Arguments: {{args}}
+
+Examples:
+- `/test-api /api/users` - Test users endpoint (all methods)
+- `/test-api auth` - Test authentication endpoints
+- `/test-api "POST /api/orders creates new order"`
+
+---
+
+## Workflow
+
+### Step 1: Identify Endpoints
+
+Based on input, determine:
+- HTTP method(s) to test (GET, POST, PUT, PATCH, DELETE)
+- Endpoint path
+- Required authentication
+- Request body format
+- Expected response structure
+
+### Step 2: Design API Tests
+
+For each endpoint, create tests for:
+- **Success case** - Valid request succeeds
+- **Authentication** - Auth required and validated
+- **Input validation** - Invalid data rejected
+- **Not found** - Missing resources handled
+- **Permissions** - Authorization enforced
+
+### Step 3: Setup Authentication
+
+Get authentication token before testing protected endpoints:
+```bash
+TOKEN=$(curl -X POST "$API_BASE_URL/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@example.com", "password": "password"}' \
+  -s | jq -r '.token')
+```
+
+### Step 4: Execute Tests
+
+Run API calls using curl:
+
+**GET Request:**
+```bash
+curl -X GET "$API_BASE_URL/endpoint" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -w "\\nStatus: %{http_code}, Time: %{time_total}s" \
+  -s
+```
+
+**POST Request:**
+```bash
+curl -X POST "$API_BASE_URL/endpoint" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"field": "value"}' \
+  -w "\\nStatus: %{http_code}, Time: %{time_total}s" \
+  -s
+```
+
+### Step 5: Validate Responses
+
+For each response, check:
+- Status code matches expected
+- Response body structure correct
+- Required fields present
+- Data types correct
+- Error format consistent
+- Response time acceptable (< 500ms typical)
+
+### Step 6: Document Results
+
+Create results for each endpoint:
+- Endpoint and method
+- Request made
+- Response received
+- Pass/fail status
+- Issues found with severity
+
+---
+
+## Common Test Patterns
+
+### CRUD Testing
+Tests: POST creates (201), GET retrieves (200), PUT/PATCH updates (200), DELETE removes (204), GET after delete (404)
+
+### Auth Testing
+Tests: Valid credentials (200+token), invalid credentials (401), protected with token (200), protected without token (401)
+
+### Validation Testing
+Tests: Required fields missing (400), invalid formats (400), invalid types (400), duplicates (409), valid data (201)
+
+### Pagination Testing
+Tests: Default page returns results, page/limit params work, total count accurate, empty page handled
+
+---
+
+## Severity Scale
+
+| Severity | Label | Action |
+|----------|-------|--------|
+| 4 | Critical | Fix immediately |
+| 3 | Major | Fix before release |
+| 2 | Minor | Schedule fix |
+| 1 | Cosmetic | Nice to have |
+
+---
+
+## Next Steps
+
+After testing APIs:
+- Use `/qa-report` to generate comprehensive report
+- Use `/test-feature` for related frontend testing
+- Use the api-validation skill for deeper validation
+"""

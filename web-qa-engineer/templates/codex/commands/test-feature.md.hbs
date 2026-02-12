@@ -1,0 +1,34 @@
+Test a specific feature based on provided specification.
+
+Usage: `/test-feature <spec-or-description>`
+
+Examples:
+- `/test-feature "User should be able to log in with email and password"`
+- `/test-feature "Test the checkout flow with credit card payment"`
+
+## Configuration
+
+- **Target URL**: {{ vars.targetUrl }}
+- **Browser Engine**: {{ vars.browserEngine }}
+- **Screenshot Dir**: {{ vars.screenshotDir }}
+- **Report Output**: {{ vars.reportOutputDir }}
+
+## Workflow
+
+1. **Parse Specification**: Extract feature scope, user stories, acceptance criteria, edge cases
+2. **Design Test Cases**: Happy path, input validation, error handling, edge cases, security basics
+3. **Setup Browser**: Launch browser via Playwright/Puppeteer MCP and navigate to target URL
+4. **Execute Tests**: For each test case — screenshot initial state, perform actions, verify results, screenshot final state
+5. **Document Results**: Test case ID, pass/fail status, evidence, issues with severity
+6. **Generate Summary**: Total tests, pass/fail counts, issues found, recommendations
+
+## Severity Scale
+
+| Severity | Label | Action |
+|----------|-------|--------|
+| 4 | Critical | Fix immediately |
+| 3 | Major | Fix before release |
+| 2 | Minor | Schedule fix |
+| 1 | Cosmetic | Nice to have |
+
+After testing, use `/qa-report` to generate a comprehensive report.

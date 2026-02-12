@@ -1,0 +1,27 @@
+Run a Codex pre-push review for a GitHub issue.
+
+Usage: `/codex-review <issue-number>`
+
+This command runs OpenAI Codex locally to review your current changes against a GitHub issue.
+
+Steps:
+
+1. **Validate Input**:
+   - Ensure an issue number is provided: `$ARGUMENTS`
+   - If no issue number, ask the user for one
+
+2. **Run the Review Script**:
+   ```bash
+   bash .claude/skills/codex-review/run.sh $ARGUMENTS
+   ```
+
+3. **Present Results**:
+   - Display the structured review output from Codex
+   - Highlight any **Blockers** that must be fixed before push
+   - Summarize **Important** items and **Nits**
+   - List any **Missing tests** that should be added
+
+4. **Follow Up**:
+   - If blockers were found, offer to help fix them
+   - If missing tests were identified, offer to create them using the TDD workflow
+   - Do not push until all blockers are resolved

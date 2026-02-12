@@ -1,0 +1,35 @@
+Test a specific CLI command with functional tests using tmux automation.
+
+Usage: `/test-cli <command>`
+
+## Configuration
+
+- **CLI Command**: `{{ vars.cliCommand }}`
+- **Working Directory**: `{{ vars.workingDir }}`
+- **Success Patterns**: `{{ vars.successPatterns }}`
+- **Error Patterns**: `{{ vars.errorPatterns }}`
+- **Session Prefix**: `{{ vars.sessionPrefix }}`
+- **Timeout**: `{{ vars.commandTimeout }}s`
+
+## Steps
+
+1. **Create Test Session**: Use tmux MCP `create-session` for isolation (`{{ vars.sessionPrefix }}-test-<timestamp>`)
+2. **Navigate**: `cd {{ vars.workingDir }}`
+3. **Run Command**: `{{ vars.cliCommand }} $ARGUMENTS` via `execute-command`
+4. **Capture Output**: Use `capture-pane` to get command output
+5. **Analyze**: Check for success patterns (`{{ vars.successPatterns }}`) and error patterns (`{{ vars.errorPatterns }}`)
+6. **Additional Tests**: Help flags, error handling with bad input, subcommand help
+7. **Cleanup**: `kill-session`
+
+## Report
+
+- Command executed and status (PASS/FAIL)
+- Captured output
+- Assertions checked
+- Observations and recommendations
+
+## Important
+
+1. Always create a fresh tmux session for isolation
+2. Always cleanup the session after tests
+3. Do not run destructive commands without explicit user confirmation

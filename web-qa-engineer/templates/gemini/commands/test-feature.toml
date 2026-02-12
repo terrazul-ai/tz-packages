@@ -1,0 +1,99 @@
+description = "Test a specific feature based on provided specification"
+prompt = """
+Test a specific feature based on provided specification.
+
+Usage: `/test-feature <spec-or-description>`
+
+Arguments: {{args}}
+
+Examples:
+- `/test-feature "User should be able to log in with email and password"`
+- `/test-feature "Test the checkout flow with credit card payment"`
+
+---
+
+## Workflow
+
+### Step 1: Parse Specification
+
+Analyze the provided spec to extract:
+- **Feature scope** - What functionality is being tested
+- **User stories** - Who does what for what purpose
+- **Acceptance criteria** - Specific pass/fail conditions
+- **Edge cases** - Boundary conditions and error scenarios
+- **Test data** - Required data for testing
+
+### Step 2: Design Test Cases
+
+Create test cases covering:
+- **Happy path** - Normal successful flow
+- **Input validation** - Field validation, required fields
+- **Error handling** - Error scenarios, edge cases
+- **Edge cases** - Boundary conditions
+- **Security basics** - Basic security checks if applicable
+
+### Step 3: Setup Browser
+
+Use the Playwright or Puppeteer MCP tools to launch and navigate the browser to the target URL. Wait for the page to be ready before proceeding.
+
+### Step 4: Execute Tests
+
+For each test case:
+1. Screenshot initial state
+2. Perform test actions
+3. Verify expected results
+4. Screenshot final state
+5. Record pass/fail
+
+### Step 5: Document Results
+
+Create test results with:
+- Test case ID and title
+- Pass/fail status
+- Evidence (screenshots)
+- Issues found with severity
+
+### Step 6: Generate Summary
+
+Output summary including:
+- Total tests run
+- Pass/fail counts
+- Issues found
+- Recommendations
+
+---
+
+## Quick Test Categories
+
+### Smoke Test
+Validates: Page loads, key elements visible, no console errors, basic navigation
+
+### Login Flow
+Validates: Login form functional, valid login succeeds, invalid login shows error, session established
+
+### Form Submission
+Validates: Required fields enforced, format validation, successful submission, clear error messages
+
+### Navigation
+Validates: All links work, correct pages load, no broken links
+
+---
+
+## Severity Scale
+
+| Severity | Label | Action |
+|----------|-------|--------|
+| 4 | Critical | Fix immediately |
+| 3 | Major | Fix before release |
+| 2 | Minor | Schedule fix |
+| 1 | Cosmetic | Nice to have |
+
+---
+
+## Next Steps
+
+After testing a feature:
+- Use `/qa-report` to generate comprehensive report
+- Use `/test-api` for related API testing
+- Use the regression-test skill for broader coverage
+"""

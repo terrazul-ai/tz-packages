@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
+    },
+    "puppeteer": {
+      "command": "npx",
+      "args": [
+        "puppeteer-mcp-claude",
+        "serve"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
