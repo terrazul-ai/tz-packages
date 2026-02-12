@@ -4,7 +4,7 @@
   "assistants/package-creator": "0.0.2",
   "assistants/cli-qa-engineer": "0.0.1",
   "assistants/impeccable-style": "1.1.0",
-  "assistants/jira-triage": "0.1.0",
+  "assistants/jira-triage": "0.1.1",
   "assistants/ux-researcher": "0.1.2",
   "assistants/web-qa-engineer": "0.0.2"
 }
