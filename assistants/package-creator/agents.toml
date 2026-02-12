@@ -1,6 +1,6 @@
 [package]
 name = "@terrazul/package-creator"
-version = "0.0.1"
+version = "0.0.2"
 description = "Package that helps in package creation"
 repository = "https://github.com/terrazul-ai/tz-packages"
 license = "MIT"
