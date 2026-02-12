@@ -1,6 +1,6 @@
 [package]
 name = "@terrazul/cli-qa-engineer"
-version = "0.0.1"
+version = "0.0.2"
 description = "AI-powered QA Engineer for testing CLIs using tmux terminal automation"
 keywords = ["qa", "testing", "cli", "terminal", "tmux", "automation"]
 license = "MIT"
