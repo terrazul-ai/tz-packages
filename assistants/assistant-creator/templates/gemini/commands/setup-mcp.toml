@@ -1,0 +1,127 @@
+description = "Interactive wizard to set up MCP server credentials in your shell environment (~/.zshenv, ~/.bashrc, etc.)"
+prompt = """
+# MCP Server Credential Setup Wizard
+
+Guide me through setting up environment variables for MCP server authentication. Since Terrazul passes MCP configuration via CLI flags, credentials must be persisted in shell environment files.
+
+## Setup Flow
+
+This is an **interactive** setup flow. Guide me through ONE credential at a time.
+
+---
+
+## Step 0: Detect Shell Environment
+
+First, determine my shell and appropriate config file by checking $SHELL.
+
+| Shell | Recommended File | Alternative |
+|-------|------------------|-------------|
+| zsh | `~/.zshenv` | `~/.zshrc` |
+| bash | `~/.bashrc` | `~/.bash_profile` |
+
+**Why ~/.zshenv?** Environment variables in `.zshenv` are loaded for all shell sessions (interactive and non-interactive), ensuring MCP servers always have access to credentials.
+
+Ask me which file I want to use. Default to `~/.zshenv` for zsh.
+
+---
+
+## Step 1: Identify Required Credentials
+
+Read the project's MCP configuration to identify which environment variables are needed. Look in these locations:
+
+1. `.gemini/settings.json` - Gemini MCP config
+2. `.claude/settings.local.json` - Claude MCP config
+3. `templates/*/mcp_servers.json.hbs` - Package MCP templates
+
+Look for `${VAR_NAME}` patterns in the configuration files.
+
+Present a summary:
+- List of MCP servers configured
+- Environment variables needed for each
+- Which are already set vs missing (check with `echo $VAR_NAME`)
+
+---
+
+## Step 2: Guide Through Each Credential
+
+For each missing credential, provide service-specific instructions:
+
+### GitHub (`GITHUB_TOKEN`)
+1. Go to https://github.com/settings/tokens
+2. Click "Generate new token" -> "Generate new token (classic)"
+3. Select scopes: `repo`, `read:org`, `read:user`
+4. Generate and copy the token
+
+### HubSpot (`HUBSPOT_ACCESS_TOKEN`)
+1. Go to HubSpot -> Settings -> Integrations -> Private Apps
+2. Create a new private app with required scopes
+3. Copy the access token
+
+### Slack (`SLACK_BOT_TOKEN`)
+1. Go to https://api.slack.com/apps
+2. Create or select your app -> "OAuth & Permissions"
+3. Copy the "Bot User OAuth Token" (starts with `xoxb-`)
+
+### Linear (`LINEAR_API_KEY`)
+1. Go to Linear -> Settings -> API
+2. Create a new personal API key
+
+### PostgreSQL (`DATABASE_URL`)
+Format: `postgresql://username:password@host:port/database`
+
+### PostHog (`POSTHOG_API_KEY`, `POSTHOG_PROJECT_ID`)
+1. Go to PostHog -> Settings -> Personal API Keys
+2. Copy the project ID from your project URL
+
+### Discord (`DISCORD_BOT_TOKEN`)
+1. Go to https://discord.com/developers/applications
+2. Select your application -> Bot -> Copy token
+
+### Context7 (`CONTEXT7_API_KEY`)
+1. Go to https://context7.com/dashboard -> API Keys
+2. Generate a new key
+
+### Exa (`EXA_API_KEY`)
+1. Go to https://exa.ai/dashboard -> API section
+2. Copy your API key
+
+### Meta Ads (`META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID`)
+1. Go to Meta Business Suite -> Business Settings -> System Users
+2. Generate a token with ads_management permission
+3. Copy Ad Account ID from Ads Manager
+
+### Garmin (`GARMIN_EMAIL`, `GARMIN_PASSWORD`)
+Use your Garmin Connect account credentials.
+
+---
+
+## Step 3: Add to Shell Profile
+
+For each credential, append to the chosen profile file:
+
+```bash
+# MCP Server: [Server Name]
+export VAR_NAME="value_here"
+```
+
+Group related variables together with comments.
+
+---
+
+## Step 4: Verify Setup
+
+After adding credentials:
+
+1. Ask me to source the profile: `source ~/.zshenv`
+2. Verify variables are set: `echo $VAR_NAME`
+3. Run test commands to verify credentials work
+
+---
+
+## Step 5: Success Summary
+
+Provide:
+- List of configured credentials
+- Reminder that new terminal sessions will have these variables
+- Note to restart Gemini CLI for changes to take effect
+"""
