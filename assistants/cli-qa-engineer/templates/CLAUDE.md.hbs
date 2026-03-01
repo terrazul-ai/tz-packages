@@ -3,7 +3,6 @@
 {{~ var successPatterns = askUser('Output patterns indicating success (comma-separated)?', { default: 'success,completed,done', placeholder: 'e.g., success,completed,✓' }) ~}}
 {{~ var errorPatterns = askUser('Output patterns indicating errors (comma-separated)?', { default: 'error,failed,Error:', placeholder: 'e.g., error,failed,Exception' }) ~}}
 {{~ var reportDir = askUser('Directory for QA reports?', { default: 'qa-reports', placeholder: 'e.g., qa-reports, test-results' }) ~}}
-{{~ var sessionPrefix = askUser('Tmux session name prefix?', { default: 'cli-qa', placeholder: 'e.g., cli-qa, test' }) ~}}
 {{~ var commandTimeout = askUser('Default command timeout in seconds?', { default: '30', placeholder: 'e.g., 30, 60' }) ~}}
 
 {{~ var projectAnalysis = askAgent('./prompts/analyze-project-for-cli-qa.txt', { json: true }) ~}}
@@ -11,6 +10,9 @@
 # CLI QA Engineer
 
 AI-powered QA testing for command-line interfaces using tmux terminal automation.
+
+> **CRITICAL**: You MUST use `tmux-cli` via the **Bash tool** for ALL terminal automation.
+> **NEVER** kill the pane you are currently running in. `tmux-cli` has built-in safety to prevent this, but always be cautious.
 
 ## Configuration
 
@@ -21,7 +23,6 @@ AI-powered QA testing for command-line interfaces using tmux terminal automation
 | Success Patterns | `{{ vars.successPatterns }}` |
 | Error Patterns | `{{ vars.errorPatterns }}` |
 | Report Directory | `{{ vars.reportDir }}` |
-| Session Prefix | `{{ vars.sessionPrefix }}` |
 | Command Timeout | `{{ vars.commandTimeout }}s` |
 
 ## Project Analysis
@@ -42,51 +43,68 @@ AI-powered QA testing for command-line interfaces using tmux terminal automation
 - **Destructive Commands (use caution):** {{ vars.projectAnalysis.destructiveCommands }}
 {{/if}}
 
-## Available Tools
+## Terminal Automation: tmux-cli
 
-This package uses the `tmux-mcp` server which provides terminal automation:
+All terminal automation is done via `tmux-cli`, a CLI tool run through the **Bash tool**. It auto-detects local vs remote mode (inside/outside tmux) and has built-in safety to prevent killing your own pane.
 
-### Session Management
-- `create-session` - Create a new tmux session for test isolation
-- `list-sessions` - List active test sessions
-- `kill-session` - Clean up completed test sessions
-- `find-session` - Locate a specific test session
+### Core Commands
 
-### Window Management
-- `create-window` - Create windows for parallel tests
-- `list-windows` - List windows in a session
-- `kill-window` - Clean up test windows
+| Command | Description |
+|---------|-------------|
+| `tmux-cli launch "zsh"` | Launch a new pane with a shell (returns pane ID) |
+| `tmux-cli send "text" --pane=ID` | Send text + Enter to a pane |
+| `tmux-cli send "text" --pane=ID --enter=False` | Send text without pressing Enter |
+| `tmux-cli send "text" --pane=ID --delay-enter=False` | Send text + Enter immediately (no delay) |
+| `tmux-cli capture --pane=ID` | Capture current pane output |
+| `tmux-cli wait_idle --pane=ID` | Wait until pane output stabilizes (no changes for 2s) |
+| `tmux-cli wait_idle --pane=ID --idle-time=3.0 --timeout=60` | Wait with custom idle time and timeout |
+| `tmux-cli kill --pane=ID` | Kill a pane (cannot kill your own) |
+| `tmux-cli interrupt --pane=ID` | Send Ctrl+C to a pane |
+| `tmux-cli escape --pane=ID` | Send Escape key to a pane |
+| `tmux-cli status` | Show current tmux status and all panes |
+| `tmux-cli list_panes` | List all panes as JSON |
 
-### Pane Management
-- `split-pane` - Split panes for side-by-side testing
-- `list-panes` - List panes in a window
-- `capture-pane` - **Key tool**: Capture command output for assertions
-- `kill-pane` - Clean up test panes
+### Pane Identification
 
-### Command Execution
-- `execute-command` - **Key tool**: Run CLI commands in tmux
-- `get-command-result` - Get results of executed commands
+- Just the pane number: `2` (current window)
+- Full format: `session:window.pane` (e.g., `myapp:1.2`)
 
 ## Testing Workflow
 
-### 1. Setup Test Session
-```
-create-session: {{ vars.sessionPrefix }}-<test-name>
+### 1. Launch a Test Pane
+
+Always launch a shell first to prevent losing output if commands fail:
+
+```bash
+tmux-cli launch "zsh"
+# Returns pane ID, e.g., "0:0.1" — save this for subsequent commands
 ```
 
-### 2. Execute Commands
-```
-execute-command: {{ vars.cliCommand }} <args>
+### 2. Navigate and Execute Commands
+
+```bash
+tmux-cli send "cd {{ vars.workingDir }}" --pane=ID
+tmux-cli send "{{ vars.cliCommand }} <args>" --pane=ID
 ```
 
-### 3. Capture Output
-```
-capture-pane → analyze for success/error patterns
+### 3. Wait for Completion
+
+```bash
+tmux-cli wait_idle --pane=ID --idle-time=2.0 --timeout={{ vars.commandTimeout }}
 ```
 
-### 4. Cleanup
+### 4. Capture and Analyze Output
+
+```bash
+tmux-cli capture --pane=ID
 ```
-kill-session: {{ vars.sessionPrefix }}-<test-name>
+
+Analyze the captured output for success/error patterns.
+
+### 5. Cleanup
+
+```bash
+tmux-cli kill --pane=ID
 ```
 
 ## Test Categories
@@ -109,12 +127,14 @@ kill-session: {{ vars.sessionPrefix }}-<test-name>
 
 When testing interactive CLI prompts:
 
-1. **Detect prompt** by capturing pane and looking for prompt patterns
-2. **Send response** via execute-command:
-   - Text input: Send text followed by Enter key
-   - Yes/No: Send 'y' or 'n' followed by Enter
-   - Selection: Arrow keys to navigate, Enter to select
-   - Multi-select: Space to toggle, Enter to confirm
+1. **Capture pane** to detect prompt patterns
+2. **Send response** via `tmux-cli send`:
+   - Text input: `tmux-cli send "my input" --pane=ID`
+   - Accept default (Enter): `tmux-cli send "" --pane=ID`
+   - Yes/No: `tmux-cli send "y" --pane=ID` or `tmux-cli send "n" --pane=ID`
+   - Arrow keys: `tmux-cli send "" --pane=ID --enter=False` then use tmux send-keys via Bash for special keys
+   - Cancel: `tmux-cli interrupt --pane=ID`
+   - Escape: `tmux-cli escape --pane=ID`
 
 ## Assertions
 

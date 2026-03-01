@@ -73,7 +73,7 @@ Create a markdown report at: `{{ vars.reportDir }}/cli-qa-report-<date>.md`
 |----------|-------|
 | CLI Command | `{{ vars.cliCommand }}` |
 | Working Directory | `{{ vars.workingDir }}` |
-| Session Prefix | `{{ vars.sessionPrefix }}` |
+| Automation | `tmux-cli` (via Bash tool) |
 | Timeout | `{{ vars.commandTimeout }}s` |
 
 ## Test Results
@@ -168,8 +168,8 @@ Create a markdown report at: `{{ vars.reportDir }}/cli-qa-report-<date>.md`
 ### Raw Test Output
 <link or collapsed section with full outputs>
 
-### Test Session IDs
-<list of tmux sessions used>
+### Test Pane IDs
+<list of tmux panes used>
 ```
 
 ### 4. Save Report

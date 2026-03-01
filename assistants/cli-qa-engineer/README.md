@@ -4,7 +4,7 @@ AI-powered QA Engineer for testing command-line interfaces using tmux terminal a
 
 ## Overview
 
-This package provides skills for automated CLI testing using Claude and the `tmux-mcp` server. It enables:
+This package provides skills for automated CLI testing using Claude and `tmux-cli`. It enables:
 
 - **Functional testing** of CLI commands, arguments, and outputs
 - **Interactive testing** of prompts, wizards, and multi-step flows
@@ -13,8 +13,8 @@ This package provides skills for automated CLI testing using Claude and the `tmu
 ## Prerequisites
 
 - **tmux** installed on your system
-- **Node.js** (for npx to run tmux-mcp)
-- **Claude Code** CLI with MCP support
+- **tmux-cli** installed via `uv tool install tmux-cli`
+- **Claude Code** CLI
 
 ### Installing tmux
 
@@ -27,6 +27,12 @@ sudo apt install tmux
 
 # Fedora
 sudo dnf install tmux
+```
+
+### Installing tmux-cli
+
+```bash
+uv tool install tmux-cli
 ```
 
 ## Installation
@@ -47,7 +53,6 @@ During setup, you'll be prompted for:
 | Success Patterns | Output indicating success | `success,completed,done` |
 | Error Patterns | Output indicating errors | `error,failed,Error:` |
 | Report Directory | Where to save reports | `qa-reports` |
-| Session Prefix | Tmux session naming | `cli-qa` |
 | Command Timeout | Max wait time (seconds) | `30` |
 
 ## Skills
@@ -103,18 +108,20 @@ Generate a comprehensive QA test report.
 - Issues and recommendations
 - JSON summary for automation
 
-## MCP Tools
+## CLI Tools
 
-The package uses `tmux-mcp` which provides:
+The package uses `tmux-cli` (run via the Bash tool) which provides:
 
-| Tool | Purpose |
-|------|---------|
-| `create-session` | Create isolated test sessions |
-| `kill-session` | Clean up test sessions |
-| `execute-command` | Run CLI commands |
-| `capture-pane` | Capture command output |
-| `list-sessions` | View active sessions |
-| `split-pane` | Parallel test execution |
+| Command | Purpose |
+|---------|---------|
+| `tmux-cli launch "zsh"` | Launch an isolated test pane |
+| `tmux-cli send "cmd" --pane=ID` | Run commands in a pane |
+| `tmux-cli capture --pane=ID` | Capture pane output |
+| `tmux-cli wait_idle --pane=ID` | Wait for command completion |
+| `tmux-cli kill --pane=ID` | Clean up test panes |
+| `tmux-cli interrupt --pane=ID` | Send Ctrl+C to a pane |
+| `tmux-cli escape --pane=ID` | Send Escape to a pane |
+| `tmux-cli status` | Show current tmux status |
 
 ## Example Usage
 
@@ -184,11 +191,13 @@ qa-reports/
 
 ## How It Works
 
-1. **Session Isolation**: Each test runs in a dedicated tmux session
-2. **Command Execution**: Commands run via tmux execute-command
-3. **Output Capture**: Pane content captured for assertions
-4. **Pattern Matching**: Success/error patterns validated
-5. **Cleanup**: Sessions destroyed after tests
+1. **Pane Isolation**: Each test runs in a dedicated tmux pane launched via `tmux-cli launch "zsh"`
+2. **Command Execution**: Commands sent via `tmux-cli send`
+3. **Idle Detection**: `tmux-cli wait_idle` waits for commands to complete
+4. **Output Capture**: Pane content captured via `tmux-cli capture` for assertions
+5. **Pattern Matching**: Success/error patterns validated against output
+6. **Cleanup**: Test panes killed via `tmux-cli kill` after tests
+7. **Safety**: `tmux-cli` prevents you from killing your own pane
 
 ## Troubleshooting
 
@@ -199,11 +208,11 @@ Ensure tmux is installed and in your PATH:
 which tmux
 ```
 
-### MCP server not loading
+### tmux-cli not found
 
-Check that npx can run tmux-mcp:
+Install via uv:
 ```bash
-npx -y tmux-mcp --help
+uv tool install tmux-cli
 ```
 
 ### Tests timing out

@@ -1,6 +1,6 @@
 ---
 name: test-interactive
-description: Test interactive CLI prompts, wizards, and multi-step flows using tmux automation
+description: Test interactive CLI prompts, wizards, and multi-step flows using tmux-cli terminal automation
 arguments: scenario
 ---
 
@@ -8,13 +8,14 @@ arguments: scenario
 
 You are a QA engineer testing interactive CLI prompts for scenario: `$ARGUMENTS`
 
+> **CRITICAL**: Use `tmux-cli` via the Bash tool for ALL terminal automation. NEVER kill the pane you are running in.
+
 ## Configuration
 
 - **CLI Command**: `{{ vars.cliCommand }}`
 - **Working Directory**: `{{ vars.workingDir }}`
 - **Success Patterns**: `{{ vars.successPatterns }}`
 - **Error Patterns**: `{{ vars.errorPatterns }}`
-- **Session Prefix**: `{{ vars.sessionPrefix }}`
 - **Timeout**: `{{ vars.commandTimeout }}s`
 
 ## Interactive Testing Strategy
@@ -35,70 +36,97 @@ Detect these patterns in captured output to identify prompts:
 | `Password:` | Hidden input | Text + Enter |
 | `(default: X)` | Optional with default | Enter for default, or text |
 
-### Sending Keystrokes via tmux
+### Sending Input via tmux-cli
 
-Use `mcp__tmux__execute-command` with send-keys:
+Use the Bash tool with `tmux-cli send` for all input:
 
-```
-# Send text and press Enter
-send-keys "my input" Enter
+```bash
+# Send text and press Enter (default behavior)
+tmux-cli send "my input" --pane=PANE_ID
 
 # Send just Enter (accept default)
-send-keys Enter
+tmux-cli send "" --pane=PANE_ID
 
-# Send arrow down
-send-keys Down
+# Send text without pressing Enter
+tmux-cli send "partial text" --pane=PANE_ID --enter=False
 
-# Send arrow up
-send-keys Up
+# Send with custom delay before Enter (for timing-sensitive prompts)
+tmux-cli send "my input" --pane=PANE_ID --delay-enter=0.5
 
-# Send space (for toggles)
-send-keys Space
-
-# Send Escape
-send-keys Escape
+# Send immediately without delay
+tmux-cli send "y" --pane=PANE_ID --delay-enter=False
 
 # Send Ctrl+C (cancel)
-send-keys C-c
+tmux-cli interrupt --pane=PANE_ID
+
+# Send Escape
+tmux-cli escape --pane=PANE_ID
+```
+
+For special keys (arrow keys, Space, Tab), use tmux send-keys directly via Bash:
+
+```bash
+# Arrow down
+tmux send-keys -t PANE_ID Down
+
+# Arrow up
+tmux send-keys -t PANE_ID Up
+
+# Space (for toggles)
+tmux send-keys -t PANE_ID Space
+
+# Tab
+tmux send-keys -t PANE_ID Tab
 ```
 
 ## Test Execution Steps
 
-### 1. Create Test Session
+### 1. Launch a Test Pane
 
-Use `mcp__tmux__create-session`:
-- Session name: `{{ vars.sessionPrefix }}-interactive-<timestamp>`
+Always launch a shell first:
+
+```bash
+tmux-cli launch "zsh"
+# Save the returned pane ID for all subsequent commands
+```
 
 ### 2. Navigate to Working Directory
 
-```
-cd {{ vars.workingDir }}
+```bash
+tmux-cli send "cd {{ vars.workingDir }}" --pane=PANE_ID
 ```
 
 ### 3. Start the Interactive Command
 
 Execute the command that triggers the interactive flow:
-```
-{{ vars.cliCommand }} $ARGUMENTS
+
+```bash
+tmux-cli send "{{ vars.cliCommand }} $ARGUMENTS" --pane=PANE_ID
 ```
 
 ### 4. Interactive Loop
 
 Repeat until flow completes:
 
-1. **Wait briefly** for prompt to appear (1-2 seconds)
+1. **Wait for prompt to appear**:
+   ```bash
+   tmux-cli wait_idle --pane=PANE_ID --idle-time=2.0 --timeout={{ vars.commandTimeout }}
+   ```
 
-2. **Capture pane output** with `mcp__tmux__capture-pane`
+2. **Capture pane output**:
+   ```bash
+   tmux-cli capture --pane=PANE_ID
+   ```
 
 3. **Detect prompt type** by analyzing captured output:
    - Look for `?`, `[Y/n]`, `>`, selection indicators
-   - Check if waiting for input vs processing
+   - Check if waiting for input vs still processing
 
 4. **Send appropriate response**:
-   - For text prompts: send test value + Enter
-   - For yes/no: send 'y' or 'n' + Enter
-   - For selections: send arrow keys then Enter
-   - For multi-select: send Space to toggle, then Enter
+   - For text prompts: `tmux-cli send "test value" --pane=PANE_ID`
+   - For yes/no: `tmux-cli send "y" --pane=PANE_ID` or `tmux-cli send "n" --pane=PANE_ID`
+   - For selections: use `tmux send-keys -t PANE_ID Down` / `Up` then `tmux-cli send "" --pane=PANE_ID`
+   - For multi-select: use `tmux send-keys -t PANE_ID Space` to toggle, then `tmux-cli send "" --pane=PANE_ID`
 
 5. **Verify response accepted** by capturing output again
 
@@ -113,7 +141,11 @@ After interactive flow completes:
 
 ### 6. Cleanup
 
-Destroy test session with `mcp__tmux__kill-session`.
+Kill the test pane:
+
+```bash
+tmux-cli kill --pane=PANE_ID
+```
 
 ## Test Scenarios
 
@@ -158,7 +190,7 @@ Test handling of invalid input:
 
 ### Flow Overview
 - **Command**: `{{ vars.cliCommand }} $ARGUMENTS`
-- **Session**: <session-name>
+- **Pane**: <pane-id>
 - **Total Steps**: <number>
 
 ### Step-by-Step Results
@@ -198,8 +230,9 @@ Test handling of invalid input:
 
 ## Important Guidelines
 
-1. **Be patient**: Interactive prompts may take time to appear
+1. **Be patient**: Interactive prompts may take time to appear — use `tmux-cli wait_idle`
 2. **Capture frequently**: Capture output before and after each input
 3. **Handle timeouts**: If a prompt doesn't appear within {{ vars.commandTimeout }}s, report timeout
-4. **Test cancellation**: Verify Ctrl+C properly cancels the flow
+4. **Test cancellation**: Verify `tmux-cli interrupt` properly cancels the flow
 5. **Document all steps**: Record every prompt and response for the report
+6. **NEVER kill your own pane**: Only kill panes you launched for testing
