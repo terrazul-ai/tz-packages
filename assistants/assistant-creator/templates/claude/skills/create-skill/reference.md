@@ -1,730 +1,342 @@
-# Claude Skill Structure Reference
+# Skill Structure Reference
 
-Complete reference for Claude Skill file format and components.
+Complete reference for Claude Skill file format, anatomy, writing patterns, and validation rules.
 
-## File Format
+## Skill Anatomy & Directory Structure
 
-Skill files are Markdown with YAML frontmatter followed by instructions.
-
-```markdown
----
-[YAML frontmatter]
----
-
-[Markdown instructions for Claude]
-```
-
-## Directory Structure
-
-A skill consists of a directory containing:
+A skill is a directory containing at minimum a `SKILL.md` file:
 
 ```
 my-skill/
-├── SKILL.md              # Required: Main skill file
-├── reference.md          # Optional: Detailed documentation
-├── examples.md           # Optional: Usage examples
-├── templates/            # Optional: Template files
-│   └── template.txt
-└── scripts/              # Optional: Helper scripts
-    └── helper.py
++-- SKILL.md              # Required: metadata + instructions (<500 lines)
++-- reference.md           # Optional: detailed specs, API refs, rule catalogs
++-- examples.md            # Optional: usage examples with input/output pairs
++-- scripts/               # Optional: helper scripts, linters, automation
++--   build.sh
++--   validate.py
++-- references/            # Optional: source docs, specs, PDFs-as-text
++--   api-spec.txt
++--   design-doc.md
++-- assets/                # Optional: images, templates, static files
++--   logo.png
++--   template.html
 ```
+
+### When to Add Supporting Files
+
+| File/Dir | Add When |
+|----------|----------|
+| `reference.md` | Instructions exceed ~200 lines or detailed specs are needed |
+| `examples.md` | Multiple complex examples that would clutter the main file |
+| `scripts/` | Automation, validation, or helper utilities support the skill |
+| `references/` | External docs, specs, or PDFs (converted to text) provide essential context |
+| `assets/` | Templates, images, or static files are referenced by instructions |
+
+### Progressive Disclosure
+
+Layer information so the model gets what it needs without drowning in detail:
+
+1. **Metadata** (frontmatter): name, description, version, allowed-tools. The description is the primary trigger mechanism.
+2. **Body** (<500 lines): overview, core instructions, inline examples. Everything the model needs to act.
+3. **Bundled resources**: reference.md for deep specs, examples.md for extended examples, scripts/ for automation, references/ for source material, assets/ for static files.
 
 ## YAML Frontmatter
 
 ### Required Fields
 
-#### name (string, required)
+#### name (string)
 
 - **Format**: Lowercase letters, numbers, hyphens only
+- **Pattern**: `/^[a-z0-9-]+$/`
 - **Length**: Maximum 64 characters
 - **Purpose**: Unique identifier for skill discovery
-- **Pattern**: `/^[a-z0-9-]+$/`
-- **Examples**:
-  - `brand-guidelines`
-  - `excel-report-generator`
-  - `api-documentation`
-  - `code-review-checklist`
 
-**Validation**:
-- ✅ `brand-guidelines`
-- ✅ `data-processor-2024`
-- ❌ `Brand Guidelines` (has spaces and capitals)
-- ❌ `brand_guidelines` (has underscore)
+**Valid**: `brand-guidelines`, `excel-report-generator`, `api-documentation`
+**Invalid**: `Brand Guidelines` (spaces/caps), `brand_guidelines` (underscore)
 
-#### description (string, required)
+#### description (string)
 
-- **Format**: Brief description
 - **Length**: Maximum 1024 characters
-- **Purpose**: Tells Claude WHAT the skill does and WHEN to use it
-- **Point of view**: MUST use third person (not "you" or "I")
-- **Content**: Explain capability + activation triggers
-- **Examples**:
-  - ✅ "Applies Acme Corp brand guidelines to all presentations and documents including logo usage, color palette, typography, and approved messaging"
-  - ✅ "Processes Excel files and generates formatted reports with charts, summaries, and automated insights from financial or sales data"
-  - ✅ "Generates comprehensive API documentation from OpenAPI/Swagger specifications including endpoint descriptions, request/response examples, and authentication guides"
-  - ❌ "Use this skill to apply brand guidelines" (wrong POV - second person)
-  - ❌ "I help with documentation" (wrong POV - first person)
-  - ❌ "Helps with Excel files" (too vague, no specifics)
+- **Point of view**: Third person only
+- **Content**: WHAT the skill does + WHEN to activate (pushy description)
 
-**Description Formula**:
+**Pushy Description Formula:**
 ```
-[Verb]s [specific thing] [context/scope] including [key features/aspects]
+[Verb]s [specific thing] [context] including [key features]. Activates when [trigger conditions].
 ```
 
-**Good verbs**: Applies, Processes, Generates, Provides, Enforces, Creates, Analyzes
+**Good verbs**: Applies, Processes, Generates, Provides, Enforces, Creates, Analyzes, Validates, Transforms, Orchestrates
+
+**Examples of pushy descriptions:**
+
+```yaml
+# Capability Uplift - API docs
+description: Generates comprehensive API documentation from OpenAPI 3.0 and Swagger 2.0 specifications including endpoint descriptions, request/response examples, authentication guides, and code samples. Activates when the user provides an API spec file, requests endpoint documentation, or needs integration guides.
+
+# Capability Uplift - data processing
+description: Processes Excel sales data files and generates formatted monthly reports with charts, KPIs, trend analysis, and actionable insights. Activates when the user provides spreadsheet data, asks for report generation, or needs automated data analysis.
+
+# Encoded Preference - brand guidelines
+description: Applies Acme Corp brand guidelines to all presentations and documents including logo usage, color palette, typography, and approved messaging. Activates when creating branded materials, reviewing documents for compliance, or answering questions about visual identity standards.
+
+# Encoded Preference - code review
+description: Enforces team code review standards for TypeScript projects including naming conventions, error handling patterns, test coverage requirements, and PR description format. Activates when reviewing pull requests, checking code quality, or answering questions about coding standards.
+```
+
+**Anti-patterns:**
+- "Use this skill to apply brand guidelines" (second person, no trigger clause)
+- "I help with documentation" (first person)
+- "Helps with Excel files" (too vague, no specifics, no trigger clause)
+- "Provides brand guidelines" (missing trigger clause - add "Activates when...")
 
 ### Optional Fields
 
-#### version (string, optional)
+#### version (string)
 
-- **Purpose**: Track skill iterations
-- **Format**: Semantic versioning recommended
-- **Example**: `"1.0.0"`, `"2.1.3"`
-- **Use case**: Track breaking changes, feature additions
+Track skill iterations with semantic versioning: `"1.0.0"`, `"2.1.3"`
 
-#### allowed-tools (array, optional)
+#### allowed-tools (array)
 
-- **Purpose**: Restrict which tools Claude can use within this skill
-- **Format**: Array of tool names
-- **Use case**: Limit skill to read-only operations or specific tools
-- **Example**:
-  ```yaml
-  allowed-tools:
-    - Read
-    - Grep
-    - Glob
-  ```
+Restrict which tools the model can use within this skill:
 
-**When to use**:
-- Skill should be read-only (guidelines, reference)
-- Skill needs specific tools only
-- Security/safety constraints
+```yaml
+# Read-only (guidelines, reference)
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
 
-**When NOT to use**:
-- Skill needs flexibility in tool choice
-- All standard tools are acceptable
-- Omit field to inherit all tools
+# Research-capable
+allowed-tools:
+  - Read
+  - Grep
+  - Glob
+  - mcp__context7__*
+  - WebSearch
 
-## Skill Instructions Structure
-
-The markdown body provides instructions to Claude. Effective structure includes:
-
-### 1. Skill Overview (Required)
-
-```markdown
-# [Skill Name]
-
-[2-3 sentence description of what this skill provides and its purpose]
+# Full write access (omit field entirely to inherit all tools)
 ```
 
-**Purpose**: Establishes what capability the skill adds
+Use `allowed-tools` when the skill should be read-only or needs specific tools only. Omit when the skill needs flexibility.
 
-**Guidelines**:
-- Keep concise (2-3 sentences)
-- Focus on value proposition
-- Complement the frontmatter description
+## Writing Patterns
 
-**Example**:
+### Imperative Form
+
+Write instructions as direct commands, not suggestions:
+
+- "Use 4-space indentation" not "You should use 4-space indentation"
+- "Return JSON with snake_case keys" not "It would be good to return JSON with snake_case keys"
+- "Validate input before processing" not "Consider validating input before processing"
+
+### Explain "Why" Behind Rules
+
+Bare rules get ignored or misapplied. Attach rationale:
+
+- "Use 4-space indentation because our formatter enforces it and mixed indentation breaks CI"
+- "Limit functions to 50 lines because longer functions correlate with higher defect density in our codebase"
+- "Always include error codes in API responses because the mobile client uses them for localized error messages"
+
+### Generalize from Instances
+
+Extract patterns rather than listing every case:
+
+**Instead of:**
 ```markdown
-# Brand Guidelines Skill
-
-This skill provides Acme Corp's official brand guidelines for creating consistent,
-professional materials. It ensures all documents, presentations, and communications
-follow our established visual identity and messaging standards.
+- For GET /users, validate the `limit` query param is between 1-100
+- For GET /orders, validate the `limit` query param is between 1-100
+- For GET /products, validate the `limit` query param is between 1-100
 ```
 
-### 2. When to Use Section (Recommended)
-
+**Write:**
 ```markdown
-## When to Use
-
-Activate this skill when:
-- [Trigger condition 1]
-- [Trigger condition 2]
-- [Trigger condition 3]
+For all paginated list endpoints, validate the `limit` query parameter:
+- Accept values between 1-100
+- Default to 20 when omitted
+- Return 400 with error code `INVALID_LIMIT` for out-of-range values
 ```
 
-**Purpose**: Helps Claude decide when to activate the skill
+### Show Patterns, Not Just Instances
 
-**Guidelines**:
-- Be specific about trigger scenarios
-- Use bulleted list for clarity
-- Include 3-5 common use cases
-- Phrase as user requests or situations
+A single example teaches one case. A pattern teaches a category:
 
-**Example**:
+**Instead of:**
 ```markdown
-## When to Use
-
-Activate this skill when:
-- Creating presentations or documents for Acme Corp
-- Reviewing materials for brand compliance
-- Questions about logo usage, colors, or typography
-- Needing approved messaging for marketing materials
-- Ensuring consistent visual identity across projects
+## Example
+When the user asks "Review this PR", check the diff for...
 ```
 
-### 3. Instructions/Guidelines (Required)
-
+**Write:**
 ```markdown
-## [Section Title]
-
-[Specific, actionable instructions]
+## Code Review Pattern
+For any code review request:
+1. Read the diff to understand scope of changes
+2. Check against the standards in reference.md
+3. Categorize findings as blocking, suggestion, or nitpick
+4. Present findings grouped by category, blocking issues first
 ```
 
-**Purpose**: Core guidance for Claude to follow
+### Output Format Specification
 
-**Guidelines**:
-- Be specific and concrete
-- Use hierarchical headers (##, ###)
-- Include lists for step-by-step processes
-- Add examples where helpful
-- Avoid vague statements
+When a skill produces structured output, specify the format explicitly:
 
-**Organization patterns**:
-
-**For Guidelines Skills**:
 ```markdown
-## [Category 1]
-### [Subcategory]
-- [Rule 1]
-- [Rule 2]
+## Output Format
 
-### [Subcategory]
-- [Rule 1]
-- [Rule 2]
-
-## [Category 2]
-[More guidelines]
+Return a Markdown report with:
+- H1 title matching the input filename
+- H2 "Summary" with 2-3 sentence overview
+- H2 "Findings" with bulleted list, each prefixed with severity emoji
+- H2 "Recommendations" with numbered action items
 ```
 
-**For Process Skills**:
-```markdown
-## Processing Workflow
+## Skill Body Structure
 
-### 1. [Step Name]
-[What to do]
+### Recommended Sections
 
-### 2. [Step Name]
-[What to do]
+1. **Overview** (required, 2-3 sentences): What the skill provides and its value
+2. **When to Use** (recommended): Bulleted trigger conditions, 3-5 items
+3. **Instructions/Guidelines** (required): Core content organized with headers
+4. **Examples** (recommended): Concrete input/output pairs
+5. **Reference Materials** (optional): Links to supporting files
 
-### 3. [Step Name]
-[What to do]
+### Organization by Skill Type
+
+**Guidelines/Standards**: Category > Subcategory > Rules with rationale
+**Process/Workflow**: Numbered steps > Sub-steps > Validation criteria
+**Tool Integration**: Parse > Transform > Generate > Format
+**Reference/Knowledge**: Principles > Patterns > Decision frameworks
+
+## Cross-Platform Skill Notes
+
+### Claude Code
+- Tool names: `Read`, `Write`, `Edit`, `Grep`, `Glob`, `Bash`, `Agent`
+- Skill location: `.claude/skills/[name]/`
+- Package location: `templates/claude/skills/[name]/`
+- Supports agent delegation and all tool types
+
+### Codex
+- Tool names differ from Claude (platform-specific)
+- Skills shared from Claude via package configuration
+- No subagent support
+- Skills location shared from `templates/claude/skills/`
+
+### Gemini
+- Tool names: `read_file`, `write_file`, `edit_file`, `run_shell`
+- Skill location: `.gemini/skills/[name]/`
+- No agent delegation support
+- Uses different path conventions (`.gemini/` vs `.claude/`)
+
+### Cross-Platform Best Practices
+
+- Write instructions generically when possible (avoid hardcoding tool names)
+- Use the `convert-skill-to-gemini` skill to adapt Claude skills
+- Test skills on each target platform after creation
+- Note platform-specific limitations in the skill's reference.md
+
+## Validation Checklist
+
+### Structure
+- [ ] Valid YAML frontmatter with triple dashes (`---`)
+- [ ] Name is lowercase with hyphens, max 64 chars, matches `/^[a-z0-9-]+$/`
+- [ ] Directory name matches the `name` field in frontmatter
+- [ ] Body under ~500 lines; detailed content in supporting files
+
+### Description Quality
+- [ ] Third person point of view ("Provides", "Generates", "Applies")
+- [ ] Under 1024 characters
+- [ ] Explains WHAT the skill does with specifics
+- [ ] Includes "Activates when..." trigger clause (pushy style)
+- [ ] Specific enough to avoid false activation, broad enough to catch intended use cases
+
+### Instruction Quality
+- [ ] Uses imperative form ("Use X" not "You should use X")
+- [ ] Explains "why" behind non-obvious rules
+- [ ] Generalizes patterns rather than listing every instance
+- [ ] Concrete examples with realistic data (no placeholders like "foo", "bar")
+- [ ] Clear output format specification when the skill produces structured output
+
+### Testing
+- [ ] Tested with 2-3 representative scenarios
+- [ ] Description triggers activation at the right time
+- [ ] Instructions produce desired output quality
+- [ ] Edge cases and error conditions handled
+
+### File Locations
+
+**Local projects:**
+```
+.claude/skills/
++-- my-skill/
+    +-- SKILL.md
+    +-- reference.md (optional)
+    +-- examples.md (optional)
+    +-- scripts/ (optional)
+    +-- references/ (optional)
+    +-- assets/ (optional)
 ```
 
-**For Tool Integration Skills**:
-```markdown
-## [Tool] Integration
-
-### 1. Parse [Input]
-[Instructions]
-
-### 2. Generate [Output Component]
-[Instructions]
-
-### 3. Format [Result]
-[Instructions]
+**Agent packages:**
 ```
-
-### 4. Examples Section (Optional but recommended)
-
-```markdown
-## Examples
-
-[Concrete usage scenarios]
-```
-
-**Purpose**: Show skill in action
-
-**Guidelines**:
-- Use real scenarios, not placeholders
-- Show both correct and incorrect usage
-- Include input/output examples
-- Use visual separators (✅ ❌)
-
-**Example**:
-```markdown
-## Examples
-
-### Correct Logo Usage
-✅ Full-color logo on white presentation slide with proper clear space
-✅ Monochrome white logo on brand blue background (#0066CC)
-✅ Minimum size respected: 100px width for digital assets
-
-### Incorrect Logo Usage
-❌ Logo stretched or distorted to fit space
-❌ Logo rotated at angles
-❌ Logo on busy photographic background without adequate contrast
-❌ Logo colors changed to non-brand colors
-```
-
-### 5. Reference Materials Section (Optional)
-
-```markdown
-## Reference Materials
-
-[Links to additional resources]
-```
-
-**Purpose**: Point to detailed documentation
-
-**Example**:
-```markdown
-## Reference Materials
-
-For complete details:
-- `reference.md` - Full brand guidelines with technical specifications
-- `examples.md` - Visual examples and use case studies
-- `templates/` - Approved presentation and document templates
+your-package/
++-- templates/
+    +-- claude/
+        +-- skills/
+            +-- my-skill/
+                +-- SKILL.md
+                +-- reference.md (optional)
+                +-- examples.md (optional)
 ```
 
 ## Skill Type Patterns
 
-### Guidelines/Standards Skill
+### Guidelines/Standards
 
-**Characteristics**:
-- Provides rules, standards, or guidelines
-- Often includes do's and don'ts
-- May reference templates or examples
-- Typically read-only (no file modifications)
+**Purpose**: Encode team conventions, brand standards, compliance rules
+**Tools**: Typically read-only (`Read`, `Grep`, `Glob`)
+**Structure**: Categories > Subcategories > Rules with rationale and examples
 
-**Use cases**:
-- Brand guidelines and visual identity
-- Coding standards and style guides
-- Compliance rules and regulations
-- Company policies and procedures
-- Documentation standards
+### Process/Workflow
 
-**Typical structure**:
-```markdown
----
-name: company-standards
-description: Applies [Company] standards for [aspect] including [specifics]
-version: "1.0.0"
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
----
+**Purpose**: Define step-by-step procedures for data processing, analysis, generation
+**Tools**: Read/write access as needed
+**Structure**: Numbered steps > Validation > Output format > Error handling
 
-# [Standards Name]
+### Tool Integration
 
-[Overview]
+**Purpose**: Interface with external tools, APIs, specifications
+**Tools**: Context-dependent
+**Structure**: Parse input > Transform > Generate output > Format result
 
-## When to Use
-[Trigger conditions]
+### Reference/Knowledge
 
-## [Category 1]
-### [Subcategory]
-[Rules and standards]
-
-## [Category 2]
-### [Subcategory]
-[Rules and standards]
-
-## Examples
-### Correct Usage
-✅ [Example]
-
-### Incorrect Usage
-❌ [Example]
-
-## Reference Materials
-[Links]
-```
-
-### Process/Workflow Skill
-
-**Characteristics**:
-- Defines step-by-step procedures
-- May process files or data
-- Often includes input/output specifications
-- May need write access to files
-
-**Use cases**:
-- Data transformation and analysis
-- File format conversion
-- Report generation from data
-- Automated analysis workflows
-- Content processing pipelines
-
-**Typical structure**:
-```markdown
----
-name: data-processor
-description: Processes [input type] and generates [output type] with [features]
-version: "1.0.0"
----
-
-# [Process Name]
-
-[Overview of what it processes and produces]
-
-## When to Use
-[Trigger conditions]
-
-## Processing Workflow
-
-### 1. Load and Validate
-[Instructions]
-
-### 2. Process Data
-[Instructions]
-
-### 3. Generate Output
-[Instructions]
-
-## Input Format
-[Specifications]
-
-## Output Format
-[Specifications]
-
-## Example
-**Input**: [Sample]
-**Output**: [Sample]
-
-## Error Handling
-[What to do when things go wrong]
-```
-
-### Tool Integration Skill
-
-**Characteristics**:
-- Interfaces with external tools or APIs
-- Provides usage patterns and examples
-- Often includes error handling guidance
-- May include helper scripts or templates
-
-**Use cases**:
-- API documentation generation
-- External service integration
-- Code generation from specifications
-- Tool automation and workflows
-- Configuration management
-
-**Typical structure**:
-```markdown
----
-name: tool-integration
-description: Generates [output] from [input spec] including [features]
-version: "1.0.0"
----
-
-# [Tool] Integration
-
-[Overview of integration]
-
-## When to Use
-[Trigger conditions]
-
-## [Process Name]
-
-### 1. Parse [Input]
-[Instructions]
-
-### 2. Generate [Component]
-[Instructions]
-
-### 3. Format [Output]
-[Instructions]
-
-## Input Specification
-[Format details]
-
-## Output Format
-[Structure and examples]
-
-## Example
-**Input**: [Sample spec/file]
-**Output**: [Generated result]
-
-## Error Handling
-[Common issues and solutions]
-
-## Reference Materials
-[Links to tool docs, specs]
-```
-
-### Reference/Knowledge Skill
-
-**Characteristics**:
-- Provides domain knowledge or context
-- Often extensive reference materials
-- May include glossaries or specifications
-- Informational (typically read-only)
-
-**Use cases**:
-- Technical specifications and standards
-- Company policies and procedures
-- Domain expertise and best practices
-- Architecture patterns and principles
-- Historical context and decisions
-
-**Typical structure**:
-```markdown
----
-name: domain-knowledge
-description: Provides guidance on [domain] including [key aspects]
-version: "1.0.0"
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
-  - mcp__context7__*
----
-
-# [Domain] Knowledge
-
-[Overview of domain and scope]
-
-## When to Use
-[Trigger conditions]
-
-## Core Principles
-[Fundamental concepts]
-
-## [Topic 1]
-### [Subtopic]
-[Detailed information]
-
-## [Topic 2]
-### [Subtopic]
-[Detailed information]
-
-## Common Patterns
-[Typical scenarios and solutions]
-
-## Decision Framework
-[How to choose between options]
-
-## Reference Materials
-[Additional resources]
-```
-
-## Best Practices
-
-### Skill Design Principles
-
-1. **Single Purpose**: One clear capability per skill
-2. **Clear Triggers**: Make it obvious when to use the skill
-3. **Third Person Description**: Always "Provides X", never "Use this to X"
-4. **Progressive Disclosure**: SKILL.md for workflow, reference.md for details
-5. **Concrete Examples**: Show real scenarios, not placeholders
-6. **Focused Scope**: Don't try to do everything
-
-### Instruction Writing Guidelines
-
-1. **Be Specific**: Concrete steps over abstract principles
-2. **Use Lists**: Break down complex information into bullets
-3. **Include Examples**: Show correct and incorrect usage
-4. **Keep Focused**: Core instructions in SKILL.md, details in reference.md
-5. **Test Instructions**: Verify Claude can follow them successfully
-6. **Avoid Jargon**: Use clear language, define technical terms
-
-### File Organization Strategy
-
-1. **Start Minimal**: Begin with SKILL.md only
-2. **Add as Needed**:
-   - reference.md when instructions exceed ~200 lines
-   - examples.md when multiple complex examples are helpful
-   - templates/ when users need starting point files
-   - scripts/ when automation or utilities are required
-3. **Keep Maintainable**: Don't duplicate content across files
-4. **Clear Separation**: Workflow in SKILL.md, specs in reference.md
+**Purpose**: Provide domain knowledge, architecture patterns, decision frameworks
+**Tools**: Read-only plus research tools
+**Structure**: Principles > Patterns > Decision frameworks > Anti-patterns
 
 ## Common Pitfalls
 
-### ❌ Avoid These Mistakes
+### Vague Descriptions
+- "Helps with documentation" tells the model nothing about when to activate
+- Fix: "Generates API documentation from OpenAPI specs including endpoints, auth, and code samples. Activates when the user provides a spec file or asks for API docs."
 
-**Vague Descriptions**:
-- ❌ "Helps with documentation"
-- ❌ "Useful for brand stuff"
-- ✅ "Generates API documentation from OpenAPI 3.0 specifications with examples"
+### Missing Trigger Clause
+- "Provides brand guidelines for presentations" has WHAT but not WHEN
+- Fix: Add "Activates when creating branded materials, reviewing for compliance, or answering visual identity questions."
 
-**Wrong Point of View**:
-- ❌ "Use this skill to process Excel files"
-- ❌ "I help you with brand guidelines"
-- ✅ "Processes Excel files and generates formatted reports"
+### Wall of Text
+- Long paragraphs without structure make instructions hard to follow
+- Fix: Use headers, lists, code blocks, and tables for organization
 
-**Too Generic**:
-- ❌ Skill that does everything related to a topic
-- ✅ Focused skill for specific capability
+### Overfitting to One Example
+- Instructions that only work for one specific case
+- Fix: Extract the general pattern and reference it
 
-**Missing Triggers**:
-- ❌ No clear indication when to activate
-- ✅ Explicit "When to Use" section with scenarios
-
-**No Examples**:
-- ❌ Only theory and abstract principles
-- ✅ Concrete examples showing usage
-
-**Wall of Text**:
-- ❌ Long paragraphs without structure
-- ✅ Headers, lists, code blocks for organization
-
-**Placeholder Content**:
-- ❌ "foo", "bar", "example.com", "[TODO]"
-- ✅ Real, meaningful examples
-
-### ✅ Follow These Patterns
-
-**Specific Descriptions**:
-```yaml
-description: Generates comprehensive API documentation from OpenAPI 3.0 specifications including endpoint descriptions, request/response examples, and authentication guides
-```
-
-**Third Person POV**:
-```yaml
-description: Provides guidance for microservices architecture including service decomposition, communication patterns, and data management strategies
-```
-
-**Focused Purpose**:
-```yaml
-name: excel-sales-reports
-description: Processes Excel sales data and generates monthly reports with charts, KPIs, and trend analysis
-```
-
-**Clear Triggers**:
-```markdown
-## When to Use
-
-Activate this skill when:
-- User provides an Excel file with sales data
-- Requesting monthly sales reports
-- Needing sales trend analysis with visualizations
-```
-
-**Concrete Examples**:
-```markdown
-## Example
-
-**Input**: `sales_january_2025.xlsx` with columns [Date, Product, Quantity, Revenue, Region]
-
-**Output**:
-# January 2025 Sales Report
-
-## Summary
-- Total Revenue: $150,000 (+12% vs Dec 2024)
-- Top Product: Widget A ($60,000)
-- Top Region: West ($55,000)
-[... detailed report ...]
-```
-
-**Structured Content**:
-```markdown
-## Logo Usage
-
-### Primary Logo
-- Use on white backgrounds
-- Minimum size: 100px width
-- Clear space: Equal to "A" height
-
-### Secondary Logo
-- Use on colored backgrounds
-- Monochrome only (black or white)
-```
-
-## Validation Checklist
-
-Before considering a skill complete, verify:
-
-- [ ] **Valid YAML frontmatter** (triple dashes, proper syntax)
-- [ ] **Name format** (lowercase with hyphens, max 64 chars)
-- [ ] **Description quality** (clear, concise, max 1024 chars)
-- [ ] **Third person POV** (uses "Provides", "Generates", "Applies", etc.)
-- [ ] **WHAT and WHEN** (description explains both capability and triggers)
-- [ ] **Clear instructions** (specific and actionable, not vague)
-- [ ] **Concrete examples** (real scenarios, not placeholders)
-- [ ] **Proper organization** (headers, lists, code blocks)
-- [ ] **File location** (saved in correct directory structure)
-- [ ] **Tested** (verified with example invocations)
-- [ ] **Reference materials** (organized if skill is complex)
-
-## Directory Naming and Location
-
-### For Local Projects
-
-```
-.claude/skills/
-└── my-skill/
-    ├── SKILL.md
-    ├── reference.md (optional)
-    └── examples.md (optional)
-```
-
-### For Agent Packages
-
-```
-your-package/
-└── templates/
-    └── claude/
-        └── skills/
-            └── my-skill/
-                ├── SKILL.md
-                ├── reference.md (optional)
-                └── examples.md (optional)
-```
-
-**Directory name**: Must match the `name` field in frontmatter
-
-## Tool Restrictions (allowed-tools)
-
-### Read-Only Skills
-
-For guidelines, reference, and knowledge skills:
-
-```yaml
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
-```
-
-### Research Skills
-
-For skills that need web or documentation research:
-
-```yaml
-allowed-tools:
-  - Read
-  - Grep
-  - Glob
-  - mcp__context7__*
-  - mcp__exa__*
-  - WebSearch
-```
-
-### Processing Skills
-
-For skills that modify files:
-
-```yaml
-# Omit allowed-tools to inherit all tools
-# Or specify exactly what's needed:
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-```
-
-### When to Restrict Tools
-
-**Use `allowed-tools` when**:
-- Skill should be read-only for safety
-- Skill only needs specific tools
-- Following principle of least privilege
-- Documenting intended tool usage
-
-**Omit `allowed-tools` when**:
-- Skill needs flexibility
-- All standard tools are acceptable
-- Restriction would limit usefulness
+### Placeholder Content
+- "foo", "bar", "example.com", "[TODO]" in examples
+- Fix: Use realistic, domain-appropriate data
 
 ## Further Resources
 
-- `examples.md` - See complete skill examples with detailed analysis
+- `examples.md` - Complete skill examples with pattern analysis
 - `templates/` - Pre-built templates for common skill types
-- Claude Code documentation - Official skill authoring best practices

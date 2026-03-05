@@ -1,12 +1,12 @@
 ---
 name: [skill-name]
-description: [Brief description of what this skill does and when to use it - use third person, under 1024 chars]
+description: "[Verb]s [specific thing] [context] including [key features]. Activates when [trigger condition 1], [trigger condition 2], or [trigger condition 3]."
 version: "1.0.0"
 ---
 
 # [Skill Title]
 
-[2-3 sentence overview of what this skill provides and its purpose]
+[2-3 sentence overview of what this skill provides and why it matters]
 
 ## When to Use
 
@@ -18,13 +18,13 @@ Activate this skill when:
 
 ## Instructions
 
-[Provide clear, specific instructions for Claude to follow]
+[Provide clear, specific instructions in imperative form explaining why each step matters]
 
 ### [Section 1 Name]
 
-[Detailed instructions for this aspect]
+[Detailed instructions for this aspect with rationale]
 
-- [Instruction point 1]
+- [Instruction point 1 with "because..." rationale if non-obvious]
 - [Instruction point 2]
 - [Instruction point 3]
 
@@ -41,7 +41,7 @@ Activate this skill when:
 
 ## Examples
 
-[Show concrete usage examples]
+[Show concrete usage examples with realistic data]
 
 ### Example 1: [Scenario Name]
 
@@ -61,3 +61,5 @@ Activate this skill when:
 
 - `reference.md` - [Description of what's in reference docs]
 - `examples.md` - [Description of what's in examples]
+- `scripts/` - [Helper scripts if applicable]
+- `references/` - [Source documents, specs, PDFs-as-text]

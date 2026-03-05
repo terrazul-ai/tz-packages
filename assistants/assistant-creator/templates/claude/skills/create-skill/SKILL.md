@@ -1,204 +1,141 @@
 ---
 name: create-skill
-description: Create well-formed Claude Skills with proper YAML frontmatter and clear instructions. Use when user wants to create a new skill, add capabilities to Claude, or needs help structuring a skill definition.
+description: Creates well-structured Claude Skills with proper YAML frontmatter, clear instructions, and supporting files. Activates when the user wants to create a new skill, add capabilities to their AI assistant, encode team preferences, or structure any reusable instruction set. Covers the full lifecycle from intent capture through writing, testing, and refinement.
 ---
 
-# Create Skill Skill
+# Create Skill
 
-This skill guides you through creating a well-structured Claude Skill with proper frontmatter and effective instructions.
+Creates Claude Skills that teach new capabilities or encode team preferences into reusable instruction sets with proper metadata, clear instructions, and supporting files.
 
-## When to Use This Skill
+## Two Skill Categories
 
-Activate this skill when the user wants to:
-- Create a new Claude Skill
-- Add a specific capability to Claude
-- Structure a skill definition file
-- Understand skill components (frontmatter, instructions, reference files)
+### Capability Uplift
 
-## Skill Creation Workflow
+Teaches the model new abilities it doesn't have out of the box. Examples: API integration patterns, data processing pipelines, documentation generation, code migration workflows.
 
-### 1. Understand Skill Purpose
+### Encoded Preference
 
-Ask the user (or infer from context):
-- What capability should this skill provide?
-- When should Claude activate this skill?
-- Does it need reference materials or examples?
-- Will it process files or provide guidelines?
+Captures team conventions, style guides, review criteria, and decision frameworks so the model follows your standards consistently. Examples: brand guidelines, coding standards, PR review checklists, architecture decision records.
 
-### 2. Determine Skill Type
+## Workflow
 
-**Skill Types**:
-- **Guidelines/Standards** - Brand guidelines, coding standards, compliance rules
-- **Process/Workflow** - Data processing, file conversion, analysis workflows
-- **Tool Integration** - API usage, external tool interaction, documentation generation
-- **Reference/Knowledge** - Domain knowledge, company policies, technical specifications
+### 1. Capture Intent
 
-**Structure Needs**:
-- **Simple**: Just SKILL.md with instructions
-- **Medium**: SKILL.md + reference.md for detailed docs
-- **Complex**: SKILL.md + reference.md + examples.md + templates/
-- **Advanced**: All above + scripts/ for helper utilities
+Understand what the user wants the skill to do:
+- What capability or convention should this skill encode?
+- Who is the audience (the model, developers using the model, end users)?
+- What does success look like?
 
-### 3. Generate Skill File
+### 2. Interview & Research
 
-Create a directory with at minimum a SKILL.md file:
+Ask targeted questions and study the codebase to gather context:
+- Read existing code, docs, and configs relevant to the skill's domain
+- Identify patterns, conventions, and anti-patterns already in use
+- Ask the user about edge cases, exceptions, and priorities
+- Gather concrete examples of good and bad outcomes
 
-```markdown
----
-name: skill-name
-description: Brief description of what this skill does and when to use it
----
+### 3. Write SKILL.md
 
-# Skill Title
+Create the skill following the anatomy below. Keep the main file under ~500 lines. Push detailed specs, reference material, and extended examples into supporting files.
 
-[2-3 sentence overview of what this skill provides]
+### 4. Test & Iterate
 
-## When to Use
+Try the skill with realistic requests and refine:
+- Use 2-3 representative scenarios that exercise the skill's core paths
+- Check that the description triggers the skill at the right time (not too broad, not too narrow)
+- Verify instructions produce the desired output quality
+- Adjust wording, add guardrails, or split into multiple skills if scope creeps
 
-[Clear trigger conditions for when Claude should use this skill]
+## Skill Anatomy
 
-## Instructions
-
-[Step-by-step instructions for Claude to follow]
-
-## Examples
-
-[Optional: Show example usage scenarios]
+```
+my-skill/
++-- SKILL.md              # Main file: metadata + instructions (<500 lines)
++-- reference.md           # Detailed specs, API references, rule catalogs
++-- examples.md            # Usage examples with input/output pairs
++-- scripts/               # Helper scripts, automation, linters
++-- references/            # Source docs, specs, PDFs-as-text
++-- assets/                # Images, templates, static files
 ```
 
-### 4. Write Effective Description
+Only `SKILL.md` is required. Add supporting files when the main file would exceed ~500 lines or when examples and references are extensive enough to warrant separation.
 
-**Requirements**:
-- Use third person point of view
-- Explain WHAT the skill does
-- Explain WHEN to use it
+### Progressive Disclosure
+
+- **Metadata** (frontmatter): name, description, version, allowed-tools
+- **Body** (<500 lines): overview, instructions, inline examples
+- **Bundled resources**: reference.md, examples.md, scripts/, references/, assets/
+
+Keep the body focused on what the model needs to act. Move "why" explanations and exhaustive catalogs to reference.md.
+
+## Writing Style
+
+- **Explain "why" behind rules**, not just the rules themselves. "Use 4-space indentation because our formatter enforces it and mixed indentation breaks CI" beats "Use 4-space indentation."
+- **Use imperative form.** "Use 4-space indentation" not "You should use 4-space indentation."
+- **Generalize, don't overfit.** Extract the pattern from specific instances. If three API endpoints follow the same auth flow, describe the flow once and reference it.
+- **Show patterns, not just instances.** A single example teaches one case; a pattern teaches a category.
+
+## Description Optimization
+
+Descriptions are the primary trigger mechanism. Write "pushy" descriptions that actively tell the model when to activate.
+
+**Formula:**
+```
+[Verb]s [specific thing] [context] including [key features]. Activates when [trigger conditions].
+```
+
+**Requirements:**
+- Third person point of view
 - Maximum 1024 characters
-- Be specific, not vague
+- Include both WHAT the skill does and WHEN to use it
+- End with "Activates when..." clause listing trigger conditions
 
-**Good examples**:
-- ✅ "Applies Acme Corp brand guidelines to all presentations and documents including logo usage, color palette, typography, and approved messaging"
-- ✅ "Processes Excel files and generates formatted reports with charts, summaries, and automated insights"
+**Good examples:**
+- "Applies Acme Corp brand guidelines to all presentations and documents including logo usage, color palette, typography, and approved messaging. Activates when creating branded materials, reviewing documents for compliance, or answering questions about visual identity standards."
+- "Processes Excel sales data and generates formatted monthly reports with charts, KPIs, and trend analysis. Activates when the user provides spreadsheet data, requests report generation, or needs data visualization from tabular files."
 
-**Bad examples**:
-- ❌ "Use this skill to apply brand guidelines" (wrong POV)
-- ❌ "I help with documentation" (wrong POV)
-- ❌ "Helps with Excel files" (too vague)
+**Bad examples:**
+- "Use this skill to apply brand guidelines" (wrong POV, no trigger clause)
+- "Helps with Excel files" (too vague, no specifics, no trigger clause)
 
-### 5. Structure Instructions
+## Cross-Platform Notes
 
-**Core sections**:
+Skills are mostly compatible across Claude, Codex, and Gemini. Key differences:
 
-1. **Overview** - What this skill provides (2-3 sentences)
-2. **When to Use** - Clear activation triggers
-3. **Instructions** - Specific, actionable steps
-4. **Examples** - Concrete usage scenarios
-5. **Reference Materials** - Links to detailed docs (if applicable)
+| Platform | Tool Names | Skill Location | Notes |
+|----------|-----------|---------------|-------|
+| Claude | `Read`, `Write`, `Edit` | `.claude/skills/` | Full support including agent delegation |
+| Codex | Different tool names | Shared from Claude via package config | No subagents |
+| Gemini | `read_file`, `write_file` | `.gemini/skills/` | No agent delegation |
 
-**Instruction writing tips**:
-- Be specific and concrete
-- Use lists and headers for clarity
-- Include examples where helpful
-- Avoid vague statements
-- Show correct and incorrect usage
+Use the `convert-skill-to-gemini` skill to adapt Claude skills for Gemini. Write instructions generically when possible to maximize cross-platform compatibility.
 
-### 6. Validation Checklist
+## Validation Checklist
 
 Before saving, verify:
-- [ ] YAML frontmatter is valid (triple dashes `---`)
-- [ ] Name is lowercase with hyphens (max 64 chars)
-- [ ] Description is clear and actionable (< 1024 chars)
+- [ ] Valid YAML frontmatter (triple dashes `---`)
+- [ ] Name is lowercase with hyphens (max 64 chars, pattern: `/^[a-z0-9-]+$/`)
+- [ ] Description is pushy: explains WHAT, includes "Activates when..." (< 1024 chars)
 - [ ] Description uses third person ("Provides", "Generates", "Applies")
-- [ ] Description explains WHAT and WHEN
-- [ ] Instructions are clear and specific
-- [ ] Examples are concrete (not vague or placeholder)
-- [ ] File saved in correct location
-
-## Skill File Naming
-
-Save skill directories as:
-- `.claude/skills/[name]/` (for local project)
-- Or in your agent package's `templates/claude/skills/` directory
-
-Directory name should match the `name` field in frontmatter.
+- [ ] Body stays under ~500 lines; excess moved to reference.md
+- [ ] Instructions use imperative form and explain "why" behind rules
+- [ ] Examples are concrete, not placeholder text
+- [ ] Directory name matches the `name` field in frontmatter
+- [ ] File saved in correct location (`.claude/skills/` or package `templates/claude/skills/`)
+- [ ] Tested with 2-3 realistic scenarios
 
 ## Quick Start Templates
 
-For common skill types, consider using these templates as starting points:
+For common skill types, use these templates as starting points:
 - `templates/basic-skill.md` - Generic structure
 - `templates/guidelines-skill.md` - Standards/brand guidelines pattern
 - `templates/process-skill.md` - Data processing workflow pattern
 - `templates/tool-integration-skill.md` - External tool/API integration pattern
 
-Access templates with: "Use the guidelines skill template"
+Invoke with: "Use the guidelines skill template"
 
 ## Reference Materials
 
 For detailed information, consult:
-- `reference.md` - Complete skill structure documentation
+- `reference.md` - Complete skill anatomy, writing patterns, and validation rules
 - `examples.md` - Real-world skill examples with pattern analysis
-
-## Tips for Effective Skills
-
-1. **Clear Triggers**: Description should make it obvious when to use the skill
-2. **Third Person**: Always write "Provides X" not "Use this to X"
-3. **Specific Instructions**: Give Claude concrete steps, not vague guidance
-4. **Progressive Disclosure**: Use reference.md for details, SKILL.md for workflow
-5. **Examples Matter**: Show real scenarios, not placeholder text
-6. **Test with Scenarios**: Try skill with realistic requests after creation
-
-## Skill vs Agent Differences
-
-| Aspect | Skills | Agents |
-|--------|--------|--------|
-| **Purpose** | Add capabilities to Claude | Define Claude personas |
-| **Frontmatter** | Simple (name, description, version) | Complex (model, color, tools, examples) |
-| **Content** | Instructions for Claude to follow | System prompts defining behavior |
-| **POV** | Third person ("Provides X") | Can be first/second person |
-| **Activation** | Model-invoked based on description | Explicit invocation or auto-delegation |
-| **Examples** | Usage scenarios in instructions | Invocation phrases in frontmatter |
-
-**When to use Skills**:
-- Adding domain knowledge or guidelines
-- Providing process instructions
-- Integrating with external tools
-- Reference materials and standards
-
-**When to use Agents**:
-- Defining specialized personas (code reviewer, architect)
-- Creating focused sub-agents with dedicated context
-- Needing specific tool access restrictions
-- Role-based task delegation
-
-## Common Patterns
-
-### Brand Guidelines Skill
-- **Type**: Guidelines/Standards
-- **Structure**: SKILL.md + reference.md + examples.md
-- **Content**: Logo rules, color palette, typography, messaging
-
-### Data Processing Skill
-- **Type**: Process/Workflow
-- **Structure**: SKILL.md + reference.md + examples.md
-- **Content**: Input validation, processing steps, output format
-
-### API Documentation Skill
-- **Type**: Tool Integration
-- **Structure**: SKILL.md + reference.md + examples.md + templates/
-- **Content**: Spec parsing, doc generation, output format
-
-### Architecture Patterns Skill
-- **Type**: Reference/Knowledge
-- **Structure**: SKILL.md + reference.md
-- **Content**: Pattern catalog, decision frameworks, best practices
-
-## Example Invocations
-
-Here are examples of how users might request different skills:
-
-- "Create a skill for our brand guidelines"
-- "I need a skill that processes CSV files"
-- "Make a skill for API documentation generation"
-- "Build a skill for code review checklists"
-- "Create a skill with company policies"
-
-For each request, determine the appropriate type and structure based on the patterns above.

@@ -1,12 +1,12 @@
 ---
 name: [tool-name]-integration
-description: Generates [output type] from [input specification/format] including [key features like documentation, code, configuration, etc.]
+description: "Generates [output type] from [input specification/format] including [key features like documentation, code, configuration, etc.]. Activates when the user provides [input spec], requests [output type], or needs [integration capability]."
 version: "1.0.0"
 ---
 
 # [Tool Name] Integration
 
-This skill [integrates with/generates from/processes] [tool/specification/format] to produce [detailed output description].
+[Integrates with/generates from/processes] [tool/specification/format] to produce [detailed output description].
 
 ## When to Use
 
@@ -28,7 +28,7 @@ Activate when the user:
 - Extract [metadata types] ([field1, field2, field3])
 
 **Validation**:
-- Check [requirement 1]
+- Check [requirement 1 with rationale for why it matters]
 - Verify [requirement 2]
 - Identify [common issues or errors]
 - Report specific validation failures
@@ -42,7 +42,7 @@ Activate when the user:
 - [Element 4 with description]
 
 **Formatting guidelines**:
-- [Guideline 1]
+- [Guideline 1 with rationale]
 - [Guideline 2]
 - [Guideline 3]
 
@@ -154,5 +154,6 @@ Generate [output format] with this structure:
 
 - `reference.md` - Complete [tool/spec format] reference and [additional details]
 - `examples.md` - Sample generated [outputs] for various [input types]
+- `scripts/` - Helper scripts for parsing, validation, or generation
+- `references/` - Specification documents, API schemas, or standards
 - [Tool/Spec] Documentation: [URL to official docs]
-- [Related Resource]: [URL if applicable]

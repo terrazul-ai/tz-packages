@@ -1,12 +1,12 @@
 ---
 name: [process-name]
-description: Processes [input type] and generates [output type] with [key features like charts, analysis, summaries, etc.]
+description: "Processes [input type] and generates [output type] with [key features like charts, analysis, summaries, etc.]. Activates when the user provides [input data], requests [output type], or needs [automated analysis or transformation]."
 version: "1.0.0"
 ---
 
 # [Process Name]
 
-This skill processes [detailed description of input] and generates [detailed description of output and its purpose].
+Processes [detailed description of input] and generates [detailed description of output and its purpose].
 
 ## When to Use
 
@@ -38,7 +38,7 @@ Activate when the user:
 ### 2. Process and Analyze Data
 
 **[Processing Phase 1 Name]**:
-- [Operation 1 description]
+- [Operation 1 with rationale for why this step is needed]
 - [Operation 2 description]
 - [Operation 3 description]
 
@@ -120,7 +120,7 @@ Generate [output format - Markdown, JSON, CSV, etc.] with:
 - Report [specific information about the error]
 - Suggest [what user should do to fix it]
 - Offer to [alternative action if possible]
-- Never [anti-pattern to avoid]
+- Never [anti-pattern to avoid, with rationale]
 
 **If [error condition 2]**:
 - List [specific problems with references]
@@ -132,3 +132,5 @@ Generate [output format - Markdown, JSON, CSV, etc.] with:
 
 - `reference.md` - Detailed [input/output] format specifications and [additional details]
 - `examples.md` - Sample [outputs] for different [input types/scenarios]
+- `scripts/` - Helper scripts for data validation or transformation
+- `references/` - Source documentation, format specs, or standards

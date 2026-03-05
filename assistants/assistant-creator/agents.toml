@@ -13,13 +13,11 @@ gemini = "*"
 
 [exports.claude]
 template = "templates/CLAUDE.md"
-commandsDir = "templates/claude/commands"
 skillsDir = "templates/claude/skills"
 mcpServers = "templates/claude/mcp_servers.json.hbs"
 
 [exports.gemini]
 template = "templates/GEMINI.md"
-commandsDir = "templates/gemini/commands"
 skillsDir = "templates/claude/skills"
 mcpServers = "templates/gemini/settings.json.hbs"
 

@@ -14,9 +14,7 @@ This package helps you create AI assistant packages with skill and MCP server in
 
 | Skill | Description |
 |-------|-------------|
-| `create-skill` | Create skills for Gemini (or any platform) |
-| `create-gemini-command` | Create Gemini slash commands (TOML format) |
-| `create-command` | Create Claude slash commands (if cross-platform needed) |
+| `create-skill` | Create skills with Anthropic's skill-creator methodology |
 | `create-agent` | Create Claude agents (Claude-only feature) |
 
 ### Discovery & Installation
@@ -31,6 +29,13 @@ This package helps you create AI assistant packages with skill and MCP server in
 | Skill | Description |
 |-------|-------------|
 | `convert-skill-to-gemini` | Convert Claude skills to Gemini format |
+
+### Help & Setup
+
+| Skill | Description |
+|-------|-------------|
+| `help` | Show package help, available skills, and troubleshooting |
+| `setup-mcp` | Interactive wizard to set up MCP server credentials |
 
 ## Quick Start
 
@@ -49,22 +54,10 @@ This activates the `create-assistant` skill which guides you through creating a 
 ```
 
 This activates the `create-skill` skill which will:
-1. Determine skill type (guidelines, process, tool integration)
+1. Use Anthropic's skill-creator methodology
 2. Generate SKILL.md with proper frontmatter
 3. Create supporting files if needed
 4. Save to `.gemini/skills/`
-
-### Creating a Gemini Command
-
-```
-"Create a command for reviewing code changes"
-```
-
-This activates the `create-gemini-command` skill which will:
-1. Understand the command purpose
-2. Generate a TOML command file
-3. Support special syntax (`{{args}}`, `!{...}`, `@{...}`)
-4. Save to `.gemini/commands/`
 
 ### Finding and Installing Skills
 
@@ -80,41 +73,6 @@ Skills from skillregistry.io are in Claude format. Use `convert-skill-to-gemini`
 ```
 "Add GitHub integration"
 "Configure MCP for PostgreSQL"
-```
-
-## Gemini-Specific Features
-
-### Command Format (TOML)
-
-Gemini commands use TOML format:
-
-```toml
-description = "Review code for issues"
-prompt = """
-Review the code: {{args}}
-
-Focus on quality and security.
-"""
-```
-
-### Special Syntax
-
-| Syntax | Purpose | Example |
-|--------|---------|---------|
-| `{{args}}` | User arguments | `Review {{args}}` |
-| `!{cmd}` | Shell output | `!{git status}` |
-| `@{path}` | File embed | `@{package.json}` |
-
-### Namespaced Commands
-
-Create directories for related commands:
-
-```
-.gemini/commands/
-├── review.toml          # /review
-└── git/
-    ├── status.toml      # /git:status
-    └── commit.toml      # /git:commit
 ```
 
 ## Platform Limitations
@@ -182,11 +140,6 @@ export DATABASE_URL="postgres://..."
 ```
 .gemini/
 ├── settings.json           # MCP configuration
-├── commands/
-│   ├── review.toml
-│   └── git/
-│       ├── status.toml
-│       └── commit.toml
 └── skills/
     └── my-skill/
         ├── SKILL.md
@@ -195,13 +148,6 @@ export DATABASE_URL="postgres://..."
 ```
 
 ## Best Practices
-
-### Creating Commands
-
-1. **Use TOML Format**: Gemini commands are `.toml`, not `.md`
-2. **Leverage Special Syntax**: Use `!{...}` for dynamic context
-3. **Handle Missing Args**: Design commands to work with or without `{{args}}`
-4. **Safe Shell Commands**: Avoid destructive commands in `!{...}`
 
 ### Creating Skills
 
@@ -228,16 +174,6 @@ pdftotext -layout document.pdf document.txt  # Preserve layout
 Use the converted text however is appropriate for your use case.
 
 ## Troubleshooting
-
-### Command Not Working
-
-```bash
-# Check TOML syntax
-cat .gemini/commands/[name].toml | toml-cli validate
-
-# Verify file location
-ls -la .gemini/commands/
-```
 
 ### Skill Not Appearing
 

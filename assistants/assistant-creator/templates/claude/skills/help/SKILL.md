@@ -1,22 +1,36 @@
+---
+name: help
+description: Shows all available skills, platform support, common workflows, and troubleshooting for the @terrazul/assistant-creator package. Activates when the user asks for help, wants to know what's available, or needs guidance on using the package.
+---
+
 # @terrazul/assistant-creator - Package Help
 
 Welcome to the **@terrazul/assistant-creator** package! This package helps you create AI assistant packages with skill and MCP server integration for Claude, Codex, and Gemini.
 
----
-
 ## Quick Overview
 
 This package includes:
-- **Skills for creating components** - Agents, skills, and commands
+- **Skills for creating components** - Agents, skills, and complete Terrazul packages
 - **Discovery tools** - Search and install from skillregistry.io and mcp.so
 - **Cross-platform support** - Claude, Codex, and Gemini
 - **Conversion utilities** - Port skills between platforms
-
----
+- **Setup tools** - Interactive credential setup for MCP servers
 
 ## Available Skills
 
-### 1. **create-agent**
+### 1. **create-assistant**
+**Purpose**: Create complete Terrazul AI assistant packages
+
+**When to use**:
+- Building reusable AI assistant configurations
+- Creating packages with agents.toml, templates, and dynamic content
+- Setting up packages for Claude, Codex, or Gemini
+
+**Example**: "Create an AI assistant package for our codebase"
+
+---
+
+### 2. **create-agent**
 **Purpose**: Create Claude Code agent definitions
 
 **When to use**:
@@ -34,7 +48,7 @@ This package includes:
 
 ---
 
-### 2. **create-skill**
+### 3. **create-skill**
 **Purpose**: Create skills for any platform
 
 **When to use**:
@@ -52,34 +66,7 @@ This package includes:
 
 ---
 
-### 3. **create-command**
-**Purpose**: Create Claude slash commands (Markdown format)
-
-**When to use**:
-- Adding custom `/command` shortcuts
-- Automating repetitive tasks
-- Creating project-specific workflows
-
-**Format**: Markdown with YAML frontmatter, uses `$ARGUMENTS`
-
-**Example**: "Create a /review command for code review"
-
----
-
-### 4. **create-gemini-command**
-**Purpose**: Create Gemini CLI slash commands (TOML format)
-
-**When to use**:
-- Building Gemini-specific commands
-- Using Gemini's special syntax (`{{args}}`, `!{...}`, `@{...}`)
-
-**Format**: TOML with `description` and `prompt` fields
-
-**Example**: "Create a Gemini command for reviewing git changes"
-
----
-
-### 5. **search-skills**
+### 4. **search-skills**
 **Purpose**: Search skillregistry.io and install skills
 
 **When to use**:
@@ -91,7 +78,7 @@ This package includes:
 
 ---
 
-### 6. **add-mcp**
+### 5. **add-mcp**
 **Purpose**: Search mcp.so and configure MCP servers
 
 **When to use**:
@@ -103,7 +90,7 @@ This package includes:
 
 ---
 
-### 7. **convert-skill-to-gemini**
+### 6. **convert-skill-to-gemini**
 **Purpose**: Convert Claude skills to Gemini format
 
 **When to use**:
@@ -115,13 +102,36 @@ This package includes:
 
 ---
 
+### 7. **help**
+**Purpose**: Show this help overview
+
+**When to use**:
+- Getting oriented with the package
+- Finding available skills
+- Learning common workflows
+
+**Example**: "What skills are available?" or "Help me get started"
+
+---
+
+### 8. **setup-mcp**
+**Purpose**: Interactive wizard to set up MCP server credentials
+
+**When to use**:
+- After adding MCP servers that require API keys
+- Setting up environment variables for authentication
+- Configuring credentials in your shell profile
+
+**Example**: "Set up my MCP credentials" or "Configure GitHub token"
+
+---
+
 ## Platform Support Matrix
 
 | Feature | Claude | Codex | Gemini |
 |---------|--------|-------|--------|
 | Agents | YES | NO | NO |
 | Skills | YES | YES | YES |
-| Commands | Markdown | N/A | TOML |
 | MCP Servers | JSON | TOML | JSON |
 
 ---
@@ -130,10 +140,11 @@ This package includes:
 
 ### Creating a Complete Agent Package
 
-1. "Create a code review agent" (uses create-agent)
-2. "Create a skill for review guidelines" (uses create-skill)
-3. "Create a /review command" (uses create-command)
+1. "Create an AI assistant package" (uses create-assistant)
+2. "Create a code review agent" (uses create-agent)
+3. "Create a skill for review guidelines" (uses create-skill)
 4. "Add GitHub integration" (uses add-mcp)
+5. "Set up my MCP credentials" (uses setup-mcp)
 
 ### Setting Up Cross-Platform Skills
 
@@ -145,7 +156,7 @@ This package includes:
 
 1. "Search for database MCP servers" (uses add-mcp)
 2. "Configure PostgreSQL server"
-3. Follow environment variable setup
+3. "Set up credentials" (uses setup-mcp)
 
 ---
 
@@ -156,7 +167,6 @@ This package includes:
 .claude/
 ├── settings.local.json    # MCP config
 ├── agents/               # Agent definitions
-├── commands/             # Slash commands
 └── skills/               # Skill directories
 ```
 
@@ -164,7 +174,6 @@ This package includes:
 ```
 .gemini/
 ├── settings.json         # MCP config
-├── commands/             # TOML commands
 └── skills/               # Skill directories
 ```
 
@@ -182,6 +191,7 @@ This package includes:
 2. **Test incrementally**: Try skills after creation
 3. **Use search skills**: Don't reinvent the wheel
 4. **Check platform compatibility**: Some features are Claude-only
+5. **Run setup-mcp after adding integrations**: Ensure credentials are configured
 
 ---
 
@@ -199,14 +209,13 @@ ls -la .claude/skills/
 npx -y @package/name --help
 # Check config
 cat .claude/settings.local.json | jq .
+# Set up missing credentials
+# Use the setup-mcp skill
 ```
 
-### Command not found
-```bash
-ls .claude/commands/
-head -10 .claude/commands/[name].md
-```
+### Credentials not set
+Run the `setup-mcp` skill to interactively configure all required environment variables for your MCP servers.
 
 ---
 
-Need more help? Check the README or ask me directly about specific features!
+Need more help? Ask about specific features!

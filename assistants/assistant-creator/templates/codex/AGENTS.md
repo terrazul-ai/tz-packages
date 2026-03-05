@@ -16,10 +16,10 @@ Skills are shared from Claude via the package configuration. All skills work wit
 
 | Skill | Description |
 |-------|-------------|
-| `create-skill` | Create skills for any platform |
+| `create-skill` | Create skills with Anthropic's skill-creator methodology |
 | `create-agent` | Create Claude agents (Claude-only, but documents patterns) |
-| `create-command` | Create Claude commands (for reference) |
-| `create-gemini-command` | Create Gemini commands (for reference) |
+| `help` | Show package help, available skills, and troubleshooting |
+| `setup-mcp` | Interactive wizard to set up MCP server credentials |
 
 ### Discovery & Installation
 

@@ -1,6 +1,6 @@
 ---
 name: [company]-[guideline-type]
-description: Applies [Company] [guideline type] to all [artifact types] including [specific aspects covered]
+description: "Applies [Company] [guideline type] to all [artifact types] including [specific aspects covered]. Activates when creating [artifacts], reviewing for [standard] compliance, or answering questions about [guideline domain]."
 version: "1.0.0"
 allowed-tools:
   - Read
@@ -10,7 +10,7 @@ allowed-tools:
 
 # [Company] [Guideline Type] Guidelines
 
-This skill provides [Company]'s official [guideline type] for [purpose and scope].
+Provides [Company]'s official [guideline type] for [purpose and scope].
 
 ## When to Use
 
@@ -25,32 +25,32 @@ Activate this skill when:
 
 ### [Subcategory A]
 
-- [Rule/standard 1 with specific details]
+- [Rule/standard 1 with rationale explaining why it matters]
 - [Rule/standard 2 with specific details]
 - [Rule/standard 3 with specific details]
 
 ### [Subcategory B]
 
-- [Rule/standard 1 with specific details]
+- [Rule/standard 1 with rationale]
 - [Rule/standard 2 with specific details]
 
 ## [Guideline Category 2]
 
 ### [Subcategory A]
 
-- [Rule/standard 1 with specific details]
+- [Rule/standard 1 with rationale]
 - [Rule/standard 2 with specific details]
 
 ### [Subcategory B]
 
-- [Rule/standard 1 with specific details]
+- [Rule/standard 1 with rationale]
 - [Rule/standard 2 with specific details]
 
 ## [Guideline Category 3]
 
 ### [Subcategory A]
 
-[Detailed specifications, measurements, or requirements]
+[Detailed specifications, measurements, or requirements with rationale for key values]
 
 ### [Subcategory B]
 
@@ -60,20 +60,21 @@ Activate this skill when:
 
 ### Correct Usage
 
-✅ [Example of proper application of guidelines]
-✅ [Another example showing correct usage]
-✅ [Third example demonstrating compliance]
+- [Example of proper application of guidelines]
+- [Another example showing correct usage]
+- [Third example demonstrating compliance]
 
 ### Incorrect Usage
 
-❌ [Example of guideline violation]
-❌ [Another example showing what NOT to do]
-❌ [Third example demonstrating non-compliance]
+- [Example of guideline violation with explanation of why it fails]
+- [Another example showing what NOT to do]
+- [Third example demonstrating non-compliance]
 
 ## Reference Materials
 
 For complete specifications and detailed guidelines:
 - `reference.md` - Full [guideline type] with technical specifications
 - `examples.md` - Visual examples and detailed use case studies
-- `templates/` - Approved templates following these guidelines
-- [External link to company resource if applicable]
+- `scripts/` - Validation or linting scripts for automated checks
+- `references/` - Source documents, brand assets, or specification PDFs
+- `assets/` - Approved templates following these guidelines
