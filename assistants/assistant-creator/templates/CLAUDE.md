@@ -18,9 +18,7 @@ This package helps you create AI assistant packages with skill and MCP server in
 | Skill | Description |
 |-------|-------------|
 | `create-agent` | Create Claude agents with proper frontmatter and system prompts |
-| `create-skill` | Create skills for Claude, Codex, or Gemini |
-| `create-command` | Create Claude slash commands (Markdown format) |
-| `create-gemini-command` | Create Gemini slash commands (TOML format) |
+| `create-skill` | Create skills with Anthropic's skill-creator methodology |
 
 ### Discovery & Installation
 
@@ -38,6 +36,13 @@ This package helps you create AI assistant packages with skill and MCP server in
 | Skill | Description |
 |-------|-------------|
 | `convert-skill-to-gemini` | Convert Claude skills to Gemini format |
+
+### Help & Setup
+
+| Skill | Description |
+|-------|-------------|
+| `help` | Show package help, available skills, and troubleshooting |
+| `setup-mcp` | Interactive wizard to set up MCP server credentials |
 
 ## Quick Start
 
@@ -73,30 +78,11 @@ This activates the `create-agent` skill which will guide you through:
 "Create a skill for our brand guidelines"
 ```
 
-This activates the `create-skill` skill which will:
+This activates the `create-skill` skill which uses Anthropic's skill-creator methodology to:
 1. Determine skill type (guidelines, process, tool integration)
 2. Generate SKILL.md with proper frontmatter
 3. Create supporting files (reference.md, examples.md)
 4. Save to `.claude/skills/`
-
-### Creating a Command
-
-**For Claude**:
-```
-"Create a /review command for code review"
-```
-
-**For Gemini**:
-```
-"Create a Gemini command for reviewing PRs"
-```
-
-## Available Commands
-
-| Command | Description |
-|---------|-------------|
-| `/help` | Show package help and available skills |
-| `/setup-mcp` | Interactive wizard to set up MCP server credentials in your shell environment |
 
 ### Finding and Installing Skills
 
@@ -113,27 +99,13 @@ This activates the `create-skill` skill which will:
 "Configure Context7 for library documentation"
 ```
 
-### Setting Up MCP Credentials
-
-After adding MCP servers that require authentication, run:
-
-```
-/setup-mcp
-```
-
-This interactive wizard:
-- Detects your shell environment (zsh/bash)
-- Identifies which credentials are needed
-- Guides you through obtaining each credential
-- Adds exports to your shell profile (~/.zshenv, ~/.bashrc)
-- Verifies the setup is working
+After adding MCP servers that require authentication, use the `setup-mcp` skill to configure credentials.
 
 ## Platform Support
 
 ### Claude Code
-- Full support for agents, skills, commands, and MCP servers
+- Full support for agents, skills, and MCP servers
 - Skills location: `.claude/skills/`
-- Commands location: `.claude/commands/`
 - Agents location: `.claude/agents/`
 - MCP config: `.claude/settings.local.json`
 
@@ -144,21 +116,11 @@ This interactive wizard:
 - Prompts: Deprecated in favor of skills
 
 ### Gemini
-- Skills and commands (agents not supported)
+- Skills (agents not supported)
 - Skills: `.gemini/skills/` or shared from Claude
-- Commands: `.gemini/commands/` (TOML format, different from Claude)
 - MCP config: `.gemini/settings.json`
 
 ## Key Differences
-
-### Commands
-
-| Feature | Claude | Gemini |
-|---------|--------|--------|
-| Format | Markdown (.md) | TOML (.toml) |
-| Arguments | `$ARGUMENTS` | `{{args}}` |
-| Shell output | Not built-in | `!{command}` |
-| File embed | Not built-in | `@{filepath}` |
 
 ### Skills
 
@@ -184,13 +146,6 @@ Use the `convert-skill-to-gemini` skill to adapt Claude skills.
 2. **Clear Triggers**: Make it obvious when to activate
 3. **Concrete Examples**: Real scenarios, not placeholders
 4. **Progressive Disclosure**: Core in SKILL.md, details in reference.md
-
-### When Creating Commands
-
-1. **Keep Focused**: One command, one purpose
-2. **Use Arguments**: Make commands flexible
-3. **Document Well**: Clear description for discoverability
-4. **Test First**: Verify before committing
 
 ### When Adding MCP Servers
 
@@ -270,18 +225,7 @@ echo $GITHUB_TOKEN
 # Validate JSON config
 cat .claude/settings.local.json | jq .
 
-# If credentials aren't set, run the setup wizard
-/setup-mcp
-```
-
-### Command Not Found
-
-```bash
-# Check file exists with correct extension
-ls .claude/commands/
-
-# Verify YAML frontmatter
-head -10 .claude/commands/[name].md
+# If credentials aren't set, use the setup-mcp skill
 ```
 
 ## File Structure Reference
@@ -293,8 +237,6 @@ head -10 .claude/commands/[name].md
 ├── settings.local.json     # Local MCP config
 ├── agents/
 │   └── [agent-name].md
-├── commands/
-│   └── [command-name].md
 └── skills/
     └── [skill-name]/
         ├── SKILL.md
@@ -307,8 +249,6 @@ head -10 .claude/commands/[name].md
 ```
 .gemini/
 ├── settings.json           # MCP config
-├── commands/
-│   └── [command-name].toml
 └── skills/
     └── [skill-name]/
         └── SKILL.md
@@ -326,8 +266,7 @@ my-package/
 │   ├── claude/
 │   │   ├── mcp_servers.json
 │   │   ├── skills/
-│   │   ├── agents/
-│   │   └── commands/
+│   │   └── agents/
 │   └── codex/
 │       └── config.toml
 └── prompts/                 # Optional: External askAgent prompts
